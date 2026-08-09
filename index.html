@@ -184,7 +184,8 @@ body.rtl .btn:hover::after{left:-100%}
 .apply .label{display:flex;align-items:center;justify-content:center;gap:13px;margin-bottom:34px}
 .apply .label .l{width:39px;height:2px;border-radius:2px;background:var(--label)}
 @media(max-width:560px){.apply .label{margin-bottom:22px}}
-.form-host iframe{display:block;width:100%;border:0;height:640px;overflow:hidden}
+.form-host iframe{display:block;width:100%;border:0;height:640px;overflow:hidden;transition:height .32s cubic-bezier(.4,0,.2,1)}
+@media(prefers-reduced-motion:reduce){.form-host iframe{transition:none}}
 /* ===== كونفيتي الصفحة (يظهر عند إتمام الفورم) ===== */
 #pageConfetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:999;display:none}
 #pageConfetti.on{display:block}
