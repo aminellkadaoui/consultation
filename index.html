@@ -149,6 +149,8 @@ body.rtl .btn:hover::after{left:-100%}
 .proc-num{display:inline-flex;align-items:center;justify-content:center;width:82px;height:82px;border-radius:22px;
   background:linear-gradient(180deg,#e9f1ff,#dbe8ff);color:var(--btn);margin-bottom:30px}
 .proc-num svg{width:40px;height:40px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.proc-num.pnum{font-weight:700;font-size:36px;font-family:'Thmanyah Sans','Satoshi',sans-serif}
+.guide-num.gic svg{width:40px;height:40px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 /* معايير العمل — رقم أحمر خافت بدل الأيقونة */
 .guide-num{display:inline-flex;align-items:center;justify-content:center;width:82px;height:82px;border-radius:22px;
   background:linear-gradient(180deg,#fceaea,#f8dede);color:#d06a6a;
@@ -236,6 +238,8 @@ footer b{color:var(--ink);font-weight:700}
   .proc-card{padding:22px 20px;min-height:0;border-radius:20px}
   .proc-num,.guide-num{width:50px;height:50px;border-radius:16px;margin-bottom:14px}
   .proc-num svg{width:25px;height:25px}
+  .proc-num.pnum{font-size:23px}
+  .guide-num.gic svg{width:25px;height:25px}
   .guide-num{font-size:23px}
   .proc-card h3{font-size:18.5px;margin-bottom:8px}
   .proc-card p{font-size:14.5px;line-height:1.6}
@@ -331,6 +335,10 @@ function videoBox(el, id){
 
 /* ===== الريلز والفيديو (مستقلة عن اللغة) ===== */
 videoBox(document.getElementById('heroVideo'), C.hero.videoId);
+const GUIDE_ICONS=[
+'<svg viewBox="0 0 24 24"><path d="M9.5 18V6.4l9.5-1.9v11.6"/><circle cx="7" cy="18" r="2.5"/><circle cx="16.5" cy="16.1" r="2.5"/><path d="M4 4l16 16"/></svg>',
+'<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2.5"/><circle cx="9" cy="10.2" r="1.7"/><path d="M3.8 16.5l4.4-3.8 3.4 2.9 3.9-3.4 4.7 4.1"/><path d="M4 4l16 16"/></svg>',
+'<svg viewBox="0 0 24 24"><path d="M12 3.4l7 2.6v5.1c0 4.4-2.9 7.5-7 8.9-4.1-1.4-7-4.5-7-8.9V6Z"/><path d="M8.8 12l2.3 2.3 4.4-4.6"/></svg>'];
 const PROC_ICONS = [
   /* 1) استلام تفاصيل المشروع — كليبورد */
   '<svg viewBox="0 0 24 24"><path d="M9 4H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M8.5 11.5h7M8.5 15h5"/></svg>',
@@ -414,7 +422,7 @@ function applyLang(lang){
     const pg = document.getElementById('procGrid'); pg.innerHTML = '';
     (proc.steps||[]).forEach((s,i)=>{
       const c = document.createElement('div'); c.className = 'proc-card';
-      c.innerHTML = '<div class="proc-num">'+PROC_ICONS[i % PROC_ICONS.length]+'</div><h3></h3><p></p>';
+      c.innerHTML = '<div class="proc-num pnum">'+(i+1)+'</div><h3></h3><p></p>';
       c.querySelector('h3').textContent = s.title;
       c.querySelector('p').textContent = s.desc;
       pg.appendChild(c);
@@ -429,7 +437,7 @@ function applyLang(lang){
     const gg = document.getElementById('guideGrid'); gg.innerHTML = '';
     (guide.steps||[]).forEach((s,i)=>{
       const c = document.createElement('div'); c.className = 'proc-card';
-      c.innerHTML = '<div class="guide-num">'+(i+1)+'</div><h3></h3><p></p>';
+      c.innerHTML = '<div class="guide-num gic">'+GUIDE_ICONS[i % GUIDE_ICONS.length]+'</div><h3></h3><p></p>';
       c.querySelector('h3').textContent = s.title;
       c.querySelector('p').textContent = s.desc;
       gg.appendChild(c);

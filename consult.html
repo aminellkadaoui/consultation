@@ -160,6 +160,17 @@ img.flag{width:20px;height:20px;display:block;object-fit:contain}.emoji{width:1.
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes fadeOut{from{opacity:1}to{opacity:0}}
 
+
+/* زر ابدأ · نفس ستايل زر الموقع (هالة + سويب) */
+.slide.wel .btn.prim{position:relative;overflow:hidden;box-shadow:0 0 18px rgba(46,133,255,.38),inset 0 1px 0 rgba(255,255,255,.32),inset 0 -1px 0 rgba(0,0,0,.1);transition:transform .2s var(--ease),box-shadow .25s var(--ease),opacity var(--t-fast)}
+.slide.wel .btn.prim:hover{transform:scale(1.04);box-shadow:0 0 28px rgba(46,133,255,.5),inset 0 1px 0 rgba(255,255,255,.38),inset 0 -1px 0 rgba(0,0,0,.12)}
+.slide.wel .btn.prim::after{content:'';position:absolute;top:0;left:150%;width:60%;height:100%;pointer-events:none;background:linear-gradient(240deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(20deg);transition:left 650ms ease}
+.slide.wel .btn.prim:hover::after{left:-100%}
+html.darija .slide.wel .btn.prim::after{left:-100%;transform:skewX(-20deg);background:linear-gradient(120deg,transparent,rgba(255,255,255,.5),transparent)}
+html.darija .slide.wel .btn.prim:hover::after{left:150%}
+.slide.wel .btn.prim:active{transform:scale(.9);opacity:.8;transition-duration:90ms}
+@media(prefers-reduced-motion:reduce){.slide.wel .btn.prim::after{display:none}.slide.wel .btn.prim:hover{transform:none}}
+
 /* ===== وضع الدمج داخل صفحة الهبوط ===== */
 html.embedded, html.embedded body{background:transparent;min-height:0}
 html,body{overflow-x:hidden;max-width:100%}
@@ -249,7 +260,7 @@ const T={
 const TT=()=>T[LANG];
 
 const DR_STEPS=[
- {type:'welcome',label:'3awna bach l call tkon mufida lik.',hint:'Jaweb 3la 7 as2ila khfaf bach nfahmo situation dyalek mzyan.',meta:'A9al mn 5 d9ay9',cta:'Bda daba'},
+ {type:'welcome',label:'3awna bach l call tkon mufida lik',hint:'Jaweb 3la 7 as2ila khfaf bach nfahmo situation dyalek mzyan.',meta:'A9al mn 5 d9ay9',cta:'Bda daba'},
  {k:'contact_name_step',count:false,eyebrow:'Info dyalek',label:'3awna n3arfo m3a mn ghadi nhadro.',fields:[
    {k:'value',storeKey:'contact_name',type:'text',label:'Smiytek kamla',req:true,ph:'Kteb smiytek'}
  ]},
@@ -291,7 +302,7 @@ const DR_STEPS=[
  ]}
 ];
 const AR_STEPS=[
- {type:'welcome',label:'ساعدنا على جعل المكالمة مفيدة لك.',hint:'أجب عن 7 أسئلة سريعة تساعدنا على فهم وضعك بشكل أفضل.',meta:'أقل من 5 دقائق',cta:'ابدأ'},
+ {type:'welcome',label:'ساعدنا على جعل المكالمة مفيدة لك',hint:'أجب عن 7 أسئلة سريعة تساعدنا على فهم وضعك بشكل أفضل.',meta:'أقل من 5 دقائق',cta:'ابدأ'},
  {k:'contact_name_step',count:false,eyebrow:'معلوماتك',label:'ساعدنا على معرفة من سنتحدث معه.',fields:[
    {k:'value',storeKey:'contact_name',type:'text',label:'الاسم الكامل',req:true,ph:'اكتب اسمك'}
  ]},
