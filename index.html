@@ -31,7 +31,8 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{position:relative;font-family:var(--sans);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+html{overflow-x:hidden}
+body{position:relative;font-family:var(--sans);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden;width:100%;max-width:100%}
 img{max-width:100%;display:block}
 .wrap{max-width:1128px;margin:0 auto;padding:0 20px}
 main{position:relative;z-index:1}
@@ -179,6 +180,10 @@ body.rtl .btn:hover::after{left:-100%}
   background:radial-gradient(50% 50% at 50% 100%,rgba(15,107,255,.30),transparent 70%);filter:blur(50px);opacity:.65}
 .apply>*{position:relative;z-index:1}
 .form-host{width:min(880px,100%);margin:0 auto}
+@media(max-width:560px){.form-host{width:min(880px,96%)}}
+.apply .label{display:flex;align-items:center;justify-content:center;gap:13px;margin-bottom:34px}
+.apply .label .l{width:39px;height:2px;border-radius:2px;background:var(--label)}
+@media(max-width:560px){.apply .label{margin-bottom:22px}}
 .form-host iframe{display:block;width:100%;border:0;height:640px;overflow:hidden}
 /* ===== كونفيتي الصفحة (يظهر عند إتمام الفورم) ===== */
 #pageConfetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:999;display:none}
@@ -203,13 +208,18 @@ footer b{color:var(--ink);font-weight:700}
 @media(max-width:900px){.grid{gap:20px}.reel-col{gap:20px}}
 @media(max-width:560px){
   .hero{padding-top:20px}
+  .hero h1{font-size:clamp(21px,6.3vw,29px);line-height:1.22;letter-spacing:-.015em}
+  .hero h1 .s{line-height:1.1}
+  body.rtl .hero h1{font-size:clamp(27px,8.4vw,38px);line-height:1.25}
+  .hero .top{padding-bottom:10px}
+  .sub{font-size:14.5px;line-height:1.65}
   /* longhand فقط للجوانب كي لا نُصفّر padding-top للأقسام */
   .wrap{padding-left:22px;padding-right:22px}
   /* مسافات الأقسام على الجوال (كانت مُلغاة) */
   .work{padding-top:66px}
   .process{padding-top:66px}
   .final{padding-top:66px}
-  .apply{padding:56px 12px 90px}
+  .apply{padding:52px 20px 84px}
   .hero-cta{margin-top:34px}
   /* الهيدلاين العربي: سطرين — «بمستوى خبرتك» في سطر واحد */
   body.rtl .hero h1{font-size:30px}
@@ -289,7 +299,8 @@ footer b{color:var(--ink);font-weight:700}
 
   <!-- APPLY FORM (مدموج في الصفحة) -->
   <section class="apply" id="apply">
-    <div class="form-host"><iframe id="consultFrame" src="consult.html?embed=1" title="نموذج الاستشارة" scrolling="no"></iframe></div>
+    <div class="wrap"><div class="label start-label"><span class="l"></span><span id="applyLabel">ابدأ الآن</span><span class="l"></span></div></div>
+    <div class="form-host"><iframe id="consultFrame" src="consult.html?embed=1&v=3" title="نموذج الاستشارة" scrolling="no"></iframe></div>
   </section>
 </main>
 
@@ -299,7 +310,9 @@ footer b{color:var(--ink);font-weight:700}
 <script>document.write('<script src="config.js?v=' + Date.now() + '"><\/script>');</script>
 <script>
 const C = (function(){
-  try{ const ls = localStorage.getItem('SITE_CONFIG'); if(ls) return JSON.parse(ls); }catch(e){}
+  var _prev = /[?&]preview=1/.test(location.search);
+  if(_prev){ try{ const ls = localStorage.getItem('SITE_CONFIG'); if(ls) return JSON.parse(ls); }catch(e){} }
+  else { try{ localStorage.removeItem('SITE_CONFIG'); }catch(e){} }
   return window.SITE_CONFIG;
 })();
 
@@ -381,6 +394,8 @@ function applyLang(lang){
   const _tag = M.hero.tagline || '';
   document.getElementById('heroTag').textContent = _tag;
   document.getElementById('heroTag').style.display = _tag ? '' : 'none';
+  const _al=document.getElementById('applyLabel');
+  if(_al) _al.textContent = M.applyLabel || (lang==='darija' ? 'Bda daba' : (lang==='ar' ? 'ابدأ الآن' : 'Start now'));
   document.getElementById('workLabel').textContent = M.workLabel;
   document.getElementById('workTitle').textContent = M.workTitle;
   const _ft=document.getElementById('finalTitle');
