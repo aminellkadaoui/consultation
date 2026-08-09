@@ -87,7 +87,52 @@ img.flag{width:20px;height:20px;display:block;object-fit:contain}.emoji{width:1.
 .wel .qh{font-size:clamp(21px,4vw,26px)}.wel .hint{font-size:14px;color:var(--soft);font-weight:400}.meta{margin-top:17px;font-family:var(--mono);font-size:12px;color:var(--faint);direction:ltr}
 .dots span{display:inline-block;width:5px;height:5px;border-radius:50%;background:#fff;margin:0 1.5px;animation:dot 1.1s ease-in-out infinite}.dots span:nth-child(2){animation-delay:.18s}.dots span:nth-child(3){animation-delay:.36s}@keyframes dot{0%,100%{opacity:.3}40%{opacity:1}}
 .state{display:none;min-height:100dvh;align-items:center;justify-content:center;padding:36px 20px}.state.on{display:flex;animation:rise .5s var(--spring) both}.state-card{width:min(580px,100%);text-align:center;padding:38px 30px}.booking .state-card{width:min(980px,100%);text-align:right}.booking-head{text-align:center;max-width:680px;margin:0 auto 22px}.state .ic{width:66px;height:66px;border-radius:50%;background:#eef4ff;color:var(--brand);display:grid;place-items:center;margin:0 auto 20px;font-size:28px;font-weight:700}.state.done .ic{background:#e9f7f0;color:var(--ok)}.state h2{font-family:'Thmanyah Serif Display',serif;font-size:clamp(20px,4vw,25px);line-height:1.45;text-wrap:balance}.state p{color:#343a46;font-size:14px;margin-top:10px;line-height:1.75}.state .note{margin-top:16px;padding:13px 15px;border-radius:13px;background:#f7f9fd;border:1px solid #e7ebf3;color:#3f4654;font-size:13.5px;text-align:center}.state .actions{display:flex;flex-direction:column;gap:10px;margin-top:18px}.state .actions .btn{width:100%}.tiny{font-size:12px!important;color:var(--faint)!important;margin-top:11px!important}.calendar-shell{overflow:hidden;border:1px solid var(--line);border-radius:16px;background:#fff;min-height:650px;box-shadow:0 10px 30px -28px rgba(25,38,72,.35)}.calendar-shell iframe{display:block;width:100%;height:690px;border:0;background:#fff}.booking-confirm{margin-top:16px;display:grid;gap:10px}.booking-confirm .btn{width:100%}.fallback-link{display:inline-block;margin-top:10px;color:var(--brand-ink);font-size:12.5px;font-weight:600;text-decoration:none}.fallback-link:hover{text-decoration:underline}.done .state-card{position:relative;overflow:hidden;padding:46px 34px}.done .ic{animation:successPop .72s var(--spring) both}.done h2{font-size:clamp(22px,4vw,28px)}.done-title{display:flex;align-items:center;justify-content:center;gap:10px;direction:rtl;white-space:nowrap}.done-title .party{display:inline-block;line-height:1;transform:translateY(-1px)}.done-copy{max-width:680px;margin:14px auto 0!important;font-size:16px!important;line-height:1.9!important;text-wrap:balance;color:#343a46!important}.thanks{font-size:18px!important;font-weight:700;color:#171a20!important}.celebration{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:90;display:none}.celebration.on{display:block}.confetti{position:absolute;top:-22px;width:9px;height:16px;border-radius:3px;background:var(--brand);opacity:.9;animation:confettiFall 1.65s var(--ease) both}.confetti:nth-child(2n){background:#12a66a}.confetti:nth-child(3n){background:#ffb020}.confetti:nth-child(4n){background:#8b5cf6}.confetti:nth-child(5n){background:#ff5d6c}@keyframes successPop{0%{opacity:0;transform:scale(.45) rotate(-12deg)}60%{opacity:1;transform:scale(1.12) rotate(3deg)}100%{transform:scale(1) rotate(0)}}@keyframes confettiFall{0%{opacity:0;transform:translateY(-4vh) rotate(0)}12%{opacity:1}100%{opacity:0;transform:translateY(112vh) rotate(560deg)}}
-@media(max-width:560px){.opts.cols{grid-template-columns:1fr}.slide{padding:13px 12px 12px}.stage-wrap{padding:10px 8px}.cstep{font-size:10px;margin-bottom:6px}.qh{font-size:16.5px;line-height:1.4}.hint{font-size:12px;line-height:1.6;margin-top:5px}.field{margin-top:11px}.block{margin-top:11px}.sublabel{font-size:12px;margin-bottom:5px}.formula{padding:9px 10px;margin:8px 0 2px;font-size:12px;line-height:1.75;border-radius:10px}.tin{font-size:16px;padding:9px 11px;border-radius:10px}textarea.tin{line-height:1.55;font-size:16px}.slide.business-step textarea.tin{min-height:56px}.opt{min-height:44px;padding:8px 10px;border-radius:10px;gap:9px}.opt .tx{font-size:12.5px}.example{margin-top:9px;padding-top:8px}.example summary{font-size:12px}.example .example-body{font-size:11.5px;padding:8px 10px}.nav{margin-top:12px}.nav .btn{padding:0 18px}.btn{height:44px;font-size:13.5px}.cardbar{margin-bottom:10px;height:3px}.multi-step .block{margin-top:13px;padding-top:11px}.multi-step .sublabel{font-size:13px;margin-bottom:7px;padding-inline-start:9px;border-inline-start-width:3px}.wel .qh{font-size:18.5px}.meta{margin-top:9px;font-size:10px}.state-card{padding:20px 14px}.booking .state-card{padding:14px 8px}.calendar-shell{min-height:520px;border-radius:12px}.calendar-shell iframe{height:560px}.done .state-card{padding:26px 16px}.done-copy{font-size:12.5px!important;margin-top:9px!important}.state h2{font-size:18px}.state p{font-size:12.5px;margin-top:8px;line-height:1.7}.state .ic{width:52px;height:52px;font-size:22px;margin-bottom:14px}.thanks{font-size:14px!important}}
+@media(max-width:560px){
+  .opts.cols{grid-template-columns:1fr}
+  .slide{padding:18px 15px 15px}
+  .stage-wrap{padding:12px 9px}
+  /* هرمية القراءة: رقم السؤال ← العنوان ← التوضيح ← الخيارات ← الأزرار */
+  .cstep{font-size:11px;margin-bottom:9px;letter-spacing:.06em}
+  .qh{font-size:22px;line-height:1.38;font-weight:700;letter-spacing:-.02em}
+  .hint{font-size:14.5px;line-height:1.75;margin-top:9px;font-weight:400;color:var(--soft)}
+  .field{margin-top:18px}
+  .block{margin-top:16px}
+  .sublabel{font-size:14.5px;font-weight:700;color:var(--ink);margin-bottom:8px}
+  .subhint{font-size:12.5px}
+  .formula{padding:12px 13px;margin:12px 0 2px;font-size:13.5px;line-height:1.95;border-radius:12px}
+  .formula::before{font-size:12px}
+  .tin{font-size:16px;padding:11px 13px;border-radius:12px}
+  textarea.tin{line-height:1.6;font-size:16px}
+  .slide.business-step textarea.tin{min-height:64px}
+  .opt{min-height:50px;padding:11px 13px;border-radius:12px;gap:10px}
+  .opt .tx{font-size:15px;font-weight:500;line-height:1.5}
+  .tick{width:19px;height:19px;flex:0 0 19px}
+  .example{margin-top:12px;padding-top:11px}
+  .example summary{font-size:13.5px}
+  .example .example-body{font-size:12.5px;padding:10px 12px}
+  .emsg{font-size:12.5px}
+  .nav{margin-top:16px;gap:9px}
+  .nav .btn{padding:0 20px}
+  .btn{height:48px;font-size:15px}
+  .cardbar{margin-bottom:12px;height:3px}
+  .multi-step .block{margin-top:16px;padding-top:14px}
+  .multi-step .sublabel{font-size:15.5px;margin-bottom:9px;padding-inline-start:10px;border-inline-start-width:3px}
+  .wel .qh{font-size:21px}
+  .wel .hint{font-size:14.5px}
+  .meta{margin-top:9px;font-size:10px}
+  .state-card{padding:22px 15px}
+  .booking .state-card{padding:16px 9px}
+  .calendar-shell{min-height:520px;border-radius:12px}
+  .calendar-shell iframe{height:560px}
+  .done .state-card{padding:28px 17px}
+  .done-copy{font-size:14px!important;margin-top:10px!important;line-height:1.8!important}
+  .state h2{font-size:21px}
+  .state p{font-size:14px;margin-top:9px;line-height:1.75}
+  .state .ic{width:54px;height:54px;font-size:23px;margin-bottom:15px}
+  .state .note{font-size:12.5px;padding:12px 14px}
+  .thanks{font-size:15.5px!important}
+}
+
 
 /* كارد البداية · بأسلوب كارد الحجز والشكر */
 .slide.wel{text-align:center;padding:40px 30px 34px;align-items:stretch}
