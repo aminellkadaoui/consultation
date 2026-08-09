@@ -75,7 +75,7 @@ window.SITE_CONFIG = {
         line1: "اجعل محتواك يبدو",
         line2: "بمستوى",
         line3: "خبرتك",
-        subtitle: "نعمل معك كشركاء في المحتوى، ونتولى المونتاج لتحقيق نتائج أفضل من محتواك."
+        subtitle: "نحوّل خبرتك إلى فيديوهات جاهزة للنشر تعزّز مكانتك، وتساعدك على جذب عملاء محتملين"
       },
       workLabel: "أعمالنا",
       workTitle: "أفضل أعمالنا",
@@ -113,7 +113,7 @@ window.SITE_CONFIG = {
         line1: "Khelli Content Dyalek Yban",
         line2: "B Niveau Dyal",
         line3: "Expertise Dyalek",
-        subtitle: "Kankhdmo m3ak b7al partners f content, w kanetkelfo b editing bach njibo lik natayj 7sen mn content dyalek."
+        subtitle: "Kan7awlo expertise dyalek l videos wajdin l nnachr, kaybniw trust w authority w kay3awnok tjbed leads."
       },
       workLabel: "Lkhedma dyalna",
       workTitle: "Chof lkhedma dyalna",

@@ -17,12 +17,6 @@
 @font-face{font-family:'Satoshi';src:url('fonts/Satoshi-Black.otf') format('opentype');font-weight:900;font-style:normal;font-display:swap}
 @font-face{font-family:'Instrument Serif';src:url('fonts/instrumentserif-regular.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:'Instrument Serif';src:url('fonts/instrumentserif-italic.ttf') format('truetype');font-weight:400;font-style:italic;font-display:swap}
-@font-face{font-family:'Thmanyah Sans';src:url('fonts/thmanyah-sans-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
-@font-face{font-family:'Thmanyah Sans';src:url('fonts/thmanyah-sans-Medium.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap}
-@font-face{font-family:'Thmanyah Sans';src:url('fonts/thmanyah-sans-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
-@font-face{font-family:'Thmanyah Serif Text';src:url('fonts/thmanyah-serif-text-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
-@font-face{font-family:'Thmanyah Serif Text';src:url('fonts/thmanyah-serif-text-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
-@font-face{font-family:'Thmanyah Serif Display';src:url('fonts/thmanyah-serif-display-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
 
 :root{
   --blue:#0f6bff;--btn:#0066ff;--ink:#000;--soft:#424242;--label:#3f8bff;--bg:#fff;
@@ -58,23 +52,22 @@ body.rtl .nav-links{direction:rtl}   /* العربية: الأعمال يمين 
 @media(max-width:620px){.nav-links{display:none}.lang-seg button{padding:6px 9px;font-size:12px}.btn.sm{padding:0 16px;font-size:16px}}
 
 /* ===== دعم العربية / الدارجة (RTL) ===== */
-body.rtl{font-family:'Thmanyah Sans',var(--sans)}
-body.rtl .hero h1{font-family:'Thmanyah Serif Text',serif;text-transform:none;letter-spacing:-.02em;line-height:1.2;color:#101010;font-weight:400;font-size:clamp(38px,5.75vw,55px)}
-body.rtl .hero h1 .b{font-family:'Thmanyah Serif Display',serif;font-weight:700;font-size:1.62em;letter-spacing:-.019em;color:#0F6BFF}
-body.rtl .hero h1 .s{display:inline-block;font-family:'Thmanyah Serif Display',serif;font-style:normal;font-weight:700;font-size:1.62em;letter-spacing:-.019em;line-height:1.18;
+body.rtl{font-family:'IBM Plex Sans Arabic',var(--sans)}
+body.rtl .hero h1{font-family:'IBM Plex Sans Arabic',sans-serif;text-transform:none;letter-spacing:-.03em;line-height:1.18;color:#101010;font-weight:500;font-size:clamp(38px,5.75vw,55px)}
+body.rtl .hero h1 .b{font-family:'IBM Plex Sans Arabic',sans-serif;font-weight:700;font-size:1.62em;color:#0F6BFF}
+body.rtl .hero h1 .s{display:inline-block;font-family:'IBM Plex Sans Arabic',sans-serif;font-style:normal;font-weight:700;font-size:1.62em;line-height:1.08;
   color:#0F6BFF;-webkit-text-fill-color:#0F6BFF;background:none;filter:none}
-body.rtl .final h2{font-family:'Thmanyah Sans',sans-serif;text-transform:none;letter-spacing:-.02em;line-height:1.3}
-body.rtl .final h2 .s{font-family:'Thmanyah Sans',sans-serif;font-style:normal;font-weight:700;font-size:1em}
-body.rtl .sub,body.rtl .final p,body.rtl .nav-links a,body.rtl .work h2,body.rtl .work .label span,body.rtl .proc-head h2,body.rtl .proc-head p,body.rtl .proc-card h3,body.rtl .proc-card p{font-family:'Thmanyah Sans',sans-serif}
-body.rtl .btn{font-family:'Thmanyah Sans',sans-serif;font-style:normal;font-weight:600;font-size:18px}
-body.rtl .work h2,body.rtl .proc-head h2{font-family:'Thmanyah Serif Text',serif;font-weight:700}
+body.rtl .final h2{font-family:'IBM Plex Sans Arabic',sans-serif;text-transform:none;letter-spacing:-.02em;line-height:1.3}
+body.rtl .final h2 .s{font-family:'IBM Plex Sans Arabic',sans-serif;font-style:normal;font-weight:700;font-size:1em}
+body.rtl .sub,body.rtl .final p,body.rtl .nav-links a,body.rtl .work h2,body.rtl .work .label span,body.rtl .proc-head h2,body.rtl .proc-head p,body.rtl .proc-card h3,body.rtl .proc-card p{font-family:'IBM Plex Sans Arabic',sans-serif}
+body.rtl .btn{font-family:'IBM Plex Sans Arabic',sans-serif;font-style:normal;font-weight:600;font-size:18px}
 
 /* ===== الزر ===== */
 .btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;
   background:var(--btn);color:#fff;text-decoration:none;
   min-width:200px;height:52px;padding:0 32px;border-radius:60px;
   font-family:var(--serif);font-style:italic;font-size:25px;line-height:1;
-  box-shadow:0 0 19px rgba(46,133,255,.34),inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.12);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.12);
   transition:transform .22s ease-out,box-shadow .22s ease}
 .btn span{position:relative;z-index:1}
 .btn:hover{transform:scale(1.05);box-shadow:0 0 28px rgba(46,133,255,.5),inset 0 1px 0 rgba(255,255,255,.38),inset 0 -1px 0 rgba(0,0,0,.12)}
@@ -172,31 +165,6 @@ body.rtl .btn:hover::after{left:-100%}
 .final p{font-weight:300;font-size:clamp(16px,2vw,20px);color:var(--soft);margin-top:6px;line-height:1.5}
 .final .btn{margin-top:34px}
 
-/* ===== APPLY FORM (مكان الـCTA الختامي، بنفس إضاءته السفلية) ===== */
-.apply{position:relative;padding:96px 20px 150px;overflow:hidden;scroll-margin-top:110px}
-.apply::before{content:"";position:absolute;left:50%;bottom:-30%;transform:translateX(-50%);
-  width:1000px;max-width:150vw;height:650px;z-index:0;pointer-events:none;
-  background:radial-gradient(50% 50% at 50% 100%,rgba(15,107,255,.30),transparent 70%);filter:blur(50px);opacity:.65}
-.apply>*{position:relative;z-index:1}
-.form-host{width:min(880px,100%);margin:0 auto}
-.form-host iframe{display:block;width:100%;border:0;height:640px;overflow:hidden}
-/* ===== كونفيتي الصفحة (يظهر عند إتمام الفورم) ===== */
-#pageConfetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:999;display:none}
-#pageConfetti.on{display:block}
-.confetti{
-  position:absolute;
-  top:-22px;
-  width:9px;
-  height:16px;
-  opacity:.9;
-  border-radius:3px;
-  animation:confettiFall 1.65s cubic-bezier(.4,0,.2,1) both;
-}
-@keyframes confettiFall{
-  0%{opacity:0;transform:translateY(-25px) rotate(0);}
-  12%{opacity:1;}
-  100%{opacity:0;transform:translateY(520px) rotate(560deg);}
-}
 footer{text-align:center;padding:28px 20px;color:var(--soft);font-size:14px;font-weight:400}
 footer b{color:var(--ink);font-weight:700}
 
@@ -209,7 +177,6 @@ footer b{color:var(--ink);font-weight:700}
   .work{padding-top:66px}
   .process{padding-top:66px}
   .final{padding-top:66px}
-  .apply{padding:56px 12px 90px}
   .hero-cta{margin-top:34px}
   /* الهيدلاين العربي: سطرين — «بمستوى خبرتك» في سطر واحد */
   body.rtl .hero h1{font-size:30px}
@@ -287,9 +254,12 @@ footer b{color:var(--ink);font-weight:700}
     <div class="proc-grid" id="guideGrid"></div>
   </section>
 
-  <!-- APPLY FORM (مدموج في الصفحة) -->
-  <section class="apply" id="apply">
-    <div class="form-host"><iframe id="consultFrame" src="consult.html?embed=1" title="نموذج الاستشارة" scrolling="no"></iframe></div>
+  <!-- FINAL CTA -->
+  <section class="final" id="contact">
+    <h2 id="finalTitle"></h2>
+    <p id="finalLine1"></p>
+    <p id="finalLine2"></p>
+    <a class="btn" id="finalCta" href="#"><span id="finalCtaText">Apply Now</span></a>
   </section>
 </main>
 
@@ -340,10 +310,11 @@ for(let i=0;i<_reels.length;i+=2){
   grid.appendChild(col);
 }
 
-/* ===== روابط الحجز: الفورم صار جزءًا من الصفحة ===== */
-['heroCta','navCta'].forEach(id=>{
+/* ===== روابط الحجز (مرة واحدة) ===== */
+['heroCta','finalCta','navCta'].forEach(id=>{
   const el = document.getElementById(id);
-  if(el) el.href = '#apply';
+  el.href = C.bookACallUrl || '#';
+  if(C.bookACallUrl && C.bookACallUrl !== '#'){ el.target='_blank'; el.rel='noopener'; }
 });
 document.getElementById('brandName').textContent = C.brand || 'Amine Editing Team';
 document.getElementById('year').textContent = new Date().getFullYear();
@@ -369,9 +340,6 @@ function withEmoji(txt){
   return esc.replace(/👇/g, '<img class="emoji" src="point-down.png" alt="">');
 }
 function applyLang(lang){
-  window.__siteLang=lang;
-  try{const _cf=document.getElementById('consultFrame'); if(_cf&&_cf.contentWindow)_cf.contentWindow.postMessage({type:'consult:lang',lang:lang},'*');}catch(_){}
-
   const M = pack(lang);
   let hh = M.hero.line1 + '<br>';
   if(M.hero.line2){ hh += '<span class="b">' + M.hero.line2 + '</span>'; }
@@ -383,12 +351,10 @@ function applyLang(lang){
   document.getElementById('heroTag').style.display = _tag ? '' : 'none';
   document.getElementById('workLabel').textContent = M.workLabel;
   document.getElementById('workTitle').textContent = M.workTitle;
-  const _ft=document.getElementById('finalTitle');
-  if(_ft){
-    _ft.innerHTML = M.closing.titlePlain + ' <span class="s">' + M.closing.titleAccent + '</span>';
-    document.getElementById('finalLine1').innerHTML = withEmoji(M.closing.line1);
-    document.getElementById('finalLine2').innerHTML = withEmoji(M.closing.line2);
-  }
+  document.getElementById('finalTitle').innerHTML =
+    M.closing.titlePlain + ' <span class="s">' + M.closing.titleAccent + '</span>';
+  document.getElementById('finalLine1').innerHTML = withEmoji(M.closing.line1);
+  document.getElementById('finalLine2').innerHTML = withEmoji(M.closing.line2);
   /* طريقة العمل */
   const proc = (T(lang) && T(lang).process) ? T(lang).process : C.process;
   if(proc){
@@ -422,7 +388,7 @@ function applyLang(lang){
   document.getElementById('nl-work').textContent = M.nav.work;
   document.getElementById('nl-process').textContent = M.nav.process;
   document.getElementById('nl-guidelines').textContent = M.nav.guidelines;
-  ['heroCtaText','navCtaText'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent = M.btn; });
+  ['heroCtaText','finalCtaText','navCtaText'].forEach(id=> document.getElementById(id).textContent = M.btn);
   document.querySelectorAll('#langSeg button').forEach(b=> b.classList.toggle('active', b.dataset.lang===lang));
   const rtl = (lang === 'ar');            /* الدارجة لاتينية = LTR */
   document.documentElement.dir = rtl ? 'rtl' : 'ltr';
@@ -436,33 +402,6 @@ applyLang(lang);
 document.querySelectorAll('#langSeg button').forEach(b=>{
   b.addEventListener('click', ()=> applyLang(b.dataset.lang));
 });
-
-/* ===== الفورم المدموج: ارتفاع تلقائي + كونفيتي على الصفحة ===== */
-(function(){
-  const frame = document.getElementById('consultFrame');
-  frame.addEventListener('load',()=>{ try{ frame.contentWindow.postMessage({type:'consult:lang',lang:window.__siteLang||'ar'},'*'); }catch(_){} });
-  const COLORS = ['#0f6bff','#12a66a','#ffb020','#8b5cf6','#ff5d6c'];
-  function celebrate(){
-    let host = document.getElementById('pageConfetti');
-    if(!host){ host=document.createElement('div'); host.id='pageConfetti'; document.body.appendChild(host); }
-    host.innerHTML='';
-    for(let i=0;i<26;i++){
-      const c=document.createElement('i'); c.className='confetti';
-      c.style.left=(2+Math.random()*96)+'%';
-      c.style.background=COLORS[i%COLORS.length];
-      c.style.animationDelay=(Math.random()*.5)+'s';
-      host.appendChild(c);
-    }
-    host.classList.add('on');
-    setTimeout(()=>host.classList.remove('on'), 2600);
-  }
-  window.addEventListener('message', e=>{
-    const d=e.data||{};
-    if(d.type==='consult:height' && frame && d.h){ frame.style.height=Math.ceil(d.h)+'px'; }
-    if(d.type==='consult:done'){ celebrate(); }
-    if(d.type==='consult:center' && frame){ const r=frame.getBoundingClientRect(); const vis=Math.min(r.height, innerHeight-120); const y=window.scrollY + r.top - Math.max(90,(innerHeight-vis)/2); window.scrollTo({top:Math.max(0,y), behavior:'smooth'}); }
-  });
-})();
 </script>
 </body>
 </html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم — Amine Editing Team</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#0f6bff;--ink:#0f1720;--muted:#6b7280;--bg:#f4f6fb;--card:#fff;--line:#e6e8ef;--green:#16a34a;--red:#dc2626}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.7}
+.bar{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:14px;padding:14px 22px}
+.bar .dot{width:10px;height:10px;border-radius:50%;background:var(--blue)}
+.bar b{font-size:16px;font-weight:700}
+.bar .sp{flex:1}
+.bar button{font-family:inherit;font-weight:600;font-size:14px;border:0;border-radius:10px;padding:10px 18px;cursor:pointer;transition:.2s}
+.b-prev{background:#eef2ff;color:var(--blue)}
+.b-prev:hover{background:#e0e7ff}
+.b-exp{background:#eef2ff;color:var(--blue)}
+.b-exp:hover{background:#e0e7ff}
+.b-pub{background:var(--blue);color:#fff}
+.b-pub:hover{filter:brightness(1.08)}
+.b-pub[disabled]{opacity:.6;cursor:progress}
+.gh-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.gh-grid .field.full{grid-column:1/-1}
+.gh-save{margin-top:4px;font-family:inherit;font-weight:600;font-size:13.5px;border:0;border-radius:10px;
+  padding:9px 16px;cursor:pointer;background:#eef2ff;color:var(--blue)}
+.gh-save:hover{background:#e0e7ff}
+.gh-state{font-size:12.5px;font-weight:600;margin-right:10px}
+.gh-state.on{color:var(--green)} .gh-state.off{color:var(--muted)}
+.warn{background:#eef6ff;border:1px solid #cfe0ff;border-radius:10px;padding:11px 14px;font-size:12.5px;color:#274b7a;margin-top:12px;line-height:1.6}
+.warn code{background:#dbe8ff;padding:1px 6px;border-radius:5px;font-family:'IBM Plex Mono',monospace}
+@media(max-width:560px){.gh-grid{grid-template-columns:1fr}}
+.langbar{position:sticky;top:57px;z-index:9;display:flex;align-items:center;gap:12px;background:#fff;
+  border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:20px;flex-wrap:wrap;box-shadow:0 4px 14px rgba(15,23,32,.05)}
+.langbar .lbl{font-size:13.5px;font-weight:600;color:#374151}
+.langbar .cur{font-size:13.5px;color:var(--muted);font-weight:500}
+.langbar .cur b{color:var(--blue)}
+.lang-seg{display:inline-flex;background:#eef2f8;border-radius:10px;padding:3px;gap:2px}
+.lang-seg button{font-family:inherit;font-weight:700;font-size:13px;border:0;border-radius:8px;padding:8px 18px;cursor:pointer;background:transparent;color:var(--muted);transition:.15s}
+.lang-seg button.active{background:var(--blue);color:#fff}
+.badge-lang,.badge-share{font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11.5px;padding:3px 10px;border-radius:8px;font-weight:600;margin-right:auto}
+.badge-lang{color:var(--blue);background:#eef2ff}
+.badge-share{color:#0a7a52;background:#e5f6ef}
+.step-box{padding:14px;background:#fafbfe;border:1px solid var(--line);border-radius:12px;margin-bottom:12px}
+.step-box .st{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--blue);margin-bottom:10px;font-weight:600}
+.wrap{max-width:920px;margin:0 auto;padding:26px 20px 80px}
+.note{background:#fff8e6;border:1px solid #f6e6b0;border-radius:12px;padding:14px 18px;font-size:14px;margin-bottom:22px;color:#7a5b00}
+.note b{color:#5c4400}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:18px}
+.card h2{font-size:17px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+.card h2 .n{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--blue);background:#eef2ff;padding:3px 9px;border-radius:7px}
+.field{margin-bottom:15px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:13.5px;font-weight:600;margin-bottom:6px;color:#374151}
+.field .hint{font-size:12px;color:var(--muted);font-weight:400;margin-right:6px}
+.field input,.field textarea{width:100%;font-family:inherit;font-size:14.5px;color:var(--ink);
+  background:#fbfcfe;border:1px solid var(--line);border-radius:10px;padding:11px 13px;transition:.2s}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(15,107,255,.12);background:#fff}
+.field input[dir=ltr]{direction:ltr;text-align:left}
+.field textarea{resize:vertical;min-height:70px;line-height:1.6}
+/* الريلز */
+.reel-row{display:grid;grid-template-columns:1fr 130px 40px;gap:10px;align-items:end;margin-bottom:12px;
+  padding:12px;background:#fafbfe;border:1px solid var(--line);border-radius:12px}
+.reel-row .field{margin:0}
+.reel-row .rm{width:40px;height:42px;border:0;border-radius:10px;background:#fdeaea;color:var(--red);font-size:18px;cursor:pointer;transition:.2s}
+.reel-row .rm:hover{background:#f9d5d5}
+.reel-thumb{display:flex;align-items:center;gap:10px;grid-column:1/-1;margin-bottom:8px}
+.reel-thumb img{width:54px;height:54px;object-fit:cover;border-radius:8px;background:#000;flex-shrink:0}
+.reel-thumb .idx{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)}
+.add{width:100%;font-family:inherit;font-weight:600;font-size:14px;border:1.5px dashed var(--blue);color:var(--blue);
+  background:#f5f8ff;border-radius:12px;padding:12px;cursor:pointer;transition:.2s}
+.add:hover{background:#eaf1ff}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);opacity:0;z-index:50;pointer-events:none;
+  background:#0f1720;color:#fff;padding:12px 22px;border-radius:12px;font-size:14px;font-weight:600;
+  display:flex;align-items:center;gap:9px;transition:transform .3s,opacity .3s;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.toast.show{transform:translate(-50%,0);opacity:1}
+.toast .ok{color:#4ade80}
+@media(max-width:560px){.reel-row{grid-template-columns:1fr 90px 40px}.bar button{padding:9px 12px;font-size:13px}}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <span class="dot"></span><b>لوحة التحكم</b>
+  <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)">Amine Editing Team</span>
+  <span class="sp"></span>
+  <button class="b-prev" onclick="preview()">👁 معاينة</button>
+  <button class="b-exp" onclick="exportConfig()">⬇ تصدير</button>
+  <button class="b-pub" id="btnPub" onclick="publish()">🚀 نشر مباشرة</button>
+</div>
+
+<div class="wrap">
+  <div class="note">
+    ✏️ عدّل أي حقل هنا. <b>«معاينة»</b> تفتح الموقع بتعديلاتك. <b>«🚀 نشر مباشرة»</b> يرفع التعديلات فوراً على موقعك المنشور. <b>بدّل اللغة من الشريط تحت</b> لتتحكم في نصوص كل لغة على حِدة. 👇
+  </div>
+
+  <!-- سويتش اللغة -->
+  <div class="langbar">
+    <span class="lbl">🌐 اللغة اللي كتعدّل:</span>
+    <div class="lang-seg" id="langSeg">
+      <button data-l="ar" class="active" onclick="switchLang('ar')">AR</button>
+      <button data-l="darija" onclick="switchLang('darija')">DAR</button>
+    </div>
+    <span class="cur">كتعدّل دبا: <b id="curLangName">العربية</b></span>
+  </div>
+
+  <!-- النشر المباشر -->
+  <div class="card">
+    <h2><span class="n">0</span> النشر المباشر (GitHub) <span class="gh-state off" id="ghState">غير مضبوط</span></h2>
+    <div class="gh-grid">
+      <div class="field"><label>اسم مستخدم GitHub</label><input id="gh_owner" dir="ltr" placeholder="aminellkadaoui"></div>
+      <div class="field"><label>اسم الريبو (Repository)</label><input id="gh_repo" dir="ltr" placeholder="amine-editing-site"></div>
+      <div class="field"><label>الفرع (Branch)</label><input id="gh_branch" dir="ltr" placeholder="main" value="main"></div>
+      <div class="field"><label>مسار الملف</label><input id="gh_path" dir="ltr" placeholder="config.js" value="config.js"></div>
+      <div class="field full"><label>التوكن (Access Token) <span class="hint">(يُحفظ في متصفحك فقط)</span></label><input id="gh_token" type="password" dir="ltr" placeholder="github_pat_..."></div>
+    </div>
+    <button class="gh-save" onclick="saveGH()">💾 حفظ إعدادات الاتصال</button>
+    <div class="warn">
+      🔐 <b>التوكن آمن:</b> يُخزَّن في متصفحك فقط (localStorage) ولا يُرفع أبداً مع صفحات الموقع.<br>
+      اصنعه من: <code>GitHub → Settings → Developer settings → Fine-grained tokens</code> — حدّده على هذا الريبو فقط، والصلاحية: <code>Contents → Read and write</code> فقط.
+    </div>
+  </div>
+
+  <!-- عام (مشترك) -->
+  <div class="card">
+    <h2><span class="n">1</span> الإعدادات العامة <span class="badge-share">🌍 مشترك لكل اللغات</span></h2>
+    <div class="field"><label>اسم البراند</label><input id="brand" dir="ltr"></div>
+    <div class="field"><label>رابط زر الحجز <span class="hint">(Calendly / TidyCal / واتساب...)</span></label><input id="bookACallUrl" dir="ltr" placeholder="https://calendly.com/..."></div>
+    <div class="field"><label>فيديو الهيرو <span class="hint">(معرّف يوتيوب)</span></label><input id="h_video" dir="ltr" placeholder="Uxsu1WrvefQ"></div>
+  </div>
+
+  <!-- الهيرو (حسب اللغة) -->
+  <div class="card">
+    <h2><span class="n">2</span> القسم العلوي (Hero) <span class="badge-lang">🔤 حسب اللغة</span></h2>
+    <div class="field"><label>العنوان — سطر 1 <span class="hint">(عادي)</span></label><input id="h_line1" dir="auto"></div>
+    <div class="field"><label>العنوان — سطر 2 <span class="hint">(عريض)</span></label><input id="h_line2" dir="auto"></div>
+    <div class="field"><label>العنوان — الكلمة المميزة <span class="hint">(أزرق)</span></label><input id="h_line3" dir="auto"></div>
+    <div class="field"><label>النص التوضيحي</label><textarea id="h_sub" dir="auto"></textarea></div>
+    <div class="field"><label>نص زر الحجز <span class="hint">(Apply Now / قدّم الآن...)</span></label><input id="bookACallText" dir="auto"></div>
+  </div>
+
+  <!-- الأعمال (حسب اللغة) -->
+  <div class="card">
+    <h2><span class="n">3</span> قسم الأعمال <span class="badge-lang">🔤 حسب اللغة</span></h2>
+    <div class="field"><label>التسمية الصغيرة</label><input id="workLabel" dir="auto"></div>
+    <div class="field"><label>عنوان القسم</label><input id="workTitle" dir="auto"></div>
+  </div>
+
+  <!-- طريقة العمل (حسب اللغة) -->
+  <div class="card">
+    <h2><span class="n">4</span> طريقة العمل (Process) <span class="badge-lang">🔤 حسب اللغة</span></h2>
+    <div class="field"><label>التسمية الصغيرة</label><input id="proc_label" dir="auto"></div>
+    <div class="field"><label>عنوان القسم</label><input id="proc_title" dir="auto"></div>
+    <div class="field"><label>النص التوضيحي</label><textarea id="proc_sub" dir="auto"></textarea></div>
+    <div id="procSteps"></div>
+  </div>
+
+  <!-- معايير العمل (حسب اللغة) -->
+  <div class="card">
+    <h2><span class="n">4.5</span> معايير العمل (Guidelines) <span class="badge-lang">🔤 حسب اللغة</span></h2>
+    <div class="field"><label>التسمية الصغيرة</label><input id="guide_label" dir="auto"></div>
+    <div class="field"><label>عنوان القسم</label><input id="guide_title" dir="auto"></div>
+    <div class="field"><label>النص التوضيحي</label><textarea id="guide_sub" dir="auto"></textarea></div>
+    <div id="guideSteps"></div>
+  </div>
+
+  <!-- القائمة (حسب اللغة) -->
+  <div class="card">
+    <h2><span class="n">5</span> قائمة التنقّل (Nav) <span class="badge-lang">🔤 حسب اللغة</span></h2>
+    <div class="field"><label>الأعمال</label><input id="nav_work" dir="auto"></div>
+    <div class="field"><label>المراحل</label><input id="nav_process" dir="auto"></div>
+    <div class="field"><label>الشروط</label><input id="nav_guidelines" dir="auto"></div>
+  </div>
+
+  <!-- الختام (حسب اللغة) -->
+  <div class="card">
+    <h2><span class="n">6</span> القسم الختامي <span class="badge-lang">🔤 حسب اللغة</span></h2>
+    <div class="field"><label>العنوان — الجزء العادي</label><input id="c_plain" dir="auto"></div>
+    <div class="field"><label>العنوان — الجزء المميز <span class="hint">(مائل)</span></label><input id="c_accent" dir="auto"></div>
+    <div class="field"><label>السطر 1</label><input id="c_line1" dir="auto"></div>
+    <div class="field"><label>السطر 2</label><input id="c_line2" dir="auto"></div>
+  </div>
+
+  <!-- الريلز (مشترك) -->
+  <div class="card">
+    <h2><span class="n">7</span> الريلز <span class="badge-share">🌍 مشترك لكل اللغات</span></h2>
+    <div id="reels"></div>
+    <button class="add" onclick="addReel()">＋ إضافة ريل</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="ok">✓</span> <span id="toastMsg"></span></div>
+
+<!-- تحميل المحتوى دائماً طازجاً (تجاوز كاش المتصفح) -->
+<script>document.write('<script src="config.js?v=' + Date.now() + '"><\/script>');</script>
+<script>
+/* نبدأ دائماً من config.js المنشور الطازج (وليس من كاش localStorage القديم)
+   حتى لا يُصدّر نشرٌ لاحق نسخةً قديمة فيُرجِع المحتوى للخلف */
+let C = JSON.parse(JSON.stringify(window.SITE_CONFIG));
+
+const $ = id => document.getElementById(id);
+
+/* ===== النظام متعدّد اللغات ===== */
+const LNAME = { en:'الإنجليزية', ar:'العربية', darija:'الدارجة' };
+let curLang = 'ar';
+
+/* الحقول المرتبطة باللغة: id الحقل -> المسار داخل كائن اللغة */
+const LANG_FIELDS = {
+  bookACallText:'bookACallText',
+  h_line1:'hero.line1', h_line2:'hero.line2', h_line3:'hero.line3', h_sub:'hero.subtitle',
+  workLabel:'workLabel', workTitle:'workTitle',
+  proc_label:'process.label', proc_title:'process.title', proc_sub:'process.subtitle',
+  guide_label:'guidelines.label', guide_title:'guidelines.title', guide_sub:'guidelines.subtitle',
+  nav_work:'nav.work', nav_process:'nav.process', nav_guidelines:'nav.guidelines',
+  c_plain:'closing.titlePlain', c_accent:'closing.titleAccent', c_line1:'closing.line1', c_line2:'closing.line2'
+};
+
+function getPath(o,p){ return p.split('.').reduce((x,k)=> (x==null?undefined:x[k]), o); }
+function setPath(o,p,v){ const ks=p.split('.'); let x=o;
+  for(let i=0;i<ks.length-1;i++){ if(x[ks[i]]==null||typeof x[ks[i]]!=='object') x[ks[i]]={}; x=x[ks[i]]; }
+  x[ks[ks.length-1]]=v; }
+
+/* كائن اللغة: en = الأساس (C)، غيرها = C.i18n[lang] */
+function langObj(lang){
+  if(lang==='en') return C;
+  C.i18n = C.i18n || {};
+  C.i18n[lang] = C.i18n[lang] || {};
+  return C.i18n[lang];
+}
+
+/* خطوات البروسيس — نبنيها مرّة (عددها ثابت من الأساس) */
+const STEP_COUNT = (C.process && C.process.steps) ? C.process.steps.length : 3;
+(function renderSteps(){
+  const box = $('procSteps');
+  for(let i=0;i<STEP_COUNT;i++){
+    const d = document.createElement('div'); d.className='step-box';
+    d.innerHTML = '<div class="st">خطوة '+(i+1)+'</div>'+
+      '<div class="field"><label>العنوان</label><input id="proc_s'+i+'_title" dir="auto"></div>'+
+      '<div class="field"><label>الوصف</label><textarea id="proc_s'+i+'_desc" dir="auto"></textarea></div>';
+    box.appendChild(d);
+  }
+})();
+
+/* خطوات معايير العمل — نفس المنطق */
+const GUIDE_COUNT = (C.guidelines && C.guidelines.steps) ? C.guidelines.steps.length : 3;
+(function renderGuideSteps(){
+  const box = $('guideSteps');
+  for(let i=0;i<GUIDE_COUNT;i++){
+    const d = document.createElement('div'); d.className='step-box';
+    d.innerHTML = '<div class="st">بند '+(i+1)+'</div>'+
+      '<div class="field"><label>العنوان</label><input id="guide_s'+i+'_title" dir="auto"></div>'+
+      '<div class="field"><label>الوصف</label><textarea id="guide_s'+i+'_desc" dir="auto"></textarea></div>';
+    box.appendChild(d);
+  }
+})();
+
+/* أداة: تحميل/حفظ خطوات قسم (process أو guidelines) */
+function loadSteps(lang, key, prefix, count){
+  const lp = (langObj(lang)[key])||{}, bp = C[key]||{};
+  for(let i=0;i<count;i++){
+    const st = (lp.steps&&lp.steps[i]) || (bp.steps&&bp.steps[i]) || {title:'',desc:''};
+    $(prefix+i+'_title').value = st.title||'';
+    $(prefix+i+'_desc').value  = st.desc||'';
+  }
+}
+function saveSteps(t, key, prefix, count){
+  t[key] = t[key] || {};
+  t[key].steps = [];
+  for(let i=0;i<count;i++){
+    t[key].steps.push({ title:$(prefix+i+'_title').value, desc:$(prefix+i+'_desc').value });
+  }
+}
+
+/* تحميل قيم لغة إلى النموذج */
+function loadLang(lang){
+  const src = langObj(lang);
+  for(const id in LANG_FIELDS){
+    let v = getPath(src, LANG_FIELDS[id]);
+    if(v==null) v = getPath(C, LANG_FIELDS[id]);   // fallback للأساس
+    $(id).value = (v==null ? '' : v);
+  }
+  loadSteps(lang, 'process', 'proc_s', STEP_COUNT);
+  loadSteps(lang, 'guidelines', 'guide_s', GUIDE_COUNT);
+}
+
+/* حفظ قيم النموذج الحالية في لغة */
+function saveLang(lang){
+  const t = langObj(lang);
+  for(const id in LANG_FIELDS){ setPath(t, LANG_FIELDS[id], $(id).value); }
+  saveSteps(t, 'process', 'proc_s', STEP_COUNT);
+  saveSteps(t, 'guidelines', 'guide_s', GUIDE_COUNT);
+}
+
+/* التبديل بين اللغات (يحفظ الحالية ثم يحمّل الجديدة) */
+function switchLang(l){
+  if(l===curLang) return;
+  saveLang(curLang);
+  curLang = l;
+  document.querySelectorAll('#langSeg button').forEach(b=> b.classList.toggle('active', b.dataset.l===l));
+  $('curLangName').textContent = LNAME[l];
+  loadLang(l);
+}
+
+/* الحقول المشتركة (نفسها لكل اللغات) */
+function loadShared(){
+  $('brand').value = C.brand||'';
+  $('bookACallUrl').value = C.bookACallUrl||'';
+  $('h_video').value = (C.hero&&C.hero.videoId)||'';
+}
+function saveShared(){
+  C.brand = $('brand').value.trim();
+  C.bookACallUrl = $('bookACallUrl').value.trim() || '#';
+  setPath(C, 'hero.videoId', $('h_video').value.trim());
+}
+
+loadShared();
+loadLang('ar');
+
+/* الريلز */
+const reelsEl = $('reels');
+function reelRow(r){
+  const wrap = document.createElement('div');
+  wrap.className = 'reel-row';
+  wrap.innerHTML =
+    '<div class="reel-thumb"><img src="https://i.ytimg.com/vi/'+(r.id||'')+'/default.jpg" onerror="this.style.opacity=.3"><span class="idx"></span></div>'+
+    '<div class="field"><label>معرّف يوتيوب</label><input class="r-id" dir="ltr" value="'+(r.id||'')+'"></div>'+
+    '<div class="field"><label>المشاهدات</label><input class="r-views" dir="ltr" value="'+(r.views||'')+'"></div>'+
+    '<button class="rm" title="حذف">✕</button>';
+  wrap.querySelector('.rm').onclick = ()=>{ wrap.remove(); renumber(); };
+  wrap.querySelector('.r-id').addEventListener('input', e=>{
+    wrap.querySelector('.reel-thumb img').src = 'https://i.ytimg.com/vi/'+e.target.value.trim()+'/default.jpg';
+  });
+  return wrap;
+}
+function renumber(){ reelsEl.querySelectorAll('.idx').forEach((e,i)=> e.textContent = 'ريل ' + (i+1)); }
+function addReel(){ reelsEl.appendChild(reelRow({id:'',views:''})); renumber(); }
+(C.reels||[]).forEach(r=> reelsEl.appendChild(reelRow(r)));
+renumber();
+
+/* جمع كل القيم (كل اللغات + المشترك) */
+function collect(){
+  saveLang(curLang);   // نحفظ اللغة المعروضة حالياً
+  saveShared();        // البراند + الرابط + فيديو الهيرو
+  C.reels = [...reelsEl.querySelectorAll('.reel-row')].map(row=>({
+    id: row.querySelector('.r-id').value.trim(),
+    views: row.querySelector('.r-views').value.trim()
+  })).filter(r=>r.id);
+  if(!C.bookACallText) C.bookACallText = 'Apply Now';
+  return JSON.parse(JSON.stringify(C));
+}
+
+function toast(msg){ $('toastMsg').textContent=msg; const t=$('toast'); t.classList.add('show'); clearTimeout(window._tt); window._tt=setTimeout(()=>t.classList.remove('show'),2200); }
+
+function preview(){
+  localStorage.setItem('SITE_CONFIG', JSON.stringify(collect()));
+  toast('حُفظت المعاينة — يُفتح الموقع...');
+  setTimeout(()=> window.open('index.html','_blank'), 400);
+}
+
+function configFileText(c){
+  return '/* ============================================================\n'+
+'   لوحة التحكم في المحتوى — مُدار من admin.html\n'+
+'   ============================================================ */\n'+
+'window.SITE_CONFIG = ' + JSON.stringify(c, null, 2) + ';\n';
+}
+
+function exportConfig(){
+  const body = configFileText(collect());
+  const blob = new Blob([body], {type:'application/javascript'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'config.js';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('نُزّل config.js — استبدل به الملف القديم');
+}
+
+/* ===== النشر المباشر عبر GitHub ===== */
+function getGH(){ try{ return JSON.parse(localStorage.getItem('GH_CFG'))||{}; }catch(e){ return {}; } }
+function fillGH(){
+  const g = getGH();
+  $('gh_owner').value = g.owner||'';
+  $('gh_repo').value  = g.repo||'';
+  $('gh_branch').value= g.branch||'main';
+  $('gh_path').value  = g.path||'config.js';
+  $('gh_token').value = g.token||'';
+  markGH();
+}
+function markGH(){
+  const g = getGH();
+  const ok = g.owner && g.repo && g.token;
+  const el = $('ghState');
+  el.textContent = ok ? ('متصل ✓ ('+g.owner+'/'+g.repo+')') : 'غير مضبوط';
+  el.className = 'gh-state ' + (ok?'on':'off');
+}
+/* تنظيف: نقبل حتى لو لصق المستخدم رابطاً كاملاً بدل الاسم فقط */
+function cleanOwner(v){
+  v=(v||'').trim();
+  let m = v.match(/github\.com\/([^\/#?]+)/i); if(m) return m[1];
+  m = v.match(/([^\/.#?]+)\.github\.io/i); if(m) return m[1];
+  return v.replace(/^https?:\/\//i,'').replace(/[\/#?].*$/,'');
+}
+function cleanRepo(v){
+  v=(v||'').trim().replace(/[#\/\s]+$/,'');
+  let m = v.match(/github\.io\/([^\/#?]+)/i) || v.match(/github\.com\/[^\/]+\/([^\/#?]+)/i);
+  if(m) return m[1].replace(/\.git$/i,'');
+  if(/https?:|\//i.test(v)){ const p=v.replace(/^https?:\/\//i,'').split('/').filter(Boolean); v=p[p.length-1]||v; }
+  return v.replace(/\.git$/i,'');
+}
+function saveGH(){
+  const g = {
+    owner:  cleanOwner($('gh_owner').value),
+    repo:   cleanRepo($('gh_repo').value),
+    branch: $('gh_branch').value.trim() || 'main',
+    path:   $('gh_path').value.trim() || 'config.js',
+    token:  $('gh_token').value.trim()
+  };
+  // نعيد كتابة الحقلين بالقيمة المُنظّفة كي يراها المستخدم
+  $('gh_owner').value = g.owner;
+  $('gh_repo').value  = g.repo;
+  localStorage.setItem('GH_CFG', JSON.stringify(g));
+  markGH();
+  toast('حُفظت إعدادات الاتصال');
+}
+function b64utf8(str){
+  const bytes = new TextEncoder().encode(str);
+  let bin=''; bytes.forEach(b=> bin += String.fromCharCode(b));
+  return btoa(bin);
+}
+async function publish(){
+  const g = getGH();
+  if(!g.owner || !g.repo || !g.token){ toast('اضبط إعدادات GitHub في القسم 0 أولاً'); $('gh_owner').focus(); return; }
+  const btn = $('btnPub'); btn.disabled = true; const label = btn.textContent; btn.textContent = '⏳ جارٍ النشر...';
+  const api = 'https://api.github.com/repos/'+g.owner+'/'+g.repo+'/contents/'+encodeURIComponent(g.path);
+  const headers = { 'Authorization':'Bearer '+g.token, 'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28' };
+  try{
+    // 1) الحصول على SHA الحالي للملف (إن وُجد)
+    let sha;
+    const gr = await fetch(api+'?ref='+encodeURIComponent(g.branch), { headers });
+    if(gr.status === 200){ sha = (await gr.json()).sha; }
+    else if(gr.status === 401){ throw new Error('التوكن غير صالح (401) — تحقّق منه'); }
+    else if(gr.status === 404){ /* ملف جديد */ }
+    else if(gr.status !== 200){ /* نكمل، قد يكون جديداً */ }
+    // 2) رفع النسخة الجديدة (commit)
+    const put = await fetch(api, {
+      method:'PUT',
+      headers: Object.assign({}, headers, {'Content-Type':'application/json'}),
+      body: JSON.stringify({
+        message: 'تحديث المحتوى من لوحة التحكم',
+        content: b64utf8(configFileText(collect())),
+        branch:  g.branch,
+        sha: sha
+      })
+    });
+    if(!put.ok){
+      let m = 'فشل النشر ('+put.status+')';
+      try{ const e = await put.json(); if(e.message) m += ' — '+e.message; }catch(_){}
+      throw new Error(m);
+    }
+    // نحدّث المعاينة المحلية أيضاً
+    localStorage.setItem('SITE_CONFIG', JSON.stringify(collect()));
+    toast('✅ نُشر بنجاح! الموقع يتحدّث خلال ~دقيقة');
+  }catch(err){
+    alert('⚠️ ' + err.message);
+  }finally{
+    btn.disabled = false; btn.textContent = label;
+  }
+}
+
+fillGH();
+</script>
+</body>
+</html>
