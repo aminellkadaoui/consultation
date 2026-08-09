@@ -113,6 +113,112 @@ button:active{transform:scale(.9);opacity:.8;transition-duration:90ms}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}button{transition:transform 170ms cubic-bezier(.4,0,.2,1),background 170ms cubic-bezier(.4,0,.2,1),box-shadow 170ms cubic-bezier(.4,0,.2,1),opacity 170ms!important}button:active{transform:scale(.9);opacity:.8;transition-duration:90ms!important}}
 
 </style>
+
+<style id="hig">
+@font-face{font-family:'Thmanyah Sans';src:url('fonts/thmanyah-sans-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Thmanyah Sans';src:url('fonts/thmanyah-sans-Medium.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'Thmanyah Sans';src:url('fonts/thmanyah-sans-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+body{font-family:'Thmanyah Sans','IBM Plex Sans Arabic',sans-serif}
+/* ضغطة الزر · معيار أمين */
+button:active{transform:scale(.9);opacity:.8;transition-duration:90ms}
+.ic{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:0 0 17px}
+
+/* ===== الهيكل: سايدبار + محتوى ===== */
+.shell{display:grid;grid-template-columns:236px 1fr;min-height:100dvh;align-items:start}
+.side{position:sticky;top:0;height:100dvh;display:flex;flex-direction:column;gap:6px;padding:18px 14px;border-inline-end:1px solid var(--line);background:rgba(250,251,254,.86);backdrop-filter:blur(18px) saturate(160%)}
+.side-brand{display:flex;align-items:center;gap:10px;padding:8px 10px 18px}
+.side-brand .sb-t{display:flex;flex-direction:column;line-height:1.35}
+.side-brand b{font-size:15px}
+.side-brand span{font-family:var(--mono);font-size:10.5px;color:var(--faint);direction:ltr;text-align:start}
+.side-nav{display:flex;flex-direction:column;gap:4px}
+.side-nav button,.side-foot button{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:0 12px;border:0;border-radius:12px;background:transparent;color:#3a4150;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s,color .15s,transform .15s,opacity .15s}
+.side-nav button:hover{background:rgba(15,107,255,.06)}
+.side-nav button.on{background:rgba(15,107,255,.1);color:var(--brand)}
+.side-foot{margin-top:auto}
+.side-foot button{color:var(--faint)}
+.side-foot button:hover{background:#f1f2f6;color:#3a4150}
+.main{min-width:0}
+.mainbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:12px 22px;background:rgba(255,255,255,.78);backdrop-filter:blur(18px) saturate(160%);border-bottom:1px solid rgba(0,0,0,.05)}
+.mainbar .mb-title{font-size:15px;font-weight:700}
+.sp{flex:1}
+@media(max-width:880px){
+  .shell{grid-template-columns:1fr}
+  .side{position:static;height:auto;flex-direction:row;align-items:center;padding:10px 12px;border-inline-end:0;border-bottom:1px solid var(--line)}
+  .side-brand{padding:0 4px;gap:8px}
+  .side-brand .sb-t span{display:none}
+  .side-nav{flex-direction:row;flex:1;justify-content:center}
+  .side-nav button{width:auto;min-height:40px;padding:0 13px;font-size:13px}
+  .side-nav button .ic{display:none}
+  .side-foot{margin:0}
+  .side-foot button{width:auto;min-height:40px;padding:0 10px}
+  .side-foot button span{display:none}
+  .mainbar{padding:10px 14px}
+}
+
+/* ===== ترويسة الطلبات ===== */
+.cihead{align-items:flex-end;padding:30px 0 6px}
+.lt{font-size:29px;font-weight:700;letter-spacing:-.02em;line-height:1.2;margin:0}
+.lt-sub{font-family:var(--mono);font-size:11.5px;color:var(--faint);direction:ltr;text-align:start;margin-top:5px}
+.tools .ibtn{display:inline-flex;align-items:center;gap:7px;min-height:38px}
+.stats{margin-top:18px}
+.stat{border-radius:14px}
+
+/* فلاتر مقسّمة */
+.listhead{display:flex;align-items:center;gap:10px;margin:26px 0 12px;flex-wrap:wrap}
+.seg{display:inline-flex;background:#eef1f6;border-radius:11px;padding:3px;gap:2px}
+.seg button{font-family:inherit;font-weight:650;font-size:12.5px;border:0;border-radius:8.5px;padding:8px 14px;min-height:36px;background:transparent;color:#5a6170;cursor:pointer;transition:background .15s,color .15s,transform .15s,opacity .15s}
+.seg button.on{background:#fff;color:#171a20;box-shadow:0 1px 4px rgba(20,30,60,.12)}
+.seg button .n{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-inline-start:4px}
+
+/* شريط التحديد الجماعي */
+.bulkbar{display:none;position:sticky;top:58px;z-index:15;align-items:center;gap:8px;background:#0f1720;color:#fff;border-radius:14px;padding:9px 12px;margin:0 0 12px;box-shadow:0 14px 34px -18px rgba(10,16,30,.55)}
+.bulkbar.on{display:flex;flex-wrap:wrap}
+.bulkbar .cnt{font-size:13px;font-weight:700;padding:0 6px}
+.bulkbar button{font-family:inherit;font-size:12.5px;font-weight:650;border:0;border-radius:9px;min-height:34px;padding:0 13px;background:rgba(255,255,255,.12);color:#fff;cursor:pointer;transition:background .15s,transform .15s,opacity .15s}
+.bulkbar button:hover{background:rgba(255,255,255,.22)}
+.bulkbar button.danger{background:#e4574e}
+.bulkbar button.plain{background:transparent;color:rgba(255,255,255,.65)}
+
+/* الجدول */
+#tableWrap table{min-width:940px}
+th{font-weight:650;letter-spacing:.02em}
+td{padding:12px 13px;font-size:13.5px;vertical-align:middle}
+.rowck{width:17px;height:17px;accent-color:var(--brand);cursor:pointer}
+th .rowck{vertical-align:middle}
+.badge.new{background:#e9f1ff;color:var(--brand-ink)}
+.badge.arch{background:#eef0f4;color:#6a7180}
+.morebtn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:#69707f;cursor:pointer;transition:background .15s,transform .15s,opacity .15s}
+.morebtn:hover{background:#f0f2f7}
+tr.sel-row{background:#f2f7ff}
+
+/* قائمة الصف (HIG Menus) */
+#rowMenu{position:fixed;z-index:60;min-width:200px;background:rgba(255,255,255,.92);backdrop-filter:blur(22px) saturate(170%);border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:5px;box-shadow:0 18px 44px -14px rgba(20,30,60,.35);display:none}
+#rowMenu.on{display:block;animation:menuIn .16s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes menuIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+#rowMenu button{display:flex;align-items:center;gap:9px;width:100%;min-height:40px;padding:0 11px;border:0;border-radius:9px;background:transparent;font-family:inherit;font-size:13.5px;font-weight:550;color:#232936;cursor:pointer;text-align:start;transition:background .12s,transform .15s,opacity .15s}
+#rowMenu button:hover{background:rgba(15,107,255,.07)}
+#rowMenu button.danger{color:var(--err)}
+#rowMenu button.danger:hover{background:#fdefee}
+#rowMenu .div{height:1px;background:rgba(0,0,0,.07);margin:5px 8px}
+
+/* نافذة الرسائل */
+#msgModal{display:none;position:fixed;inset:0;z-index:70;background:rgba(24,26,52,.42);backdrop-filter:blur(3px);padding:18px;overflow:auto}
+#msgModal.on{display:block}
+.msgcard{max-width:620px;margin:36px auto;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 24px 60px -30px rgba(24,26,52,.45)}
+.msgcard .mh{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
+.msgcard h2{font-size:18px;margin:0}
+.msgcard .who{font-size:12.5px;color:var(--faint);margin-top:4px}
+.msgcard .x{border:0;background:#f1f2f6;width:34px;height:34px;border-radius:10px;font-size:15px;cursor:pointer;transition:transform .15s,opacity .15s}
+.msgsegs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.msgcard textarea{width:100%;min-height:220px;font-family:inherit;font-size:14px;line-height:1.9;color:var(--ink);border:1.5px solid var(--line);border-radius:13px;padding:13px 15px;resize:vertical;outline:none}
+.msgcard textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(15,107,255,.12)}
+.msgacts{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.msgacts .ibtn{min-height:42px;display:inline-flex;align-items:center;gap:7px}
+.msgacts .wa{background:#12a66a;color:#fff;border:0}
+.msgacts .ibtn[disabled]{opacity:.45;cursor:not-allowed}
+.hint-line{font-size:11.5px;color:var(--faint);margin-top:9px}
+@media(prefers-reduced-motion:reduce){#rowMenu.on{animation:none}button:active{transform:none}}
+</style>
 </head>
 <body>
 
@@ -125,17 +231,21 @@ button:active{transform:scale(.9);opacity:.8;transition-duration:90ms}
 </div>
 
 <div id="adminShell" style="display:none">
-<div class="bar">
-  <span class="dot"></span><b>لوحة التحكم</b>
-  <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)">Amine Editing Team</span>
-  <span class="admtabs" id="admTabs"><button class="on" data-t="ci">طلبات الاستشارة</button><button data-t="site">محتوى الموقع</button></span>
-  <span class="sp"></span>
-  <span id="siteTools" style="display:none">
+<div class="shell">
+<aside class="side">
+  <div class="side-brand"><span class="dot"></span><div class="sb-t"><b>لوحة التحكم</b><span>Amine Editing Team</span></div></div>
+  <nav class="side-nav" id="admTabs">
+    <button class="on" data-t="ci"><svg class="ic" viewBox="0 0 24 24"><path d="M3.5 13.5h4l1.6 2.6h5.8l1.6-2.6h4M5.6 5.5h12.8l2.1 8v4.4a1.6 1.6 0 0 1-1.6 1.6H5.1a1.6 1.6 0 0 1-1.6-1.6V13.5Z"/></svg><span>طلبات الاستشارة</span></button>
+    <button data-t="site"><svg class="ic" viewBox="0 0 24 24"><path d="M7 3.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9.5A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5ZM14 3.8V8h4.2M8.8 12h6.4M8.8 15.5h4.4"/></svg><span>محتوى الموقع</span></button>
+  </nav>
+  <div class="side-foot"><button id="sideLogout"><svg class="ic" viewBox="0 0 24 24"><path d="M14.5 8V5.8A1.8 1.8 0 0 0 12.7 4H6.3a1.8 1.8 0 0 0-1.8 1.8v12.4A1.8 1.8 0 0 0 6.3 20h6.4a1.8 1.8 0 0 0 1.8-1.8V16M9.5 12h10M16.7 9.2 19.5 12l-2.8 2.8"/></svg><span>خروج</span></button></div>
+</aside>
+<div class="main">
+<div class="mainbar"><div class="mb-title" id="mbTitle">طلبات الاستشارة</div><span class="sp"></span><span id="siteTools" style="display:none">
   <button class="b-prev" onclick="preview()">👁 معاينة</button>
   <button class="b-exp" onclick="exportConfig()">⬇ تصدير</button>
   <button class="b-pub" id="btnPub" onclick="publish()">🚀 نشر مباشرة</button>
-  </span>
-</div>
+</span></div>
 
 <div id="siteTab" class="hidden"><div class="wrap">
   <div class="note">
@@ -231,11 +341,14 @@ button:active{transform:scale(.9);opacity:.8;transition-duration:90ms}
 </div>
 <div id="ciTab" class="on">
 
-<div id="app" style="display:none"><div class="ciwrap"><div class="cihead"><span class="brand"><span class="dot"></span>Client Intelligence · طلبات الاستشارة</span><div class="tools"><button class="ibtn" id="refreshBtn">⟳ تحديث</button><button class="ibtn p" id="csvBtn">⬇ CSV</button><button class="ibtn" id="logoutBtn">خروج</button></div></div><div class="stats" id="stats"></div><div class="eyebrow">كل الطلبات · اضغط أي صف لفتح ملف العميل</div><div id="tableWrap"><div class="empty">جارٍ التحميل…</div></div></div></div>
-<div id="detail"><div class="dcard"><div class="dh"><div><h2 id="dTitle">ملف العميل</h2><div class="sub" id="dSub"></div></div><button class="x" id="dClose">✕</button></div><div class="dtools"><button class="ibtn p" id="copyPrompt">📋 نسخ برومت التحليل</button><button class="ibtn" id="copyBrief">نسخ الـBrief</button><button class="ibtn" id="dlBrief">⬇ تنزيل</button></div><div id="dBody"></div></div></div>
+<div id="app" style="display:none"><div class="ciwrap"><div class="cihead"><div><h1 class="lt">طلبات الاستشارة</h1><div class="lt-sub">Client Intelligence</div></div><div class="tools"><button class="ibtn" id="refreshBtn"><svg class="ic" viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.7 3.8v3.4h-3.4"/></svg>تحديث</button><button class="ibtn p" id="csvBtn"><svg class="ic" viewBox="0 0 24 24"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 19.5h14"/></svg>CSV</button><button class="ibtn" id="logoutBtn" style="display:none">خروج</button></div></div><div class="stats" id="stats"></div><div class="listhead"><div class="seg" id="filterSeg"><button class="on" data-f="all">الكل</button><button data-f="new">جديد</button><button data-f="accepted">مقبول</button><button data-f="rejected">مرفوض</button><button data-f="archived">الأرشيف</button></div></div><div class="bulkbar" id="bulkBar"><span class="cnt" id="bulkCount"></span><span class="sp"></span><button data-act="accept">قبول</button><button data-act="reject">رفض</button><button data-act="archive">أرشفة</button><button data-act="unarchive">استرجاع</button><button class="danger" data-act="delete">حذف</button><button class="plain" data-act="clear">إلغاء</button></div><div id="tableWrap"><div class="empty">جارٍ التحميل…</div></div></div></div>
+<div id="rowMenu"></div>
+<div id="msgModal"><div class="msgcard"><div class="mh"><div><h2 id="mmTitle">رسالة القبول</h2><div class="who" id="mmWho"></div></div><button class="x" id="mmClose">✕</button></div><div class="msgsegs"><div class="seg" id="mmType"><button class="on" data-v="accept">رسالة القبول</button><button data-v="follow">رسالة المتابعة</button></div><div class="seg" id="mmLang"><button class="on" data-v="ar">عربي</button><button data-v="dar">Darija</button></div></div><textarea id="mmText" dir="auto"></textarea><div class="msgacts"><button class="ibtn wa" id="mmWa">إرسال WhatsApp</button><button class="ibtn" id="mmMail">إرسال بريد</button><button class="ibtn" id="mmCopy">نسخ</button></div><div class="hint-line" id="mmHint">راجع الرسالة وعدّلها قبل الإرسال · الاسم والتفاصيل معبأة تلقائيًا من إجابات العميل.</div></div></div>
+<div id="detail"><div class="dcard"><div class="dh"><div><h2 id="dTitle">ملف العميل</h2><div class="sub" id="dSub"></div></div><button class="x" id="dClose">✕</button></div><div class="dtools" id="dStatusRow"></div><div class="dtools"><button class="ibtn p" id="copyPrompt">📋 نسخ برومت التحليل</button><button class="ibtn" id="copyBrief">نسخ الـBrief</button><button class="ibtn" id="dlBrief">⬇ تنزيل</button></div><div id="dBody"></div></div></div>
 <div class="toast" id="ciToast"></div>
 
 </div>
+</div></div>
 </div>
 <div class="toast" id="toast"><span class="ok">✓</span> <span id="toastMsg"></span></div>
 
@@ -680,7 +793,109 @@ function showGate(){$('gate').style.display='flex';$('adminShell').style.display
 $('demoBtn').onclick=()=>{ROWS=[DEMO];showAdmin();render()};
 ensureFirebase().then(fb=>fb.onAuth(auth,u=>{if(u){showAdmin();load()}else{showGate()}})).catch(()=>{});
 async function load(){$('tableWrap').innerHTML='<div class="empty">جارٍ التحميل…</div>';try{const token=await auth.currentUser.getIdToken();const runQ=id=>fetch(fsDocs(id)+':runQuery',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({structuredQuery:{from:[{collectionId:COLLECTION}],limit:1000}})});let dbid=null,qres=null;for(const id of FS_DBS){const r=await runQ(id);if(r.ok){dbid=id;qres=r;break}if(r.status!==404&&r.status!==400)throw new Error('HTTP '+r.status)}if(!dbid){ROWS=[];render();return}window.__DBID=dbid;const arr=await qres.json();let docs=[];(Array.isArray(arr)?arr:[]).forEach(x=>{const d=x.document;if(d)docs.push(Object.assign({id:d.name.split('/').pop(),__ct:d.createTime},fsFields(d.fields)))});docs.sort((a,b)=>String(b.submittedAt||b.__ct||'').localeCompare(String(a.submittedAt||a.__ct||'')));const events=docs.filter(d=>d.record_type==='booking_confirmation'),confirmedByToken=new Map();events.forEach(e=>{if(e.lead_token&&!confirmedByToken.has(e.lead_token))confirmedByToken.set(e.lead_token,e)});ROWS=docs.filter(d=>d.record_type!=='booking_confirmation').map(r=>{const ev=r.lead_token?confirmedByToken.get(r.lead_token):null;return ev?Object.assign({},r,{booking_status:'confirmed_by_user',bookingConfirmedAt:ev.bookingConfirmedAt||ev.submittedAt}):r});render()}catch(e){console.error(e);$('tableWrap').innerHTML='<div class="empty">تعذّر التحميل: '+esc(e.message||e)+'</div>'}}$('refreshBtn').onclick=load;
-function render(){const n=ROWS.length,confirmed=ROWS.filter(r=>g(r,'booking_status')==='confirmed_by_user').length,opened=ROWS.filter(r=>['booking_page_shown','booking_opened','confirmed_by_user'].includes(g(r,'booking_status'))).length,ready=ROWS.filter(r=>{const b=g(r,'monthly_budget');return b&&b!=='لست مستعدًا للاستثمار حاليًا'}).length;$('stats').innerHTML=[['الطلبات',n],['وصلوا للحجز',opened],['أكدوا الحجز',confirmed],['لديهم ميزانية',ready]].map(([k,v])=>`<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');if(!n){$('tableWrap').innerHTML='<div class="empty">لا توجد طلبات بعد.</div>';return}$('tableWrap').innerHTML='<table><thead><tr><th>العميل</th><th>العرض / العمل</th><th>الميزانية</th><th>القرار</th><th>الحجز</th><th>التاريخ</th></tr></thead><tbody>'+ROWS.map((r,i)=>{const d=r.submittedAt?new Date(r.submittedAt):null,ds=d?d.toLocaleDateString('ar'):'·';return`<tr class="clk" data-i="${i}"><td><b>${esc(nameOf(r))}</b><br><span style="color:var(--faint);font-size:11.5px">${esc(first(r,'contact_phone'))}</span></td><td style="max-width:330px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(businessOf(r))}</td><td>${esc(budgetOf(r))}</td><td>${esc(first(r,'decision_authority')||'·')}</td><td>${bookingBadge(r)}</td><td class="mono">${ds}</td></tr>`}).join('')+'</tbody></table>';$('tableWrap').querySelectorAll('tr.clk').forEach(tr=>tr.onclick=()=>openIntel(ROWS[+tr.dataset.i]))}
+
+/* ===== الحالة والفلاتر والتحديد ===== */
+let FILTER='all';const SEL=new Set();
+function statusOf(r){return r.admin_status||'new'}
+function statusBadge(r){const st=statusOf(r);if(st==='accepted')return'<span class="badge ok">مقبول</span>';if(st==='rejected')return'<span class="badge err">مرفوض</span>';if(st==='archived')return'<span class="badge arch">مؤرشف</span>';return'<span class="badge new">جديد</span>'}
+function viewRows(){return ROWS.filter(r=>{const st=statusOf(r);if(FILTER==='all')return st!=='archived';if(FILTER==='new')return st==='new';return st===FILTER})}
+function idxOf(r){return ROWS.indexOf(r)}
+function render(){
+ const n=ROWS.filter(r=>statusOf(r)!=='archived').length,
+ confirmed=ROWS.filter(r=>g(r,'booking_status')==='confirmed_by_user').length,
+ accepted=ROWS.filter(r=>statusOf(r)==='accepted').length,
+ ready=ROWS.filter(r=>{const b=g(r,'monthly_budget');return b&&b!=='لست مستعدًا للاستثمار حاليًا'&&b!=='Mazal machi mesta3ed daba'}).length;
+ $('stats').innerHTML=[['الطلبات',n],['أكدوا الحجز',confirmed],['مقبولون',accepted],['لديهم ميزانية',ready]].map(([k,v])=>`<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
+ const V=viewRows();
+ [...SEL].forEach(id=>{if(!V.some(r=>r.id===id))SEL.delete(id)});
+ updateBulk();
+ if(!V.length){$('tableWrap').innerHTML='<div class="empty">'+(FILTER==='all'?'لا توجد طلبات بعد.':'لا شيء هنا.')+'</div>';return}
+ $('tableWrap').innerHTML='<table><thead><tr><th style="width:34px"><input type="checkbox" class="rowck" id="ckAll"></th><th>العميل</th><th>العرض / العمل</th><th>الميزانية</th><th>الحالة</th><th>الحجز</th><th>التاريخ</th><th style="width:40px"></th></tr></thead><tbody>'+
+ V.map(r=>{const d=r.submittedAt?new Date(r.submittedAt):null,ds=d?d.toLocaleDateString('ar'):'·';const on=SEL.has(r.id);
+ return`<tr class="clk ${on?'sel-row':''}" data-id="${esc(r.id)}"><td><input type="checkbox" class="rowck rck" data-id="${esc(r.id)}" ${on?'checked':''}></td><td><b>${esc(nameOf(r))}</b><br><span style="color:var(--faint);font-size:11.5px" class="mono">${esc(first(r,'contact_phone'))}</span></td><td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(businessOf(r))}</td><td>${esc(budgetOf(r))}</td><td>${statusBadge(r)}</td><td>${bookingBadge(r)}</td><td class="mono">${ds}</td><td><button class="morebtn" data-id="${esc(r.id)}" aria-label="خيارات"><svg class="ic" viewBox="0 0 24 24"><circle cx="5.4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="18.6" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg></button></td></tr>`}).join('')+'</tbody></table>';
+ $('tableWrap').querySelectorAll('tr.clk').forEach(tr=>tr.onclick=e=>{if(e.target.closest('.rck')||e.target.closest('.morebtn'))return;const r=byId(tr.dataset.id);if(r)openIntel(r)});
+ $('tableWrap').querySelectorAll('.rck').forEach(ck=>ck.onchange=()=>{ck.checked?SEL.add(ck.dataset.id):SEL.delete(ck.dataset.id);ck.closest('tr').classList.toggle('sel-row',ck.checked);updateBulk()});
+ $('tableWrap').querySelectorAll('.morebtn').forEach(b=>b.onclick=e=>{e.stopPropagation();openMenu(b,byId(b.dataset.id))});
+ const all=$('ckAll');if(all)all.onchange=()=>{const V2=viewRows();V2.forEach(r=>all.checked?SEL.add(r.id):SEL.delete(r.id));render()};
+}
+function byId(id){return ROWS.find(r=>r.id===id)}
+function updateBulk(){const b=$('bulkBar');if(!b)return;b.classList.toggle('on',SEL.size>0);$('bulkCount').textContent=SEL.size?('محدد: '+SEL.size):''}
+$('filterSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;FILTER=b.dataset.f;$('filterSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));SEL.clear();render()});
+
+/* ===== كتابة Firestore ===== */
+function toFsFields(o){const f={};for(const k in o)f[k]={stringValue:String(o[k])};return f}
+async function fsPatch(id,fields){const token=await auth.currentUser.getIdToken();const db=window.__DBID||'default';const mask=Object.keys(fields).map(k=>'updateMask.fieldPaths='+encodeURIComponent(k)).join('&');const r=await fetch(fsDocs(db)+'/'+COLLECTION+'/'+encodeURIComponent(id)+'?'+mask,{method:'PATCH',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({fields:toFsFields(fields)})});if(r.status===403)throw new Error('RULES');if(!r.ok)throw new Error('HTTP '+r.status);return true}
+async function fsDelete(id){const token=await auth.currentUser.getIdToken();const db=window.__DBID||'default';const r=await fetch(fsDocs(db)+'/'+COLLECTION+'/'+encodeURIComponent(id),{method:'DELETE',headers:{Authorization:'Bearer '+token}});if(r.status===403)throw new Error('RULES');if(!r.ok)throw new Error('HTTP '+r.status);return true}
+function ruleErr(e){if(String(e.message)==='RULES'){toast('حدّث قواعد Firestore للسماح بحفظ الحالة (أرسلتها لك)')}else toast('تعذّر الحفظ: '+(e.message||e))}
+async function setStatus(ids,st){try{for(const id of ids){await fsPatch(id,st==='new'?{admin_status:''}:{admin_status:st,decidedAt:new Date().toISOString()});const r=byId(id);if(r)r.admin_status=(st==='new'?'':st)}render();return true}catch(e){ruleErr(e);return false}}
+async function delRows(ids){if(!confirm('حذف نهائي لـ '+ids.length+' طلب؟ لا يمكن التراجع.'))return;try{for(const id of ids){await fsDelete(id);ROWS=ROWS.filter(r=>r.id!==id);SEL.delete(id)}render();toast('تم الحذف')}catch(e){ruleErr(e)}}
+$('bulkBar').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;const act=b.dataset.act,ids=[...SEL];if(!ids.length&&act!=='clear')return;
+ if(act==='clear'){SEL.clear();render();return}
+ if(act==='delete'){delRows(ids);return}
+ const map={accept:'accepted',reject:'rejected',archive:'archived',unarchive:'new'};
+ if(await setStatus(ids,map[act])){SEL.clear();render();toast(act==='accept'?'تم القبول':act==='reject'?'تم الرفض':act==='archive'?'تمت الأرشفة':'تم الاسترجاع')}});
+
+/* ===== قائمة الصف ===== */
+let MENU_R=null;
+function openMenu(btn,r){MENU_R=r;const m=$('rowMenu');const st=statusOf(r);
+ m.innerHTML=
+  (st!=='accepted'?'<button data-a="accept">قبول الطلب</button>':'')+
+  (st!=='rejected'?'<button data-a="reject">رفض الطلب</button>':'')+
+  '<div class="div"></div>'+
+  '<button data-a="msgA">رسالة القبول</button><button data-a="msgF">رسالة المتابعة</button>'+
+  '<div class="div"></div>'+
+  '<button data-a="open">فتح الملف</button>'+
+  (st==='archived'?'<button data-a="unarchive">استرجاع من الأرشيف</button>':'<button data-a="archive">أرشفة</button>')+
+  '<div class="div"></div><button class="danger" data-a="del">حذف</button>';
+ m.classList.add('on');
+ const b=btn.getBoundingClientRect(),mw=m.offsetWidth||210,mh=m.offsetHeight;
+ let x=Math.min(Math.max(8,b.left-mw+b.width),innerWidth-mw-8);
+ let y=b.bottom+6;if(y+mh>innerHeight-8)y=b.top-mh-6;
+ m.style.left=x+'px';m.style.top=y+'px';}
+function closeMenu(){$('rowMenu').classList.remove('on')}
+document.addEventListener('click',e=>{if(!e.target.closest('#rowMenu')&&!e.target.closest('.morebtn'))closeMenu()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMenu();$('msgModal').classList.remove('on')}});
+$('rowMenu').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b||!MENU_R)return;const a=b.dataset.a,r=MENU_R;closeMenu();
+ if(a==='open')openIntel(r);
+ else if(a==='accept'){if(await setStatus([r.id],'accepted'))toast('تم قبول '+nameOf(r))}
+ else if(a==='reject'){if(await setStatus([r.id],'rejected'))toast('تم رفض الطلب')}
+ else if(a==='archive'){if(await setStatus([r.id],'archived'))toast('تمت الأرشفة')}
+ else if(a==='unarchive'){if(await setStatus([r.id],'new'))toast('تم الاسترجاع')}
+ else if(a==='del')delRows([r.id]);
+ else if(a==='msgA')openMsg(r,'accept');
+ else if(a==='msgF')openMsg(r,'follow');});
+
+/* ===== مولّد الرسائل ===== */
+const CAL_URL=(window.SITE_CONFIG&&window.SITE_CONFIG.bookingUrl)||'https://calendar.app.google/Wox9zm9zaCydyEkG8';
+function firstName(r){return (nameOf(r)||'').trim().split(/\s+/)[0]||''}
+function goalOf(r){return first(r,'change_to','desired_change')}
+function buildMsg(r,type,lang){
+ const fn=firstName(r),booked=g(r,'booking_status')==='confirmed_by_user',goal=goalOf(r),fromTxt=first(r,'change_from');
+ if(lang==='dar'){
+  if(type==='accept'){let o='Salam '+fn+' 👋\n\n';o+='Choukran 3la lformulaire dyal listichara. Raje3na ajwiba dyalek, w khbar zwin: talab dyalek t9bel ✅\n\n';if(goal)o+='Fhamna anna lhadaf dyalek howa: '+goal+'\n\n';o+=booked?'Lmaw3id dyalna tabet. Ghadi nraj3o content dyalek 9bel l call bach njiw wajdin.\n\n':'B9at ghir khotwa we7da: booki lmaw3id dyal l call mn hna:\n'+CAL_URL+'\n\n';o+='Ntla9aw 9rib,\nAmine · Amine Editing Team';return o}
+  let o='Salam '+fn+' 👋\n\n';o+='Tadkir b lmaw3id dyal l call dyalna li jay. Raje3na ajwiba w content dyalek, w wajjadna n9at khassa b lwad3 dyalek.\n\n';if(fromTxt&&goal)o+='Ghadi nrakzo 3la kifach ndouzo mn:\n«'+fromTxt+'»\nl:\n«'+goal+'»\n\n';o+='Ila tbeddel chi 7aja wla bghiti tbeddel lwe9t, goulha liya hna.\n\nNtla9aw f l call 🙌';return o}
+ if(type==='accept'){let o='مرحبًا '+fn+' 👋\n\n';o+='شكرًا لك على تعبئة نموذج الاستشارة. راجعنا إجاباتك بعناية، ويسعدنا إخبارك أن طلبك مقبول ✅\n\n';if(goal)o+='فهمنا أن هدفك الأساسي هو: '+goal+'\n\n';o+=booked?'موعدنا ثابت كما حجزته، وسنراجع محتواك قبل المكالمة حتى نأتي جاهزين بأفكار لوضعك.\n\n':'بقيت خطوة واحدة فقط: احجز موعد المكالمة من هنا:\n'+CAL_URL+'\n\n';o+='نراك قريبًا،\nأمين · Amine Editing Team';return o}
+ let o='مرحبًا '+fn+' 👋\n\n';o+='تذكير بموعد مكالمتنا القادمة. راجعنا إجاباتك ومحتواك، وجهزنا نقاطًا مخصصة لوضعك.\n\n';if(fromTxt&&goal)o+='سنركّز في المكالمة على الانتقال من:\n«'+fromTxt+'»\nإلى:\n«'+goal+'»\n\n';o+='إذا استجدّ شيء أو احتجت تغيير الموعد، راسلني هنا مباشرة.\n\nنراك في المكالمة 🙌';return o}
+let MSG_R=null,MSG_TYPE='accept',MSG_LANG='ar';
+function openMsg(r,type){MSG_R=r;MSG_TYPE=type||'accept';
+ MSG_LANG=/[A-Za-z]/.test(g(r,'business_profile'))&&!/[؀-ۿ]/.test(g(r,'business_profile'))?'dar':'ar';
+ syncMsgSegs();refreshMsg();
+ $('mmWho').textContent=nameOf(r)+' · '+(first(r,'contact_phone')||'بدون رقم');
+ $('msgModal').classList.add('on')}
+function syncMsgSegs(){$('mmType').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===MSG_TYPE));$('mmLang').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===MSG_LANG));$('mmTitle').textContent=MSG_TYPE==='accept'?'رسالة القبول':'رسالة المتابعة'}
+function refreshMsg(){$('mmText').value=buildMsg(MSG_R,MSG_TYPE,MSG_LANG);
+ const ph=String(first(MSG_R,'contact_phone')).replace(/[^0-9]/g,''),em=first(MSG_R,'contact_email');
+ $('mmWa').disabled=!ph;$('mmMail').disabled=!em;
+ $('mmHint').textContent=(!ph?'لا يوجد رقم واتساب لهذا العميل. ':'')+(!em?'لا يوجد بريد (اختياري في الفورم). ':'')+'راجع الرسالة وعدّلها قبل الإرسال.'}
+$('mmType').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;MSG_TYPE=b.dataset.v;syncMsgSegs();refreshMsg()});
+$('mmLang').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;MSG_LANG=b.dataset.v;syncMsgSegs();refreshMsg()});
+$('mmClose').onclick=()=>$('msgModal').classList.remove('on');
+$('msgModal').onclick=e=>{if(e.target.id==='msgModal')$('msgModal').classList.remove('on')};
+$('mmCopy').onclick=async()=>{await navigator.clipboard.writeText($('mmText').value);toast('نُسخت الرسالة')};
+$('mmWa').onclick=()=>{const ph=String(first(MSG_R,'contact_phone')).replace(/[^0-9]/g,'');if(!ph)return;window.open('https://wa.me/'+ph+'?text='+encodeURIComponent($('mmText').value),'_blank')};
+$('mmMail').onclick=()=>{const em=first(MSG_R,'contact_email');if(!em)return;const su=MSG_TYPE==='accept'?'قبول طلب الاستشارة · Amine Editing Team':'تذكير بموعد المكالمة · Amine Editing Team';location.href='mailto:'+em+'?subject='+encodeURIComponent(su)+'&body='+encodeURIComponent($('mmText').value)};
+$('sideLogout').onclick=()=>$('logoutBtn').click();
+
 function safeHref(v){try{const u=new URL(String(v));return /^https?:$/.test(u.protocol)?u.href:''}catch(_){return''}}function kv(k,v,link=false){const has=v&&String(v).trim(),href=has&&link?safeHref(v):'';const value=has?(href?`<a class="link" href="${esc(href)}" target="_blank" rel="noopener">${esc(v)}</a>`:esc(v)):'·';return`<div class="kv"><div class="k">${esc(k)}</div><div class="v">${value}</div></div>`}
 function derive(r){const H=[],ASK=[],FLAG=[];const decision=g(r,'decision_authority'),budget=g(r,'monthly_budget'),status=g(r,'booking_status');if(decision==='أنا أبحث حاليًا فقط')FLAG.push('العميل صرّح أنه في مرحلة بحث فقط، لا قرار شراء حالي.');if(decision==='أحتاج إلى اتخاذ القرار مع شريك أو شخص آخر')ASK.push('من الشخص الآخر الذي يشارك في القرار؟ وهل يحتاج أن يحضر جزءًا من المكالمة؟');if(budget==='لست مستعدًا للاستثمار حاليًا')FLAG.push('العميل صرّح أنه غير مستعد للاستثمار حاليًا.');if(!budget)ASK.push('ما نطاق الاستثمار الشهري المسؤول إذا وجدنا Fit واضحًا؟');if(status&&status!=='confirmed_by_user')ASK.push('هل تم اختيار موعد بالفعل؟ حالة النموذج الحالية: '+status);return{H,ASK,FLAG}}
 function buildIntel(r){const {H,ASK,FLAG}=derive(r);let h='';
@@ -699,9 +914,18 @@ function buildIntel(r){const {H,ASK,FLAG}=derive(r);let h='';
 function briefText(r){const {H,ASK,FLAG}=derive(r);let o='CLIENT SNAPSHOT\n';o+='• الاسم: '+nameOf(r)+'\n';o+='• الهاتف: '+first(r,'contact_phone')+'\n';o+='• البريد (اختياري): '+first(r,'contact_email')+'\n';o+='• العرض/العمل: '+businessOf(r)+'\n';o+='• المحتوى الآن: '+first(r,'content_current')+'\n';o+='• النظام والتجارب السابقة: '+first(r,'operation_current_and_past')+'\n';o+='• التغيير المطلوب: '+changeOf(r)+'\n';o+='• لماذا الآن: '+first(r,'trigger_reason')+'\n';o+='• المصدر: '+first(r,'source_channel')+'\n';o+='• القرار: '+first(r,'decision_authority')+'\n';o+='• الميزانية: '+budgetOf(r)+'\n';o+='• حالة الحجز: '+(g(r,'booking_status')||'UNKNOWN')+'\n';if(H.length)o+='\nHYPOTHESES\n'+H.map(x=>'- '+x).join('\n');if(ASK.length)o+='\n\nQUESTIONS FOR THE CALL\n'+ASK.map((x,i)=>(i+1)+'. '+x).join('\n');if(FLAG.length)o+='\n\nRED FLAGS\n'+FLAG.map(x=>'- '+x).join('\n');return o}
 function rawQA(r){let o='';Object.keys(QLAB).forEach(k=>{const v=g(r,k);if(v)o+=QLAB[k]+':\n'+v+'\n\n'});return o}
 const ANALYZER_PROMPT=`أنت محلّل ذكاء عميل لاستشارة محتوى ومونتاج مع خبراء وكوتشز ومستشارين وبراندات شخصية.\n\nستستلم إجابات نموذج تأهيل قبل المكالمة. ابنِ تحليلًا قائمًا على الأدلة، ولا تضف معلومات غير موجودة.\n\nافصل بوضوح بين: معلومات العميل، العمل والعرض (وفيه وصف العميل المستهدف ومشكلته ونتيجته كما كتبها العميل)، وضع المحتوى الحالي، إدارة الإنتاج والتجارب السابقة، النتيجة المطلوبة خلال 3 أشهر، Trigger الحالي، مصدر الوصول إلينا، الاستعداد لاتخاذ القرار والاستثمار، ومواد البحث المرفقة.\n\nقواعد:\n1) صنّف أي استنتاج إلى Confirmed / Inference / Hypothesis / Unknown.\n2) لا تستنتج القدرة على الدفع من سعر العرض؛ استخدم فقط إجابة الميزانية.\n3) لا تخترع مشاكل أو اعتراضات أو أسباب شراء غير مكتوبة.\n4) استخرج التناقضات والفجوات والأسئلة التي يجب حسمها في المكالمة.\n5) ركّز على أثر المعلومات على Strategy / Content System / Editing، وليس على زخرفة المونتاج.\n\nالمخرجات: 1) Snapshot 2) Q1 Business & Offer 3) Q2 Current Content 4) Q3 Production System & Past Attempts 5) Q4 Desired A→B 6) Q5 Trigger 7) Q6 Acquisition Source 8) Q7 Decision & Budget 9) Evidence/Links 10) Booking Status 11) Hypotheses 12) Red Flags 13) Critical Unknowns 14) Top Opportunities 15) أسئلة المكالمة مرتبة بالأهمية.\n\n=== إجابات العميل ===\n`;
-let CURRENT=null;function openIntel(r){CURRENT=r;$('dTitle').textContent=nameOf(r);const d=r.submittedAt?new Date(r.submittedAt):null;$('dSub').textContent=(budgetOf(r)!=='·'?budgetOf(r)+' · ':'')+(d?d.toLocaleDateString('ar'):'');$('dBody').innerHTML=buildIntel(r);$('detail').classList.add('on')}$('dClose').onclick=()=>$('detail').classList.remove('on');$('detail').onclick=e=>{if(e.target.id==='detail')$('detail').classList.remove('on')};document.addEventListener('keydown',e=>{if(e.key==='Escape')$('detail').classList.remove('on')});$('copyPrompt').onclick=async()=>{await navigator.clipboard.writeText(ANALYZER_PROMPT+rawQA(CURRENT));toast('نُسخ برومت التحليل')};$('copyBrief').onclick=async()=>{await navigator.clipboard.writeText(briefText(CURRENT));toast('نُسخ الـBrief')};$('dlBrief').onclick=()=>{const blob=new Blob(['﻿'+briefText(CURRENT)],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='client-brief.txt';a.click()};
+let CURRENT=null;function openIntel(r){CURRENT=r;$('dTitle').textContent=nameOf(r);renderDStatus(r);const d=r.submittedAt?new Date(r.submittedAt):null;$('dSub').textContent=(budgetOf(r)!=='·'?budgetOf(r)+' · ':'')+(d?d.toLocaleDateString('ar'):'');$('dBody').innerHTML=buildIntel(r);$('detail').classList.add('on')}function renderDStatus(r){const st=statusOf(r);$('dStatusRow').innerHTML=
+ '<span class="badge '+(st==='accepted'?'ok':st==='rejected'?'err':st==='archived'?'arch':'new')+'" style="font-size:12px;padding:6px 12px">'+(st==='accepted'?'مقبول':st==='rejected'?'مرفوض':st==='archived'?'مؤرشف':'جديد')+'</span>'+
+ (st!=='accepted'?'<button class="ibtn p" id="dAccept">قبول الطلب</button>':'')+
+ (st!=='rejected'?'<button class="ibtn" id="dReject">رفض</button>':'')+
+ '<button class="ibtn" id="dMsgA">رسالة القبول</button><button class="ibtn" id="dMsgF">رسالة المتابعة</button>';
+ const w=(id,fn)=>{const b=$('' + id);if(b)b.onclick=fn};
+ w('dAccept',async()=>{if(await setStatus([r.id],'accepted')){renderDStatus(r);toast('تم القبول')}});
+ w('dReject',async()=>{if(await setStatus([r.id],'rejected')){renderDStatus(r);toast('تم الرفض')}});
+ w('dMsgA',()=>openMsg(r,'accept'));w('dMsgF',()=>openMsg(r,'follow'));}
+$('dClose').onclick=()=>$('detail').classList.remove('on');$('detail').onclick=e=>{if(e.target.id==='detail')$('detail').classList.remove('on')};document.addEventListener('keydown',e=>{if(e.key==='Escape')$('detail').classList.remove('on')});$('copyPrompt').onclick=async()=>{await navigator.clipboard.writeText(ANALYZER_PROMPT+rawQA(CURRENT));toast('نُسخ برومت التحليل')};$('copyBrief').onclick=async()=>{await navigator.clipboard.writeText(briefText(CURRENT));toast('نُسخ الـBrief')};$('dlBrief').onclick=()=>{const blob=new Blob(['﻿'+briefText(CURRENT)],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='client-brief.txt';a.click()};
 $('csvBtn').onclick=()=>{const keys=Object.keys(QLAB),head=['submittedAt',...keys.map(k=>QLAB[k])],e2=s=>`"${String(s??'').replace(/"/g,'""')}"`,lines=[head.map(e2).join(',')];ROWS.forEach(r=>lines.push([r.submittedAt||'',...keys.map(k=>g(r,k))].map(e2).join(',')));const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='consultation-leads.csv';a.click()};
-const DEMO={submittedAt:new Date().toISOString(),form_version:'7q_booking_v2_embed',contact_name:'محمد العتيبي',contact_email:'mohammed@example.com',contact_phone:'+966 50 000 0000',contact_main_link:'https://instagram.com/example',business_profile:'أساعد أصحاب الشركات الخدمية الذين لديهم مبيعات لكن محتواهم غير منتظم على بناء حضور يجذب Leads مؤهلين من خلال استشارة وتنفيذ محتوى، بسعر 2,000 دولار.',content_current:'أنشر 2–3 Reels أسبوعيًا على Instagram. الهدف جذب Leads وبناء الثقة. يأتيني بعض العملاء لكن النتائج غير ثابتة والمحتوى يأخذ وقتًا كبيرًا.',operation_current_and_past:'عندي Editor فريلانسر، لكن لا توجد استراتيجية موثقة. جرّبت العمل مع مونتير سابقًا؛ الجودة كانت جيدة لكن احتاج مني توجيهًا كثيرًا.',change_from:'محتوى متقطع يعتمد علي في كل قرار.',change_to:'نظام ينشر باستمرار ويجذب Leads بدون أن أراجع كل تفصيلة.',trigger_reason:'بدأت أوسع الفريق وأريد إخراج المحتوى من وقتي.',source_channel:'شاهدت فيديو / Reel على Instagram',decision_authority:'نعم، القرار بيدي',monthly_budget:'أكثر من 1,000 دولار',prep_offer:'https://example.com/offer',prep_social:'https://instagram.com/example',booking_status:'confirmed_by_user',bookingConfirmedAt:new Date().toISOString()};window.__demo=DEMO;
+const DEMO={id:'demo_1',submittedAt:new Date().toISOString(),form_version:'7q_booking_v2_embed',contact_name:'محمد العتيبي',contact_email:'mohammed@example.com',contact_phone:'+966 50 000 0000',contact_main_link:'https://instagram.com/example',business_profile:'أساعد أصحاب الشركات الخدمية الذين لديهم مبيعات لكن محتواهم غير منتظم على بناء حضور يجذب Leads مؤهلين من خلال استشارة وتنفيذ محتوى، بسعر 2,000 دولار.',content_current:'أنشر 2–3 Reels أسبوعيًا على Instagram. الهدف جذب Leads وبناء الثقة. يأتيني بعض العملاء لكن النتائج غير ثابتة والمحتوى يأخذ وقتًا كبيرًا.',operation_current_and_past:'عندي Editor فريلانسر، لكن لا توجد استراتيجية موثقة. جرّبت العمل مع مونتير سابقًا؛ الجودة كانت جيدة لكن احتاج مني توجيهًا كثيرًا.',change_from:'محتوى متقطع يعتمد علي في كل قرار.',change_to:'نظام ينشر باستمرار ويجذب Leads بدون أن أراجع كل تفصيلة.',trigger_reason:'بدأت أوسع الفريق وأريد إخراج المحتوى من وقتي.',source_channel:'شاهدت فيديو / Reel على Instagram',decision_authority:'نعم، القرار بيدي',monthly_budget:'أكثر من 1,000 دولار',prep_offer:'https://example.com/offer',prep_social:'https://instagram.com/example',booking_status:'confirmed_by_user',bookingConfirmedAt:new Date().toISOString()};window.__demo=DEMO;
 </script>
 <script>
 (function(){
@@ -713,6 +937,7 @@ const DEMO={submittedAt:new Date().toISOString(),form_version:'7q_booking_v2_emb
     document.getElementById('ciTab').classList.toggle('on',ci);
     document.getElementById('siteTab').classList.toggle('hidden',ci);
     document.getElementById('siteTools').style.display=ci?'none':'';
+    document.getElementById('mbTitle').textContent=ci?'طلبات الاستشارة':'محتوى الموقع';
   });
 })();
 </script>
