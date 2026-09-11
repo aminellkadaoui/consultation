@@ -24,7 +24,7 @@ function renderSettings(config){
   if(parts.length===2){$('headline').append(document.createTextNode(parts[0]),node('span','s', 'على ماذا تركز الآن؟'),document.createTextNode(parts[1]));}
   else $('headline').textContent=headline;
   $('subheadline').textContent=config.subheadline||base.subheadline;
-  $('brandName').textContent=config.brand||base.brand;$('footerBrand').textContent=config.brand||base.brand;
+  
   document.title='استشارة للإديتورز | '+(config.brand||base.brand);
   const values={'[data-duration]':config.durationMinutes,'[data-price]':config.price,'[data-currency]':config.currency,'[data-hours]':config.actionDocHours};
   for(const [selector,value] of Object.entries(values)){if(value!==undefined)document.querySelectorAll(selector).forEach(el=>el.textContent=value);}
