@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم · Amine Editing Team</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#0f6bff;--ink:#0f1720;--muted:#6b7280;--bg:#f4f6fb;--card:#fff;--line:#e6e8ef;--green:#16a34a;--red:#dc2626}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.7}
+.bar{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:14px;padding:14px 22px}
+.bar .dot{width:10px;height:10px;border-radius:50%;background:var(--blue)}
+.bar b{font-size:16px;font-weight:700}
+.bar .sp{flex:1}
+.bar button{font-family:inherit;font-weight:600;font-size:14px;border:0;border-radius:10px;padding:10px 18px;cursor:pointer;transition:.2s}
+.b-prev{background:#eef2ff;color:var(--blue)}
+.b-prev:hover{background:#e0e7ff}
+.b-exp{background:#eef2ff;color:var(--blue)}
+.b-exp:hover{background:#e0e7ff}
+.b-pub{background:var(--blue);color:#fff}
+.b-pub:hover{filter:brightness(1.08)}
+.b-pub[disabled]{opacity:.6;cursor:progress}
+.gh-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.gh-grid .field.full{grid-column:1/-1}
+.gh-save{margin-top:4px;font-family:inherit;font-weight:600;font-size:13.5px;border:0;border-radius:10px;
+  padding:9px 16px;cursor:pointer;background:#eef2ff;color:var(--blue)}
+.gh-save:hover{background:#e0e7ff}
+.gh-state{font-size:12.5px;font-weight:600;margin-right:10px}
+.gh-state.on{color:var(--green)} .gh-state.off{color:var(--muted)}
+.warn{background:#eef6ff;border:1px solid #cfe0ff;border-radius:10px;padding:11px 14px;font-size:12.5px;color:#274b7a;margin-top:12px;line-height:1.6}
+.warn code{background:#dbe8ff;padding:1px 6px;border-radius:5px;font-family:'IBM Plex Mono',monospace}
+@media(max-width:560px){.gh-grid{grid-template-columns:1fr}}
+.langbar{position:sticky;top:57px;z-index:9;display:flex;align-items:center;gap:12px;background:#fff;
+  border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:20px;flex-wrap:wrap;box-shadow:0 4px 14px rgba(15,23,32,.05)}
+.langbar .lbl{font-size:13.5px;font-weight:600;color:#374151}
+.langbar .cur{font-size:13.5px;color:var(--muted);font-weight:500}
+.langbar .cur b{color:var(--blue)}
+.lang-seg{display:inline-flex;background:#eef2f8;border-radius:10px;padding:3px;gap:2px}
+.lang-seg button{font-family:inherit;font-weight:700;font-size:13px;border:0;border-radius:8px;padding:8px 18px;cursor:pointer;background:transparent;color:var(--muted);transition:.15s}
+.lang-seg button.active{background:var(--blue);color:#fff}
+.badge-lang,.badge-share{font-family:'IBM Plex Sans Arabic',sans-serif;font-size:11.5px;padding:3px 10px;border-radius:8px;font-weight:600;margin-right:auto}
+.badge-lang{color:var(--blue);background:#eef2ff}
+.badge-share{color:#0a7a52;background:#e5f6ef}
+.step-box{padding:14px;background:#fafbfe;border:1px solid var(--line);border-radius:12px;margin-bottom:12px}
+.step-box .st{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--blue);margin-bottom:10px;font-weight:600}
+.wrap{max-width:920px;margin:0 auto;padding:26px 20px 80px}
+.note{background:#fff8e6;border:1px solid #f6e6b0;border-radius:12px;padding:14px 18px;font-size:14px;margin-bottom:22px;color:#7a5b00}
+.note b{color:#5c4400}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:18px}
+.card h2{font-size:17px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+.card h2 .n{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--blue);background:#eef2ff;padding:3px 9px;border-radius:7px}
+.field{margin-bottom:15px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:13.5px;font-weight:600;margin-bottom:6px;color:#374151}
+.field .hint{font-size:12px;color:var(--muted);font-weight:400;margin-right:6px}
+.field input,.field textarea{width:100%;font-family:inherit;font-size:14.5px;color:var(--ink);
+  background:#fbfcfe;border:1px solid var(--line);border-radius:10px;padding:11px 13px;transition:.2s}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(15,107,255,.12);background:#fff}
+.field input[dir=ltr]{direction:ltr;text-align:left}
+.field textarea{resize:vertical;min-height:70px;line-height:1.6}
+/* الريلز */
+.reel-row{display:grid;grid-template-columns:1fr 130px 40px;gap:10px;align-items:end;margin-bottom:12px;
+  padding:12px;background:#fafbfe;border:1px solid var(--line);border-radius:12px}
+.reel-row .field{margin:0}
+.reel-row .rm{width:40px;height:42px;border:0;border-radius:10px;background:#fdeaea;color:var(--red);font-size:18px;cursor:pointer;transition:.2s}
+.reel-row .rm:hover{background:#f9d5d5}
+.reel-thumb{display:flex;align-items:center;gap:10px;grid-column:1/-1;margin-bottom:8px}
+.reel-thumb img{width:54px;height:54px;object-fit:cover;border-radius:8px;background:#000;flex-shrink:0}
+.reel-thumb .idx{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)}
+.add{width:100%;font-family:inherit;font-weight:600;font-size:14px;border:1.5px dashed var(--blue);color:var(--blue);
+  background:#f5f8ff;border-radius:12px;padding:12px;cursor:pointer;transition:.2s}
+.add:hover{background:#eaf1ff}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);opacity:0;z-index:50;pointer-events:none;
+  background:#0f1720;color:#fff;padding:12px 22px;border-radius:12px;font-size:14px;font-weight:600;
+  display:flex;align-items:center;gap:9px;transition:transform .3s,opacity .3s;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.toast.show{transform:translate(-50%,0);opacity:1}
+.toast .ok{color:#4ade80}
+@media(max-width:560px){.reel-row{grid-template-columns:1fr 90px 40px}.bar button{padding:9px 12px;font-size:13px}}
+
+/* ===== Client Intelligence (مدموج) ===== */
+:root{--brand:#0f6bff;--brand-ink:#0056d6;--btn:#0066ff;--soft:#4b5260;--faint:#858c99;--ok:#12865a;--warn:#ad7217;--err:#c83b34;--mono:'IBM Plex Mono',monospace;--ar:'IBM Plex Sans Arabic',sans-serif}
+#ciTab{display:none}
+#ciTab.on{display:block}
+#siteTab{display:block}
+#siteTab.hidden{display:none}
+.admtabs{display:inline-flex;background:#eef2f8;border-radius:10px;padding:3px;gap:2px;margin-inline-start:6px}
+.admtabs button{font-family:inherit;font-weight:700;font-size:13px;border:0;border-radius:8px;padding:8px 16px;cursor:pointer;background:transparent;color:var(--muted);transition:.15s}
+.admtabs button.on{background:var(--blue);color:#fff}
+#gate{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:20px}
+#gate #login{margin:0}
+
+
+#app{width:100%}.ciwrap{max-width:1120px;margin:auto;padding:0 20px 70px}.mono{font-family:var(--mono);direction:ltr;unicode-bidi:plaintext}:focus-visible{outline:2.5px solid rgba(15,107,255,.4);outline-offset:2px;border-radius:8px}
+#login{width:min(400px,92vw);margin:auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:32px 28px;text-align:center;box-shadow:0 20px 48px -30px rgba(24,26,52,.18)}#login .brand,.cihead .brand{font-weight:700;font-size:18px;display:flex;align-items:center;justify-content:center;gap:8px}.dot{width:10px;height:10px;border-radius:50%;background:var(--brand)}#login p{color:var(--faint);font-size:13.5px;margin:6px 0 22px}#login input{width:100%;font-size:15px;border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;outline:none;direction:ltr;text-align:right;transition:border-color .17s,box-shadow .17s}#login input:focus{border-color:var(--brand);box-shadow:0 0 0 3.5px rgba(15,107,255,.12)}
+button,.ibtn{font-family:var(--ar);cursor:pointer}.loginbtn{width:100%;height:48px;background:var(--btn);color:#fff;border:0;border-radius:60px;font-weight:600;font-size:16px}.msg{color:var(--err);font-size:13px;margin-top:10px;min-height:18px}.demo{all:unset;display:inline-block;margin-top:14px;color:var(--faint);font-size:12.5px;text-decoration:underline;cursor:pointer}
+.cihead{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:26px 0 8px;flex-wrap:wrap}.cihead .brand{justify-content:flex-start}.tools{display:flex;gap:8px;flex-wrap:wrap}.ibtn{font-size:13px;font-weight:600;border:1.5px solid var(--line);background:#fff;color:var(--soft);border-radius:60px;padding:8px 16px}.ibtn.p{background:var(--btn);color:#fff;border:0}.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;color:var(--brand-ink);margin:28px 0 12px;direction:ltr}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px 15px;text-align:center}.stat .v{font-family:var(--mono);font-size:28px;color:var(--brand);font-weight:600;direction:ltr}.stat .k{font-size:12.5px;color:var(--soft)}
+#tableWrap{overflow-x:auto;border-radius:16px}table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;min-width:820px}th,td{text-align:right;padding:11px 13px;font-size:13px;border-bottom:1px solid var(--line)}th{background:#f7f8fb;color:var(--soft);font-size:12px}tr:last-child td{border-bottom:0}tr.clk{cursor:pointer}tr.clk:hover{background:#fafcff}.badge{display:inline-block;font-family:var(--mono);font-size:10.5px;border-radius:99px;padding:2px 8px;background:#f1f2f6;color:var(--soft);white-space:nowrap}.badge.ok{background:#e8f7f0;color:var(--ok)}.badge.warn{background:#fbf1e2;color:var(--warn)}.badge.err{background:#fdeceb;color:var(--err)}.empty{text-align:center;color:var(--faint);padding:42px}
+#detail{display:none;position:fixed;inset:0;z-index:40;background:rgba(24,26,52,.42);backdrop-filter:blur(3px);padding:18px;overflow:auto}#detail.on{display:block}.dcard{max-width:820px;margin:20px auto;background:#fff;border:1px solid var(--line);border-radius:18px;padding:25px;box-shadow:0 24px 60px -30px rgba(24,26,52,.45)}.dh{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.dh h2{font-size:21px}.sub{font-size:12.5px;color:var(--faint)}.x{border:1.5px solid var(--line);background:#fff;width:34px;height:34px;border-radius:50%}.dtools{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0 20px}.sec{margin-top:20px}.sec>h3{font-size:12.5px;font-family:var(--mono);color:var(--brand-ink);margin-bottom:9px}.kv{display:flex;gap:12px;padding:9px 0;border-top:1px dashed rgba(0,0,0,.08);align-items:flex-start}.kv:first-child{border-top:0}.kv .k{flex:0 0 32%;font-size:12.5px;color:var(--soft)}.kv .v{flex:1;font-size:14px;font-weight:500;white-space:pre-wrap}.ab{background:#eef4ff;border:1px solid #dce8ff;border-radius:12px;padding:13px 14px;font-weight:600}.li{list-style:none}.li li{position:relative;padding:7px 16px 7px 0;border-top:1px dashed rgba(0,0,0,.07);font-size:14px}.li li:first-child{border-top:0}.li li:before{content:'›';position:absolute;right:0;color:var(--brand);font-weight:700}.raw{margin-top:18px}.raw summary{cursor:pointer;font-size:13px;color:var(--soft);font-weight:600}.qa{padding:8px 0;border-top:1px dashed rgba(0,0,0,.07)}.ql{font-size:12px;color:var(--faint)}.qv{font-size:14px;font-weight:500;white-space:pre-wrap}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:9px 17px;border-radius:99px;font-size:13px;opacity:0;transition:opacity .3s;z-index:60}.toast.on{opacity:.96}.link{color:var(--brand-ink);text-decoration:none;word-break:break-all}.link:hover{text-decoration:underline}
+
+/* Press / hover animation copied from admin(2).html */
+.loginbtn{touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform 170ms cubic-bezier(.4,0,.2,1),background 170ms cubic-bezier(.4,0,.2,1),box-shadow 170ms cubic-bezier(.4,0,.2,1),opacity 170ms}
+.loginbtn:hover{background:#0052d6}.loginbtn:active{transform:scale(.9);opacity:.8;transition-duration:90ms}
+.demo{-webkit-tap-highlight-color:transparent;transition:transform 170ms cubic-bezier(.4,0,.2,1),opacity 170ms,color .15s}.demo:hover{color:var(--soft)}
+.ibtn{touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform 170ms cubic-bezier(.4,0,.2,1),border-color 170ms cubic-bezier(.4,0,.2,1),background 170ms cubic-bezier(.4,0,.2,1),box-shadow 170ms cubic-bezier(.4,0,.2,1),opacity 170ms}
+.ibtn:hover{border-color:#cfd3e0;background:#fafbfc}.ibtn:active{transform:scale(.9);opacity:.8;transition-duration:90ms}.ibtn.p:hover{background:#0052d6}
+button{-webkit-tap-highlight-color:transparent;transition:transform 170ms cubic-bezier(.4,0,.2,1),background 170ms cubic-bezier(.4,0,.2,1),box-shadow 170ms cubic-bezier(.4,0,.2,1),opacity 170ms}
+button:active{transform:scale(.9);opacity:.8;transition-duration:90ms}
+
+@media(max-width:760px){.stats{grid-template-columns:1fr 1fr}.kv{display:block}.kv .k{margin-bottom:3px}.dcard{padding:20px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}button{transition:transform 170ms cubic-bezier(.4,0,.2,1),background 170ms cubic-bezier(.4,0,.2,1),box-shadow 170ms cubic-bezier(.4,0,.2,1),opacity 170ms!important}button:active{transform:scale(.9);opacity:.8;transition-duration:90ms!important}}
+
+</style>
+
+<style id="hig">
+@font-face{font-family:'Thmanyah Sans';src:url('fonts/thmanyah-sans-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Thmanyah Sans';src:url('fonts/thmanyah-sans-Medium.woff2') format('woff2');font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'Thmanyah Sans';src:url('fonts/thmanyah-sans-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+body{font-family:'Thmanyah Sans','IBM Plex Sans Arabic',sans-serif}
+/* ضغطة الزر · معيار أمين */
+button:active{transform:scale(.9);opacity:.8;transition-duration:90ms}
+.ic{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:0 0 17px}
+
+/* ===== الهيكل: سايدبار + محتوى ===== */
+.shell{display:grid;grid-template-columns:236px 1fr;min-height:100dvh;align-items:start}
+.side{position:sticky;top:0;height:100dvh;display:flex;flex-direction:column;gap:6px;padding:18px 14px;border-inline-end:1px solid var(--line);background:rgba(250,251,254,.86);backdrop-filter:blur(18px) saturate(160%)}
+.side-brand{display:flex;align-items:center;gap:10px;padding:8px 10px 18px}
+.side-brand .sb-t{display:flex;flex-direction:column;line-height:1.35}
+.side-brand b{font-size:15px}
+.side-brand span{font-family:var(--mono);font-size:10.5px;color:var(--faint);direction:ltr;text-align:start}
+.side-nav{display:flex;flex-direction:column;gap:4px}
+.side-nav button,.side-foot button{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:0 12px;border:0;border-radius:12px;background:transparent;color:#3a4150;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s,color .15s,transform .15s,opacity .15s}
+.side-nav button:hover{background:rgba(15,107,255,.06)}
+.side-nav button.on{background:rgba(15,107,255,.1);color:var(--brand)}
+.side-foot{margin-top:auto}
+.side-foot button{color:var(--faint)}
+.side-foot button:hover{background:#f1f2f6;color:#3a4150}
+.main{min-width:0}
+.mainbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:12px 22px;background:rgba(255,255,255,.78);backdrop-filter:blur(18px) saturate(160%);border-bottom:1px solid rgba(0,0,0,.05)}
+.mainbar .mb-title{font-size:15px;font-weight:700}
+.sp{flex:1}
+@media(max-width:880px){
+  .shell{grid-template-columns:1fr}
+  .side{position:static;height:auto;flex-direction:row;align-items:center;padding:10px 12px;border-inline-end:0;border-bottom:1px solid var(--line)}
+  .side-brand{padding:0 4px;gap:8px}
+  .side-brand .sb-t span{display:none}
+  .side-nav{flex-direction:row;flex:1;justify-content:center}
+  .side-nav button{width:auto;min-height:40px;padding:0 13px;font-size:13px}
+  .side-nav button .ic{display:none}
+  .side-foot{margin:0}
+  .side-foot button{width:auto;min-height:40px;padding:0 10px}
+  .side-foot button span{display:none}
+  .mainbar{padding:10px 14px}
+}
+
+/* ===== ترويسة الطلبات ===== */
+.cihead{align-items:flex-end;padding:30px 0 6px}
+.lt{font-size:29px;font-weight:700;letter-spacing:-.02em;line-height:1.2;margin:0}
+.lt-sub{font-family:var(--mono);font-size:11.5px;color:var(--faint);direction:ltr;text-align:start;margin-top:5px}
+.tools .ibtn{display:inline-flex;align-items:center;gap:7px;min-height:38px}
+.stats{margin-top:18px}
+.stat{border-radius:14px}
+
+/* فلاتر مقسّمة */
+.listhead{display:flex;align-items:center;gap:10px;margin:26px 0 12px;flex-wrap:wrap}
+.seg{display:inline-flex;background:#eef1f6;border-radius:11px;padding:3px;gap:2px}
+.seg button{font-family:inherit;font-weight:650;font-size:12.5px;border:0;border-radius:8.5px;padding:8px 14px;min-height:36px;background:transparent;color:#5a6170;cursor:pointer;transition:background .15s,color .15s,transform .15s,opacity .15s}
+.seg button.on{background:#fff;color:#171a20;box-shadow:0 1px 4px rgba(20,30,60,.12)}
+.seg button .n{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-inline-start:4px}
+
+/* شريط التحديد الجماعي */
+.bulkbar{display:none;position:sticky;top:58px;z-index:15;align-items:center;gap:8px;background:#0f1720;color:#fff;border-radius:14px;padding:9px 12px;margin:0 0 12px;box-shadow:0 14px 34px -18px rgba(10,16,30,.55)}
+.bulkbar.on{display:flex;flex-wrap:wrap}
+.bulkbar .cnt{font-size:13px;font-weight:700;padding:0 6px}
+.bulkbar button{font-family:inherit;font-size:12.5px;font-weight:650;border:0;border-radius:9px;min-height:34px;padding:0 13px;background:rgba(255,255,255,.12);color:#fff;cursor:pointer;transition:background .15s,transform .15s,opacity .15s}
+.bulkbar button:hover{background:rgba(255,255,255,.22)}
+.bulkbar button.danger{background:#e4574e}
+.bulkbar button.plain{background:transparent;color:rgba(255,255,255,.65)}
+
+/* الجدول */
+#tableWrap table{min-width:940px}
+th{font-weight:650;letter-spacing:.02em}
+td{padding:12px 13px;font-size:13.5px;vertical-align:middle}
+.rowck{width:17px;height:17px;accent-color:var(--brand);cursor:pointer}
+th .rowck{vertical-align:middle}
+.badge.new{background:#e9f1ff;color:var(--brand-ink)}
+.badge.arch{background:#eef0f4;color:#6a7180}
+.morebtn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:#69707f;cursor:pointer;transition:background .15s,transform .15s,opacity .15s}
+.morebtn:hover{background:#f0f2f7}
+tr.sel-row{background:#f2f7ff}
+
+/* قائمة الصف (HIG Menus) */
+#rowMenu{position:fixed;z-index:60;min-width:200px;background:rgba(255,255,255,.92);backdrop-filter:blur(22px) saturate(170%);border:1px solid rgba(0,0,0,.08);border-radius:14px;padding:5px;box-shadow:0 18px 44px -14px rgba(20,30,60,.35);display:none}
+#rowMenu.on{display:block;animation:menuIn .16s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes menuIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+#rowMenu button{display:flex;align-items:center;gap:9px;width:100%;min-height:40px;padding:0 11px;border:0;border-radius:9px;background:transparent;font-family:inherit;font-size:13.5px;font-weight:550;color:#232936;cursor:pointer;text-align:start;transition:background .12s,transform .15s,opacity .15s}
+#rowMenu button:hover{background:rgba(15,107,255,.07)}
+#rowMenu button.danger{color:var(--err)}
+#rowMenu button.danger:hover{background:#fdefee}
+#rowMenu .div{height:1px;background:rgba(0,0,0,.07);margin:5px 8px}
+
+/* نافذة الرسائل */
+#msgModal{display:none;position:fixed;inset:0;z-index:70;background:rgba(24,26,52,.42);backdrop-filter:blur(3px);padding:18px;overflow:auto}
+#msgModal.on{display:block}
+.msgcard{max-width:620px;margin:36px auto;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 24px 60px -30px rgba(24,26,52,.45)}
+.msgcard .mh{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
+.msgcard h2{font-size:18px;margin:0}
+.msgcard .who{font-size:12.5px;color:var(--faint);margin-top:4px}
+.msgcard .x{border:0;background:#f1f2f6;width:34px;height:34px;border-radius:10px;font-size:15px;cursor:pointer;transition:transform .15s,opacity .15s}
+.msgsegs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.msgcard textarea{width:100%;min-height:220px;font-family:inherit;font-size:14px;line-height:1.9;color:var(--ink);border:1.5px solid var(--line);border-radius:13px;padding:13px 15px;resize:vertical;outline:none}
+.msgcard textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(15,107,255,.12)}
+.msgacts{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.msgacts .ibtn{min-height:42px;display:inline-flex;align-items:center;gap:7px}
+.msgacts .wa{background:#12a66a;color:#fff;border:0}
+.msgacts .ibtn[disabled]{opacity:.45;cursor:not-allowed}
+.hint-line{font-size:11.5px;color:var(--faint);margin-top:9px}
+@media(prefers-reduced-motion:reduce){#rowMenu.on{animation:none}button:active{transform:none}}
+</style>
+</head>
+<body>
+
+<div id="gate">
+<div id="login">
+ <div class="brand"><span class="dot"></span>لوحة التحكم · Amine Editing Team</div><p>الدخول للأدمن فقط</p>
+ <input id="email" type="email" placeholder="Email" autocomplete="username"><input id="pass" type="password" placeholder="Password" autocomplete="current-password">
+ <button class="loginbtn" id="loginBtn">دخول</button><div class="msg" id="loginMsg"></div><button class="demo" id="demoBtn">استعرض بردّ تجريبي</button>
+</div>
+</div>
+
+<div id="adminShell" style="display:none">
+<div class="shell">
+<aside class="side">
+  <div class="side-brand"><span class="dot"></span><div class="sb-t"><b>لوحة التحكم</b><span>Amine Editing Team</span></div></div>
+  <nav class="side-nav" id="admTabs">
+    <button class="on" data-t="ci"><svg class="ic" viewBox="0 0 24 24"><path d="M3.5 13.5h4l1.6 2.6h5.8l1.6-2.6h4M5.6 5.5h12.8l2.1 8v4.4a1.6 1.6 0 0 1-1.6 1.6H5.1a1.6 1.6 0 0 1-1.6-1.6V13.5Z"/></svg><span>طلبات الاستشارة</span></button>
+    <button data-t="site"><svg class="ic" viewBox="0 0 24 24"><path d="M7 3.5h7l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9.5A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5ZM14 3.8V8h4.2M8.8 12h6.4M8.8 15.5h4.4"/></svg><span>محتوى الموقع</span></button>
+  </nav>
+  <div class="side-foot"><button id="sideLogout"><svg class="ic" viewBox="0 0 24 24"><path d="M14.5 8V5.8A1.8 1.8 0 0 0 12.7 4H6.3a1.8 1.8 0 0 0-1.8 1.8v12.4A1.8 1.8 0 0 0 6.3 20h6.4a1.8 1.8 0 0 0 1.8-1.8V16M9.5 12h10M16.7 9.2 19.5 12l-2.8 2.8"/></svg><span>خروج</span></button></div>
+</aside>
+<div class="main">
+<div class="mainbar"><div class="mb-title" id="mbTitle">طلبات الاستشارة</div><span class="sp"></span><span id="siteTools" style="display:none">
+  <button class="b-prev" onclick="preview()">👁 معاينة</button>
+  <button class="b-exp" onclick="exportConfig()">⬇ تصدير</button>
+  <button class="b-pub" id="btnPub" onclick="publish()">🚀 نشر مباشرة</button>
+</span></div>
+
+<div id="siteTab" class="hidden"><div class="wrap">
+  <div class="note">
+    ✏️ عدّل أي حقل هنا. <b>«معاينة»</b> تفتح الموقع بتعديلاتك. <b>«🚀 نشر مباشرة»</b> يرفع التعديلات فوراً على موقعك المنشور. <b>بدّل اللغة من الشريط تحت</b> لتتحكم في نصوص كل لغة على حِدة. 👇
+  </div>
+
+  <!-- سويتش اللغة -->
+  <div class="langbar">
+    <span class="lbl">🌐 اللغة اللي كتعدّل:</span>
+    <div class="lang-seg" id="langSeg">
+      <button data-l="ar" class="active" onclick="switchLang('ar')">AR</button>
+      <button data-l="darija" onclick="switchLang('darija')">DAR</button>
+    </div>
+    <span class="cur">كتعدّل دبا: <b id="curLangName">العربية</b></span>
+  </div>
+
+  <!-- النشر المباشر -->
+  <div class="card">
+    <h2><span class="n">0</span> النشر المباشر (GitHub) <span class="gh-state off" id="ghState">غير مضبوط</span></h2>
+    <div class="gh-grid">
+      <div class="field"><label>اسم مستخدم GitHub</label><input id="gh_owner" dir="ltr" placeholder="aminellkadaoui"></div>
+      <div class="field"><label>اسم الريبو (Repository)</label><input id="gh_repo" dir="ltr" placeholder="amine-editing-site"></div>
+      <div class="field"><label>الفرع (Branch)</label><input id="gh_branch" dir="ltr" placeholder="main" value="main"></div>
+      <div class="field"><label>مسار الملف</label><input id="gh_path" dir="ltr" placeholder="config.js" value="config.js"></div>
+      <div class="field full"><label>التوكن (Access Token) <span class="hint">(يُحفظ في متصفحك فقط)</span></label><input id="gh_token" type="password" dir="ltr" placeholder="github_pat_..."></div>
+    </div>
+    <button class="gh-save" onclick="saveGH()">💾 حفظ إعدادات الاتصال</button>
+    <div class="warn">
+      🔐 <b>التوكن آمن:</b> يُخزَّن في متصفحك فقط (localStorage) ولا يُرفع أبداً مع صفحات الموقع.<br>
+      اصنعه من: <code>GitHub → Settings → Developer settings → Fine-grained tokens</code> · حدّده على هذا الريبو فقط، والصلاحية: <code>Contents → Read and write</code> فقط.
+    </div>
+  </div>
+
+  <!-- عام (مشترك) -->
+  <div class="card">
+    <h2><span class="n">1</span> الإعدادات العامة <span class="badge-share">🌍 مشترك لكل اللغات</span></h2>
+    <div class="field"><label>اسم البراند</label><input id="brand" dir="ltr"></div>
+    <div class="field"><label>رابط زر الحجز <span class="hint">(Calendly / TidyCal / واتساب...)</span></label><input id="bookACallUrl" dir="ltr" placeholder="https://calendly.com/..."></div>
+    <div class="field"><label>فيديو الهيرو <span class="hint">(معرّف يوتيوب)</span></label><input id="h_video" dir="ltr" placeholder="Uxsu1WrvefQ"></div>
+  </div>
+
+  <!-- الهيرو (حسب اللغة) -->
+  <div class="card">
+    <h2><span class="n">2</span> القسم العلوي (Hero) <span class="badge-lang">🔤 حسب اللغة</span></h2>
+    <div class="field"><label>العنوان · سطر 1 <span class="hint">(عادي)</span></label><input id="h_line1" dir="auto"></div>
+    <div class="field"><label>العنوان · سطر 2 <span class="hint">(عريض)</span></label><input id="h_line2" dir="auto"></div>
+    <div class="field"><label>العنوان · الكلمة المميزة <span class="hint">(أزرق)</span></label><input id="h_line3" dir="auto"></div>
+    <div class="field"><label>النص التوضيحي</label><textarea id="h_sub" dir="auto"></textarea></div>
+    <div class="field"><label>نص زر الحجز <span class="hint">(Apply Now / قدّم الآن...)</span></label><input id="bookACallText" dir="auto"></div>
+  </div>
+
+  <!-- الأعمال (حسب اللغة) -->
+  <div class="card">
+    <h2><span class="n">3</span> قسم الأعمال <span class="badge-lang">🔤 حسب اللغة</span></h2>
+    <div class="field"><label>التسمية الصغيرة</label><input id="workLabel" dir="auto"></div>
+    <div class="field"><label>عنوان القسم</label><input id="workTitle" dir="auto"></div>
+  </div>
+
+  <!-- طريقة العمل (حسب اللغة) -->
+  <div class="card">
+    <h2><span class="n">4</span> طريقة العمل (Process) <span class="badge-lang">🔤 حسب اللغة</span></h2>
+    <div class="field"><label>التسمية الصغيرة</label><input id="proc_label" dir="auto"></div>
+    <div class="field"><label>عنوان القسم</label><input id="proc_title" dir="auto"></div>
+    <div class="field"><label>النص التوضيحي</label><textarea id="proc_sub" dir="auto"></textarea></div>
+    <div id="procSteps"></div>
+  </div>
+
+  <!-- معايير العمل (حسب اللغة) -->
+  <div class="card">
+    <h2><span class="n">4.5</span> معايير العمل (Guidelines) <span class="badge-lang">🔤 حسب اللغة</span></h2>
+    <div class="field"><label>التسمية الصغيرة</label><input id="guide_label" dir="auto"></div>
+    <div class="field"><label>عنوان القسم</label><input id="guide_title" dir="auto"></div>
+    <div class="field"><label>النص التوضيحي</label><textarea id="guide_sub" dir="auto"></textarea></div>
+    <div id="guideSteps"></div>
+  </div>
+
+  <!-- القائمة (حسب اللغة) -->
+  <div class="card">
+    <h2><span class="n">5</span> قائمة التنقّل (Nav) <span class="badge-lang">🔤 حسب اللغة</span></h2>
+    <div class="field"><label>الأعمال</label><input id="nav_work" dir="auto"></div>
+    <div class="field"><label>المراحل</label><input id="nav_process" dir="auto"></div>
+    <div class="field"><label>الشروط</label><input id="nav_guidelines" dir="auto"></div>
+  </div>
+
+  <!-- الريلز (مشترك) -->
+  <div class="card">
+    <h2><span class="n">7</span> الريلز <span class="badge-share">🌍 مشترك لكل اللغات</span></h2>
+    <div id="reels"></div>
+    <button class="add" onclick="addReel()">＋ إضافة ريل</button>
+  </div>
+</div>
+
+</div>
+<div id="ciTab" class="on">
+
+<div id="app" style="display:none"><div class="ciwrap"><div class="cihead"><div><h1 class="lt">طلبات الاستشارة</h1><div class="lt-sub">Client Intelligence</div></div><div class="tools"><button class="ibtn" id="refreshBtn"><svg class="ic" viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3M19.7 3.8v3.4h-3.4"/></svg>تحديث</button><button class="ibtn p" id="csvBtn"><svg class="ic" viewBox="0 0 24 24"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 19.5h14"/></svg>CSV</button><button class="ibtn" id="logoutBtn" style="display:none">خروج</button></div></div><div class="stats" id="stats"></div><div class="listhead"><div class="seg" id="filterSeg"><button class="on" data-f="all">الكل</button><button data-f="new">جديد</button><button data-f="accepted">مقبول</button><button data-f="rejected">مرفوض</button><button data-f="archived">الأرشيف</button><button data-f="trash">المهملات</button></div></div><div class="bulkbar" id="bulkBar"><span class="cnt" id="bulkCount"></span><span class="sp"></span><button data-act="accept">قبول</button><button data-act="reject">رفض</button><button data-act="archive">أرشفة</button><button data-act="unarchive">استرجاع</button><button class="danger" data-act="delete" id="bulkDel">حذف</button><button class="plain" data-act="clear">إلغاء</button></div><div id="tableWrap"><div class="empty">جارٍ التحميل…</div></div></div></div>
+<div id="rowMenu"></div>
+<div id="msgModal"><div class="msgcard"><div class="mh"><div><h2 id="mmTitle">رسالة القبول</h2><div class="who" id="mmWho"></div></div><button class="x" id="mmClose">✕</button></div><div class="msgsegs"><div class="seg" id="mmType"><button class="on" data-v="accept">رسالة القبول</button><button data-v="follow">رسالة المتابعة</button></div><div class="seg" id="mmLang"><button class="on" data-v="ar">عربي</button><button data-v="dar">Darija</button></div></div><textarea id="mmText" dir="auto"></textarea><div class="msgacts"><button class="ibtn wa" id="mmWa">إرسال WhatsApp</button><button class="ibtn" id="mmMail">إرسال بريد</button><button class="ibtn" id="mmCopy">نسخ</button></div><div class="hint-line" id="mmHint">راجع الرسالة وعدّلها قبل الإرسال · الاسم والتفاصيل معبأة تلقائيًا من إجابات العميل.</div></div></div>
+<div id="detail"><div class="dcard"><div class="dh"><div><h2 id="dTitle">ملف العميل</h2><div class="sub" id="dSub"></div></div><button class="x" id="dClose">✕</button></div><div class="dtools" id="dStatusRow"></div><div class="dtools"><button class="ibtn p" id="copyPrompt">📋 نسخ برومت التحليل</button><button class="ibtn" id="copyBrief">نسخ الـBrief</button><button class="ibtn" id="dlBrief">⬇ تنزيل</button></div><div id="dBody"></div></div></div>
+<div class="toast" id="ciToast"></div>
+
+</div>
+</div></div>
+</div>
+<div class="toast" id="toast"><span class="ok">✓</span> <span id="toastMsg"></span></div>
+
+<!-- تحميل المحتوى دائماً طازجاً (تجاوز كاش المتصفح) -->
+<script>document.write('<script src="config.js?v=' + Date.now() + '"><\/script>');</script>
+<script>/* نسخة احتياطية مدمجة: الصفحة تعمل حتى بدون config.js بجانبها؛ وعند وجوده تُستخدم نسخته الأحدث */
+window.SITE_CONFIG = window.SITE_CONFIG || {
+  brand: "Amine Editing Team",
+
+  /* رابط زر الحجز — Calendly / TidyCal / واتساب / Google Calendar... */
+  bookACallUrl: "https://calendar.app.google/Wox9zm9zaCydyEkG8",
+  bookACallText: "Book A Call",
+
+  /* القسم العلوي (Hero) — الإنجليزية */
+  hero: {
+    line1: "Make Your Content Look",
+    line2: "As Strong As Your",
+    line3: "Expertise",
+    subtitle: "Turning your expertise into ready-to-publish videos that build trust, authority, and attract leads.",
+    videoId: "Uxsu1WrvefQ"
+  },
+
+  workLabel: "Portfolio",
+  workTitle: "Our Best Work",
+
+  /* الريلز — مرتّبة كأزواج: كل زوج = عمود/عميل واحد (فيديو فوق + فيديو تحت) */
+  reels: [
+    { id: "eoiDtYK9i2M", views: "296K" },
+    { id: "Ytu0_ETdSBk", views: "150K" },
+    { id: "IOmmXnQNBY0", views: "257K" },
+    { id: "baKkfTYGkkI", views: "122K" },
+    { id: "3fQCQ6n434E", views: "158K" },
+    { id: "bqGQXk0KZPA", views: "283K" }
+  ],
+
+  closing: {
+    titlePlain: "What are you",
+    titleAccent: "waiting for?",
+    line1: "You've seen the work. You know what's possible.",
+    line2: "The only question is: are you ready to take action? 👇"
+  },
+
+  /* قسم طريقة العمل */
+  process: {
+    label: "Workflow",
+    title: "Our Process",
+    subtitle: "A simple workflow built to understand your project, create your unique editing style, and improve your content over time.",
+    steps: [
+      { title: "Project Details", desc: "We receive the key details about your business, offer, audience, references, and brand direction." },
+      { title: "Unique Editing Style", desc: "We create a custom editing style built around your brand, expertise, and authority." },
+      { title: "Delivery & Analysis", desc: "We deliver ready-to-publish videos and review what performs best to improve the next content." }
+    ]
+  },
+
+  /* قسم معايير العمل — أرقام حمراء بدل الأيقونات */
+  guidelines: {
+    label: "Guidelines",
+    title: "Work Guidelines",
+    subtitle: "We work with selected clients whose content aligns with our values and production standards.",
+    steps: [
+      { title: "No Music", desc: "We do not use music in our edits. We focus on clean sound design, clarity, pacing, and visual storytelling." },
+      { title: "No Women's Images", desc: "We do not include women's images or scenes in the videos we produce." },
+      { title: "Selective Content", desc: "We only work with specific types of content. Every project is reviewed first to make sure it fits our values, standards, and workflow." }
+    ]
+  },
+
+  /* روابط القائمة (الإنجليزية) — الأعمال / المراحل / الشروط */
+  nav: { work: "Work", process: "Process", guidelines: "Guidelines" },
+
+  /* ===== الترجمات ===== */
+  i18n: {
+    ar: {
+      bookACallText: "احجز مكالمة",
+      nav: { work: "الأعمال", process: "المراحل", guidelines: "الشروط" },
+      hero: {
+        line1: "اجعل محتواك يبدو",
+        line2: "بمستوى",
+        line3: "خبرتك",
+        subtitle: "نعمل معك كشركاء في المحتوى، ونتولى المونتاج لتحقيق نتائج أفضل من محتواك."
+      },
+      workLabel: "أعمالنا",
+      workTitle: "أفضل أعمالنا",
+      closing: {
+        titlePlain: "ماذا تنتظر",
+        titleAccent: "بعد؟",
+        line1: "رأيت العمل. تعرف ما هو ممكن.",
+        line2: "السؤال الوحيد: هل أنت مستعد للتحرّك؟ 👇"
+      },
+      process: {
+        label: "المراحل",
+        title: "طريقة العمل",
+        subtitle: "نظام بسيط نفهم فيه مشروعك، نبني لك ستايل مونتاج خاص، ثم نحسّن المحتوى مع الوقت.",
+        steps: [
+          { title: "نستلم معلومات المشروع", desc: "نستلم منك أهم التفاصيل عن البيزنس، العرض، الجمهور، الريفرنس، واتجاه البراند." },
+          { title: "Unique Editing Style", desc: "نبني لك ستايل مونتاج خاص يعكس البراند، الخبرة، وطريقة ظهورك أمام الجمهور." },
+          { title: "التسليم والتحليل", desc: "نسلّم الفيديوهات جاهزة للنشر، ونراجع ما الذي يعمل بشكل أفضل لتحسين المحتوى القادم." }
+        ]
+      },
+      guidelines: {
+        label: "الشروط",
+        title: "معايير العمل",
+        subtitle: "نعمل مع عملاء مختارين فقط، حسب نوع المحتوى ومدى توافقه مع قيمنا ومعايير العمل لدينا.",
+        steps: [
+          { title: "بدون موسيقى", desc: "لا نستخدم الموسيقى في المونتاج. نعتمد على المؤثرات الصوتية، وطريقة عرض بصرية احترافية." },
+          { title: "بدون صور للنساء", desc: "لا نضع صورًا أو مشاهد للنساء داخل الفيديوهات التي ننتجها، كما أننا لا نعمل مع النساء." },
+          { title: "نختار المحتوى بعناية", desc: "لا نقبل كل المشاريع. نراجع نوع المحتوى أولًا للتأكد من توافقه مع قيمنا، معاييرنا، وطريقة عملنا." }
+        ]
+      }
+    },
+    darija: {
+      bookACallText: "7jez Mokalma",
+      nav: { work: "Lkhedma", process: "Process", guidelines: "Shorot" },
+      hero: {
+        line1: "Khelli Content Dyalek Yban",
+        line2: "B Niveau Dyal",
+        line3: "Expertise Dyalek",
+        subtitle: "Kankhdmo m3ak b7al partners f content, w kanetkelfo b editing bach njibo lik natayj 7sen mn content dyalek."
+      },
+      workLabel: "Lkhedma dyalna",
+      workTitle: "Chof lkhedma dyalna",
+      closing: {
+        titlePlain: "3lach katsanna",
+        titleAccent: "?",
+        line1: "Chefti lkhedma. 3arf chno mumkin.",
+        line2: "Bqa ghir so2al: wach rak msta3d ttharrek? 👇"
+      },
+      process: {
+        label: "Workflow",
+        title: "Process Dyal l Khedma",
+        subtitle: "Workflow bsit kankhedmo bih bach nfehmo project dyalek, nbniw lik unique editing style, w ntawro content m3a lwe9t.",
+        steps: [
+          { title: "Kanstelmo Details", desc: "Kanstelmo mennek l infos l mohimma 3la business, offer, audience, references, w Kifach baghi tban." },
+          { title: "Unique Editing Style", desc: "Kanbniw lik editing style khass bik, kaybin brand dyalek, expertise, w authority." },
+          { title: "Delivery & Analysis", desc: "Kanselmo videos wajdin l nnachr, w kanchofo chno khdem mzyan bach ntawro content jay." }
+        ]
+      },
+      guidelines: {
+        label: "Shorot",
+        title: "Ma3ayir lkhadma",
+        subtitle: "Kan khdmou ghir m3a clients li mnassbin lina, 7sab no3 dyal lcontent w wach kaytawaf9 m3a l9iyam w ma3ayir lkhadma dyalna.",
+        steps: [
+          { title: "Bla music", desc: "Ma kansta3mlouch music f montage. Kan3tmdo 3la sound design, clarity, pacing, w visual presentation." },
+          { title: "Bla tsawr dyal nssa", desc: "Ma kandiroch tsawr wla machahid dyal nssa dakhel videos li kan ntajo, w ma kan khdmouch m3a nssa." },
+          { title: "Kan khtaro lcontent b 3inaya", desc: "Ma kan9blouch kolchi projects. Kan reviewiw no3 dyal lcontent lwel bach nt2akdo bli kaytawaf9 m3a l9iyam dyalna, ma3ayirna, w tari9a dyal lkhadma." }
+        ]
+      }
+    }
+  }
+};</script>
+<script>
+/* نبدأ دائماً من config.js المنشور الطازج (وليس من كاش localStorage القديم)
+   حتى لا يُصدّر نشرٌ لاحق نسخةً قديمة فيُرجِع المحتوى للخلف */
+let C = JSON.parse(JSON.stringify(window.SITE_CONFIG));
+
+const $ = id => document.getElementById(id);
+
+/* ===== النظام متعدّد اللغات ===== */
+const LNAME = { en:'الإنجليزية', ar:'العربية', darija:'الدارجة' };
+let curLang = 'ar';
+
+/* الحقول المرتبطة باللغة: id الحقل -> المسار داخل كائن اللغة */
+const LANG_FIELDS = {
+  bookACallText:'bookACallText',
+  h_line1:'hero.line1', h_line2:'hero.line2', h_line3:'hero.line3', h_sub:'hero.subtitle',
+  workLabel:'workLabel', workTitle:'workTitle',
+  proc_label:'process.label', proc_title:'process.title', proc_sub:'process.subtitle',
+  guide_label:'guidelines.label', guide_title:'guidelines.title', guide_sub:'guidelines.subtitle',
+  nav_work:'nav.work', nav_process:'nav.process', nav_guidelines:'nav.guidelines'
+};
+
+function getPath(o,p){ return p.split('.').reduce((x,k)=> (x==null?undefined:x[k]), o); }
+function setPath(o,p,v){ const ks=p.split('.'); let x=o;
+  for(let i=0;i<ks.length-1;i++){ if(x[ks[i]]==null||typeof x[ks[i]]!=='object') x[ks[i]]={}; x=x[ks[i]]; }
+  x[ks[ks.length-1]]=v; }
+
+/* كائن اللغة: en = الأساس (C)، غيرها = C.i18n[lang] */
+function langObj(lang){
+  if(lang==='en') return C;
+  C.i18n = C.i18n || {};
+  C.i18n[lang] = C.i18n[lang] || {};
+  return C.i18n[lang];
+}
+
+/* خطوات البروسيس · نبنيها مرّة (عددها ثابت من الأساس) */
+const STEP_COUNT = (C.process && C.process.steps) ? C.process.steps.length : 3;
+(function renderSteps(){
+  const box = $('procSteps');
+  for(let i=0;i<STEP_COUNT;i++){
+    const d = document.createElement('div'); d.className='step-box';
+    d.innerHTML = '<div class="st">خطوة '+(i+1)+'</div>'+
+      '<div class="field"><label>العنوان</label><input id="proc_s'+i+'_title" dir="auto"></div>'+
+      '<div class="field"><label>الوصف</label><textarea id="proc_s'+i+'_desc" dir="auto"></textarea></div>';
+    box.appendChild(d);
+  }
+})();
+
+/* خطوات معايير العمل · نفس المنطق */
+const GUIDE_COUNT = (C.guidelines && C.guidelines.steps) ? C.guidelines.steps.length : 3;
+(function renderGuideSteps(){
+  const box = $('guideSteps');
+  for(let i=0;i<GUIDE_COUNT;i++){
+    const d = document.createElement('div'); d.className='step-box';
+    d.innerHTML = '<div class="st">بند '+(i+1)+'</div>'+
+      '<div class="field"><label>العنوان</label><input id="guide_s'+i+'_title" dir="auto"></div>'+
+      '<div class="field"><label>الوصف</label><textarea id="guide_s'+i+'_desc" dir="auto"></textarea></div>';
+    box.appendChild(d);
+  }
+})();
+
+/* أداة: تحميل/حفظ خطوات قسم (process أو guidelines) */
+function loadSteps(lang, key, prefix, count){
+  const lp = (langObj(lang)[key])||{}, bp = C[key]||{};
+  for(let i=0;i<count;i++){
+    const st = (lp.steps&&lp.steps[i]) || (bp.steps&&bp.steps[i]) || {title:'',desc:''};
+    $(prefix+i+'_title').value = st.title||'';
+    $(prefix+i+'_desc').value  = st.desc||'';
+  }
+}
+function saveSteps(t, key, prefix, count){
+  t[key] = t[key] || {};
+  t[key].steps = [];
+  for(let i=0;i<count;i++){
+    t[key].steps.push({ title:$(prefix+i+'_title').value, desc:$(prefix+i+'_desc').value });
+  }
+}
+
+/* تحميل قيم لغة إلى النموذج */
+function loadLang(lang){
+  const src = langObj(lang);
+  for(const id in LANG_FIELDS){
+    let v = getPath(src, LANG_FIELDS[id]);
+    if(v==null) v = getPath(C, LANG_FIELDS[id]);   // fallback للأساس
+    $(id).value = (v==null ? '' : v);
+  }
+  loadSteps(lang, 'process', 'proc_s', STEP_COUNT);
+  loadSteps(lang, 'guidelines', 'guide_s', GUIDE_COUNT);
+}
+
+/* حفظ قيم النموذج الحالية في لغة */
+function saveLang(lang){
+  const t = langObj(lang);
+  for(const id in LANG_FIELDS){ setPath(t, LANG_FIELDS[id], $(id).value); }
+  saveSteps(t, 'process', 'proc_s', STEP_COUNT);
+  saveSteps(t, 'guidelines', 'guide_s', GUIDE_COUNT);
+}
+
+/* التبديل بين اللغات (يحفظ الحالية ثم يحمّل الجديدة) */
+function switchLang(l){
+  if(l===curLang) return;
+  saveLang(curLang);
+  curLang = l;
+  document.querySelectorAll('#langSeg button').forEach(b=> b.classList.toggle('active', b.dataset.l===l));
+  $('curLangName').textContent = LNAME[l];
+  loadLang(l);
+}
+
+/* الحقول المشتركة (نفسها لكل اللغات) */
+function loadShared(){
+  $('brand').value = C.brand||'';
+  $('bookACallUrl').value = C.bookACallUrl||'';
+  $('h_video').value = (C.hero&&C.hero.videoId)||'';
+}
+function saveShared(){
+  C.brand = $('brand').value.trim();
+  C.bookACallUrl = $('bookACallUrl').value.trim() || '#';
+  setPath(C, 'hero.videoId', $('h_video').value.trim());
+}
+
+loadShared();
+loadLang('ar');
+
+/* الريلز */
+const reelsEl = $('reels');
+function reelRow(r){
+  const wrap = document.createElement('div');
+  wrap.className = 'reel-row';
+  wrap.innerHTML =
+    '<div class="reel-thumb"><img src="https://i.ytimg.com/vi/'+(r.id||'')+'/default.jpg" onerror="this.style.opacity=.3"><span class="idx"></span></div>'+
+    '<div class="field"><label>معرّف يوتيوب</label><input class="r-id" dir="ltr" value="'+(r.id||'')+'"></div>'+
+    '<div class="field"><label>المشاهدات</label><input class="r-views" dir="ltr" value="'+(r.views||'')+'"></div>'+
+    '<button class="rm" title="حذف">✕</button>';
+  wrap.querySelector('.rm').onclick = ()=>{ wrap.remove(); renumber(); };
+  wrap.querySelector('.r-id').addEventListener('input', e=>{
+    wrap.querySelector('.reel-thumb img').src = 'https://i.ytimg.com/vi/'+e.target.value.trim()+'/default.jpg';
+  });
+  return wrap;
+}
+function renumber(){ reelsEl.querySelectorAll('.idx').forEach((e,i)=> e.textContent = 'ريل ' + (i+1)); }
+function addReel(){ reelsEl.appendChild(reelRow({id:'',views:''})); renumber(); }
+(C.reels||[]).forEach(r=> reelsEl.appendChild(reelRow(r)));
+renumber();
+
+/* جمع كل القيم (كل اللغات + المشترك) */
+function collect(){
+  saveLang(curLang);   // نحفظ اللغة المعروضة حالياً
+  saveShared();        // البراند + الرابط + فيديو الهيرو
+  C.reels = [...reelsEl.querySelectorAll('.reel-row')].map(row=>({
+    id: row.querySelector('.r-id').value.trim(),
+    views: row.querySelector('.r-views').value.trim()
+  })).filter(r=>r.id);
+  if(!C.bookACallText) C.bookACallText = 'Apply Now';
+  return JSON.parse(JSON.stringify(C));
+}
+
+function toast(msg){ $('toastMsg').textContent=msg; const t=$('toast'); t.classList.add('show'); clearTimeout(window._tt); window._tt=setTimeout(()=>t.classList.remove('show'),2200); }
+
+function preview(){
+  localStorage.setItem('SITE_CONFIG', JSON.stringify(collect()));
+  toast('حُفظت المعاينة · يُفتح الموقع...');
+  setTimeout(()=> window.open('index.html?preview=1','_blank'), 400);
+}
+
+function configFileText(c){
+  return '/* ============================================================\n'+
+'   لوحة التحكم في المحتوى · مُدار من admin.html\n'+
+'   ============================================================ */\n'+
+'window.SITE_CONFIG = ' + JSON.stringify(c, null, 2) + ';\n';
+}
+
+function exportConfig(){
+  const body = configFileText(collect());
+  const blob = new Blob([body], {type:'application/javascript'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'config.js';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('نُزّل config.js · استبدل به الملف القديم');
+}
+
+/* ===== النشر المباشر عبر GitHub ===== */
+function getGH(){ try{ return JSON.parse(localStorage.getItem('GH_CFG'))||{}; }catch(e){ return {}; } }
+function fillGH(){
+  const g = getGH();
+  $('gh_owner').value = g.owner||'';
+  $('gh_repo').value  = g.repo||'';
+  $('gh_branch').value= g.branch||'main';
+  $('gh_path').value  = g.path||'config.js';
+  $('gh_token').value = g.token||'';
+  markGH();
+}
+function markGH(){
+  const g = getGH();
+  const ok = g.owner && g.repo && g.token;
+  const el = $('ghState');
+  el.textContent = ok ? ('متصل ✓ ('+g.owner+'/'+g.repo+')') : 'غير مضبوط';
+  el.className = 'gh-state ' + (ok?'on':'off');
+}
+/* تنظيف: نقبل حتى لو لصق المستخدم رابطاً كاملاً بدل الاسم فقط */
+function cleanOwner(v){
+  v=(v||'').trim();
+  let m = v.match(/github\.com\/([^\/#?]+)/i); if(m) return m[1];
+  m = v.match(/([^\/.#?]+)\.github\.io/i); if(m) return m[1];
+  return v.replace(/^https?:\/\//i,'').replace(/[\/#?].*$/,'');
+}
+function cleanRepo(v){
+  v=(v||'').trim().replace(/[#\/\s]+$/,'');
+  let m = v.match(/github\.io\/([^\/#?]+)/i) || v.match(/github\.com\/[^\/]+\/([^\/#?]+)/i);
+  if(m) return m[1].replace(/\.git$/i,'');
+  if(/https?:|\//i.test(v)){ const p=v.replace(/^https?:\/\//i,'').split('/').filter(Boolean); v=p[p.length-1]||v; }
+  return v.replace(/\.git$/i,'');
+}
+function saveGH(){
+  const g = {
+    owner:  cleanOwner($('gh_owner').value),
+    repo:   cleanRepo($('gh_repo').value),
+    branch: $('gh_branch').value.trim() || 'main',
+    path:   $('gh_path').value.trim() || 'config.js',
+    token:  $('gh_token').value.trim()
+  };
+  // نعيد كتابة الحقلين بالقيمة المُنظّفة كي يراها المستخدم
+  $('gh_owner').value = g.owner;
+  $('gh_repo').value  = g.repo;
+  localStorage.setItem('GH_CFG', JSON.stringify(g));
+  markGH();
+  toast('حُفظت إعدادات الاتصال');
+}
+function b64utf8(str){
+  const bytes = new TextEncoder().encode(str);
+  let bin=''; bytes.forEach(b=> bin += String.fromCharCode(b));
+  return btoa(bin);
+}
+async function publish(){
+  const g = getGH();
+  if(!g.owner || !g.repo || !g.token){ toast('اضبط إعدادات GitHub في القسم 0 أولاً'); $('gh_owner').focus(); return; }
+  const btn = $('btnPub'); btn.disabled = true; const label = btn.textContent; btn.textContent = '⏳ جارٍ النشر...';
+  const api = 'https://api.github.com/repos/'+g.owner+'/'+g.repo+'/contents/'+encodeURIComponent(g.path);
+  const headers = { 'Authorization':'Bearer '+g.token, 'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28' };
+  try{
+    // 1) الحصول على SHA الحالي للملف (إن وُجد)
+    let sha;
+    const gr = await fetch(api+'?ref='+encodeURIComponent(g.branch), { headers });
+    if(gr.status === 200){ sha = (await gr.json()).sha; }
+    else if(gr.status === 401){ throw new Error('التوكن غير صالح (401) · تحقّق منه'); }
+    else if(gr.status === 404){ /* ملف جديد */ }
+    else if(gr.status !== 200){ /* نكمل، قد يكون جديداً */ }
+    // 2) رفع النسخة الجديدة (commit)
+    const put = await fetch(api, {
+      method:'PUT',
+      headers: Object.assign({}, headers, {'Content-Type':'application/json'}),
+      body: JSON.stringify({
+        message: 'تحديث المحتوى من لوحة التحكم',
+        content: b64utf8(configFileText(collect())),
+        branch:  g.branch,
+        sha: sha
+      })
+    });
+    if(!put.ok){
+      let m = 'فشل النشر ('+put.status+')';
+      try{ const e = await put.json(); if(e.message) m += ' · '+e.message; }catch(_){}
+      throw new Error(m);
+    }
+    // نحدّث المعاينة المحلية أيضاً
+    localStorage.setItem('SITE_CONFIG', JSON.stringify(collect()));
+    toast('✅ نُشر بنجاح! الموقع يتحدّث خلال ~دقيقة');
+  }catch(err){
+    alert('⚠️ ' + err.message);
+  }finally{
+    btn.disabled = false; btn.textContent = label;
+  }
+}
+
+fillGH();
+</script>
+<script type="module">
+const firebaseConfig={apiKey:'AIzaSyAou6PxuGGpDSNnmZ1ja4eMYIke3OR_sXY',authDomain:'elite-editor-9fe62.firebaseapp.com',projectId:'elite-editor-9fe62',storageBucket:'elite-editor-9fe62.firebasestorage.app',messagingSenderId:'705152552088',appId:'1:705152552088:web:c9b082ee8d5f0a1565d4ed'};
+let auth=null,_fb=null;async function ensureFirebase(){if(_fb)return _fb;const[a,b]=await Promise.all([import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'),import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js')]);const app=a.initializeApp(firebaseConfig);auth=b.getAuth(app);_fb={signIn:b.signInWithEmailAndPassword,signOut:b.signOut,onAuth:b.onAuthStateChanged};return _fb;}
+const COLLECTION='client_context',FS_DBS=['default','(default)'];const fsDocs=id=>'https://firestore.googleapis.com/v1/projects/'+firebaseConfig.projectId+'/databases/'+id+'/documents';
+function fsValue(v){if(v==null)return null;if('stringValue'in v)return v.stringValue;if('integerValue'in v)return +v.integerValue;if('doubleValue'in v)return v.doubleValue;if('booleanValue'in v)return v.booleanValue;if('timestampValue'in v)return v.timestampValue;if('nullValue'in v)return null;if('arrayValue'in v)return(v.arrayValue.values||[]).map(fsValue);if('mapValue'in v)return fsFields(v.mapValue.fields);return null}function fsFields(f){const o={};for(const k in(f||{}))o[k]=fsValue(f[k]);return o}
+const QLAB={
+ contact_name:'الاسم الكامل',contact_phone:'الهاتف / WhatsApp',contact_main_link:'الحساب الرئيسي',contact_email:'البريد الإلكتروني (اختياري)',
+ business_profile:'العمل والعرض',content_current:'الوضع الحالي للمحتوى',operation_current_and_past:'إدارة المحتوى والتجارب السابقة',
+ change_from:'الوضع الحالي',change_to:'الوضع المطلوب خلال 3 أشهر',trigger_reason:'لماذا الآن',source_channel:'كيف وصل إلينا',
+ decision_authority:'صاحب القرار؟',monthly_budget:'الميزانية الشهرية',prep_offer:'صفحة العرض / الموقع',prep_social:'روابط السوشيال',
+ booking_status:'حالة الحجز',bookingOpenedAt:'ظهور صفحة الحجز',bookingConfirmedAt:'تأكيد الحجز'
+};
+let ROWS=[];const $=id=>document.getElementById(id);const esc=s=>{const d=document.createElement('span');d.textContent=s??'';return d.innerHTML};function g(r,k){let v=r[k];if(Array.isArray(v))return v.join('، ');return v==null?'':String(v)}function first(r,...ks){for(const k of ks){const v=g(r,k);if(v)return v}return''}function toast(m){const t=$('ciToast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1500)}
+function nameOf(r){return first(r,'contact_name','name')||'بدون اسم'}function businessOf(r){return first(r,'business_profile','business_offer')||'·'}function budgetOf(r){return first(r,'monthly_budget','business_price')||'·'}function changeOf(r){const a=first(r,'change_from'),b=first(r,'change_to','desired_change');return [a,b].filter(Boolean).join(' → ')||'·'}
+function bookingBadge(r){const s=g(r,'booking_status');if(s==='confirmed_by_user')return'<span class="badge ok">أكد الحجز</span>';if(s==='booking_page_shown'||s==='booking_opened')return'<span class="badge warn">وصل للحجز</span>';if(s==='awaiting_booking')return'<span class="badge err">بانتظار الحجز</span>';return'<span class="badge">غير معروف</span>'}
+$('loginBtn').onclick=async()=>{const b=$('loginBtn');b.disabled=true;$('loginMsg').textContent='';try{const fb=await ensureFirebase();await fb.signIn(auth,$('email').value.trim(),$('pass').value)}catch(e){$('loginMsg').textContent='بيانات الدخول غير صحيحة أو تعذّر الاتصال'}finally{b.disabled=false}};$('pass').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginBtn').click()});$('logoutBtn').onclick=async()=>{try{const fb=await ensureFirebase();fb.signOut(auth)}catch(_){}};function showAdmin(){$('gate').style.display='none';$('adminShell').style.display='block';$('app').style.display='block';}
+function showGate(){$('gate').style.display='flex';$('adminShell').style.display='none';}
+$('demoBtn').onclick=()=>{ROWS=[DEMO];showAdmin();render()};
+ensureFirebase().then(fb=>fb.onAuth(auth,u=>{if(u){showAdmin();load()}else{showGate()}})).catch(()=>{});
+async function load(){$('tableWrap').innerHTML='<div class="empty">جارٍ التحميل…</div>';try{const token=await auth.currentUser.getIdToken();const runQ=id=>fetch(fsDocs(id)+':runQuery',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({structuredQuery:{from:[{collectionId:COLLECTION}],limit:1000}})});let dbid=null,qres=null;for(const id of FS_DBS){const r=await runQ(id);if(r.ok){dbid=id;qres=r;break}if(r.status!==404&&r.status!==400)throw new Error('HTTP '+r.status)}if(!dbid){ROWS=[];render();return}window.__DBID=dbid;const arr=await qres.json();let docs=[];(Array.isArray(arr)?arr:[]).forEach(x=>{const d=x.document;if(d)docs.push(Object.assign({id:d.name.split('/').pop(),__ct:d.createTime},fsFields(d.fields)))});docs.sort((a,b)=>String(b.submittedAt||b.__ct||'').localeCompare(String(a.submittedAt||a.__ct||'')));const events=docs.filter(d=>d.record_type==='booking_confirmation'),confirmedByToken=new Map();events.forEach(e=>{if(e.lead_token&&!confirmedByToken.has(e.lead_token))confirmedByToken.set(e.lead_token,e)});ROWS=docs.filter(d=>d.record_type!=='booking_confirmation').map(r=>{const ev=r.lead_token?confirmedByToken.get(r.lead_token):null;return ev?Object.assign({},r,{booking_status:'confirmed_by_user',bookingConfirmedAt:ev.bookingConfirmedAt||ev.submittedAt}):r});render()}catch(e){console.error(e);$('tableWrap').innerHTML='<div class="empty">تعذّر التحميل: '+esc(e.message||e)+'</div>'}}$('refreshBtn').onclick=load;
+
+/* ===== الحالة والفلاتر والتحديد ===== */
+let FILTER='all';const SEL=new Set();
+function statusOf(r){return r.admin_status||'new'}
+function statusBadge(r){const st=statusOf(r);if(st==='accepted')return'<span class="badge ok">مقبول</span>';if(st==='rejected')return'<span class="badge err">مرفوض</span>';if(st==='archived')return'<span class="badge arch">مؤرشف</span>';if(st==='trash')return'<span class="badge err">في المهملات</span>';return'<span class="badge new">جديد</span>'}
+function viewRows(){return ROWS.filter(r=>{const st=statusOf(r);if(FILTER==='all')return st!=='archived'&&st!=='trash';if(FILTER==='new')return st==='new';return st===FILTER})}
+function idxOf(r){return ROWS.indexOf(r)}
+function render(){
+ const n=ROWS.filter(r=>!['archived','trash'].includes(statusOf(r))).length,
+ confirmed=ROWS.filter(r=>g(r,'booking_status')==='confirmed_by_user').length,
+ accepted=ROWS.filter(r=>statusOf(r)==='accepted').length,
+ ready=ROWS.filter(r=>{const b=g(r,'monthly_budget');return b&&b!=='لست مستعدًا للاستثمار حاليًا'&&b!=='Mazal machi mesta3ed daba'}).length;
+ $('stats').innerHTML=[['الطلبات',n],['أكدوا الحجز',confirmed],['مقبولون',accepted],['لديهم ميزانية',ready]].map(([k,v])=>`<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join('');
+ const V=viewRows();
+ [...SEL].forEach(id=>{if(!V.some(r=>r.id===id))SEL.delete(id)});
+ updateBulk();
+ if(!V.length){$('tableWrap').innerHTML='<div class="empty">'+(FILTER==='all'?'لا توجد طلبات بعد.':'لا شيء هنا.')+'</div>';return}
+ $('tableWrap').innerHTML='<table><thead><tr><th style="width:34px"><input type="checkbox" class="rowck" id="ckAll"></th><th>العميل</th><th>العرض / العمل</th><th>الميزانية</th><th>الحالة</th><th>الحجز</th><th>التاريخ</th><th style="width:40px"></th></tr></thead><tbody>'+
+ V.map(r=>{const d=r.submittedAt?new Date(r.submittedAt):null,ds=d?d.toLocaleDateString('ar'):'·',ts=d?d.toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'}):'';const on=SEL.has(r.id);
+ return`<tr class="clk ${on?'sel-row':''}" data-id="${esc(r.id)}"><td><input type="checkbox" class="rowck rck" data-id="${esc(r.id)}" ${on?'checked':''}></td><td><b>${esc(nameOf(r))}</b><br><span style="color:var(--faint);font-size:11.5px" class="mono">${esc(first(r,'contact_phone'))}</span></td><td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(businessOf(r))}</td><td>${esc(budgetOf(r))}</td><td>${statusBadge(r)}</td><td>${bookingBadge(r)}</td><td class="mono">${ds}<br><span style="font-size:10.5px;color:var(--faint)">${ts}</span></td><td><button class="morebtn" data-id="${esc(r.id)}" aria-label="خيارات"><svg class="ic" viewBox="0 0 24 24"><circle cx="5.4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="18.6" cy="12" r="1.5" fill="currentColor" stroke="none"/></svg></button></td></tr>`}).join('')+'</tbody></table>';
+ $('tableWrap').querySelectorAll('tr.clk').forEach(tr=>tr.onclick=e=>{if(e.target.closest('.rck')||e.target.closest('.morebtn'))return;const r=byId(tr.dataset.id);if(r)openIntel(r)});
+ $('tableWrap').querySelectorAll('.rck').forEach(ck=>ck.onchange=()=>{ck.checked?SEL.add(ck.dataset.id):SEL.delete(ck.dataset.id);ck.closest('tr').classList.toggle('sel-row',ck.checked);updateBulk()});
+ $('tableWrap').querySelectorAll('.morebtn').forEach(b=>b.onclick=e=>{e.stopPropagation();openMenu(b,byId(b.dataset.id))});
+ const all=$('ckAll');if(all)all.onchange=()=>{const V2=viewRows();V2.forEach(r=>all.checked?SEL.add(r.id):SEL.delete(r.id));render()};
+}
+function byId(id){return ROWS.find(r=>r.id===id)}
+function updateBulk(){const b=$('bulkBar');if(!b)return;b.classList.toggle('on',SEL.size>0);$('bulkCount').textContent=SEL.size?('محدد: '+SEL.size):'';const bd=$('bulkDel');if(bd)bd.textContent=FILTER==='trash'?'حذف نهائي':'نقل للمهملات'}
+$('filterSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;FILTER=b.dataset.f;$('filterSeg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));SEL.clear();render()});
+
+/* ===== كتابة Firestore ===== */
+function toFsFields(o){const f={};for(const k in o)f[k]={stringValue:String(o[k])};return f}
+async function fsPatch(id,fields){const token=await auth.currentUser.getIdToken();const db=window.__DBID||'default';const mask=Object.keys(fields).map(k=>'updateMask.fieldPaths='+encodeURIComponent(k)).join('&');const r=await fetch(fsDocs(db)+'/'+COLLECTION+'/'+encodeURIComponent(id)+'?'+mask,{method:'PATCH',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({fields:toFsFields(fields)})});if(r.status===403)throw new Error('RULES');if(!r.ok)throw new Error('HTTP '+r.status);return true}
+async function fsDelete(id){const token=await auth.currentUser.getIdToken();const db=window.__DBID||'default';const r=await fetch(fsDocs(db)+'/'+COLLECTION+'/'+encodeURIComponent(id),{method:'DELETE',headers:{Authorization:'Bearer '+token}});if(r.status===403)throw new Error('RULES');if(!r.ok)throw new Error('HTTP '+r.status);return true}
+function ruleErr(e){if(String(e.message)==='RULES'){toast('حدّث قواعد Firestore للسماح بحفظ الحالة (أرسلتها لك)')}else toast('تعذّر الحفظ: '+(e.message||e))}
+async function setStatus(ids,st){try{for(const id of ids){await fsPatch(id,st==='new'?{admin_status:''}:{admin_status:st,decidedAt:new Date().toISOString()});const r=byId(id);if(r)r.admin_status=(st==='new'?'':st)}render();return true}catch(e){ruleErr(e);return false}}
+async function trashRows(ids){if(await setStatus(ids,'trash')){SEL.clear();render();toast('نُقل إلى المهملات · يمكنك استرجاعه')}}
+async function delForever(ids){if(!confirm('حذف نهائي لـ '+ids.length+' طلب من المهملات؟ لا يمكن التراجع بعدها.'))return;try{for(const id of ids){await fsDelete(id);ROWS=ROWS.filter(r=>r.id!==id);SEL.delete(id)}render();toast('حُذف نهائيًا')}catch(e){ruleErr(e)}}
+function delRows(ids){const allTrash=ids.every(id=>statusOf(byId(id)||{})==='trash');allTrash?delForever(ids):trashRows(ids)}
+$('bulkBar').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;const act=b.dataset.act,ids=[...SEL];if(!ids.length&&act!=='clear')return;
+ if(act==='clear'){SEL.clear();render();return}
+ if(act==='delete'){delRows(ids);return}
+ const map={accept:'accepted',reject:'rejected',archive:'archived',unarchive:'new'};
+ if(await setStatus(ids,map[act])){SEL.clear();render();toast(act==='accept'?'تم القبول':act==='reject'?'تم الرفض':act==='archive'?'تمت الأرشفة':'تم الاسترجاع')}});
+
+/* ===== قائمة الصف ===== */
+let MENU_R=null;
+function openMenu(btn,r){MENU_R=r;const m=$('rowMenu');const st=statusOf(r);
+ m.innerHTML=
+  (st!=='accepted'?'<button data-a="accept">قبول الطلب</button>':'')+
+  (st!=='rejected'?'<button data-a="reject">رفض الطلب</button>':'')+
+  '<div class="div"></div>'+
+  '<button data-a="msgA">رسالة القبول</button><button data-a="msgF">رسالة المتابعة</button>'+
+  '<div class="div"></div>'+
+  '<button data-a="open">فتح الملف</button>'+
+  (st==='archived'?'<button data-a="unarchive">استرجاع من الأرشيف</button>':'<button data-a="archive">أرشفة</button>')+
+  '<div class="div"></div>'+(st==='trash'?'<button data-a="unarchive">استرجاع</button><button class="danger" data-a="delForever">حذف نهائي</button>':'<button class="danger" data-a="del">نقل إلى المهملات</button>');
+ m.classList.add('on');
+ const b=btn.getBoundingClientRect(),mw=m.offsetWidth||210,mh=m.offsetHeight;
+ let x=Math.min(Math.max(8,b.left-mw+b.width),innerWidth-mw-8);
+ let y=b.bottom+6;if(y+mh>innerHeight-8)y=b.top-mh-6;
+ m.style.left=x+'px';m.style.top=y+'px';}
+function closeMenu(){$('rowMenu').classList.remove('on')}
+document.addEventListener('click',e=>{if(!e.target.closest('#rowMenu')&&!e.target.closest('.morebtn'))closeMenu()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMenu();$('msgModal').classList.remove('on')}});
+$('rowMenu').addEventListener('click',async e=>{const b=e.target.closest('button');if(!b||!MENU_R)return;const a=b.dataset.a,r=MENU_R;closeMenu();
+ if(a==='open')openIntel(r);
+ else if(a==='accept'){if(await setStatus([r.id],'accepted'))toast('تم قبول '+nameOf(r))}
+ else if(a==='reject'){if(await setStatus([r.id],'rejected'))toast('تم رفض الطلب')}
+ else if(a==='archive'){if(await setStatus([r.id],'archived'))toast('تمت الأرشفة')}
+ else if(a==='unarchive'){if(await setStatus([r.id],'new'))toast('تم الاسترجاع')}
+ else if(a==='del')trashRows([r.id]);
+ else if(a==='delForever')delForever([r.id]);
+ else if(a==='msgA')openMsg(r,'accept');
+ else if(a==='msgF')openMsg(r,'follow');});
+
+/* ===== مولّد الرسائل ===== */
+const CAL_URL=(window.SITE_CONFIG&&window.SITE_CONFIG.bookingUrl)||'https://calendar.app.google/Wox9zm9zaCydyEkG8';
+function firstName(r){return (nameOf(r)||'').trim().split(/\s+/)[0]||''}
+function goalOf(r){return first(r,'change_to','desired_change')}
+function buildMsg(r,type,lang){
+ const fn=firstName(r),booked=g(r,'booking_status')==='confirmed_by_user',goal=goalOf(r),fromTxt=first(r,'change_from');
+ if(lang==='dar'){
+  if(type==='accept'){let o='Salam '+fn+' 👋\n\n';o+='Choukran 3la lformulaire dyal listichara. Raje3na ajwiba dyalek, w khbar zwin: talab dyalek t9bel ✅\n\n';if(goal)o+='Fhamna anna lhadaf dyalek howa: '+goal+'\n\n';o+=booked?'Lmaw3id dyalna tabet. Ghadi nraj3o content dyalek 9bel l call bach njiw wajdin.\n\n':'B9at ghir khotwa we7da: booki lmaw3id dyal l call mn hna:\n'+CAL_URL+'\n\n';o+='Ntla9aw 9rib,\nAmine · Amine Editing Team';return o}
+  let o='Salam '+fn+' 👋\n\n';o+='Tadkir b lmaw3id dyal l call dyalna li jay. Raje3na ajwiba w content dyalek, w wajjadna n9at khassa b lwad3 dyalek.\n\n';if(fromTxt&&goal)o+='Ghadi nrakzo 3la kifach ndouzo mn:\n«'+fromTxt+'»\nl:\n«'+goal+'»\n\n';o+='Ila tbeddel chi 7aja wla bghiti tbeddel lwe9t, goulha liya hna.\n\nNtla9aw f l call 🙌';return o}
+ if(type==='accept'){let o='مرحبًا '+fn+' 👋\n\n';o+='شكرًا لك على تعبئة نموذج الاستشارة. راجعنا إجاباتك بعناية، ويسعدنا إخبارك أن طلبك مقبول ✅\n\n';if(goal)o+='فهمنا أن هدفك الأساسي هو: '+goal+'\n\n';o+=booked?'موعدنا ثابت كما حجزته، وسنراجع محتواك قبل المكالمة حتى نأتي جاهزين بأفكار لوضعك.\n\n':'بقيت خطوة واحدة فقط: احجز موعد المكالمة من هنا:\n'+CAL_URL+'\n\n';o+='نراك قريبًا،\nأمين · Amine Editing Team';return o}
+ let o='مرحبًا '+fn+' 👋\n\n';o+='تذكير بموعد مكالمتنا القادمة. راجعنا إجاباتك ومحتواك، وجهزنا نقاطًا مخصصة لوضعك.\n\n';if(fromTxt&&goal)o+='سنركّز في المكالمة على الانتقال من:\n«'+fromTxt+'»\nإلى:\n«'+goal+'»\n\n';o+='إذا استجدّ شيء أو احتجت تغيير الموعد، راسلني هنا مباشرة.\n\nنراك في المكالمة 🙌';return o}
+let MSG_R=null,MSG_TYPE='accept',MSG_LANG='ar';
+function openMsg(r,type){MSG_R=r;MSG_TYPE=type||'accept';
+ MSG_LANG=/[A-Za-z]/.test(g(r,'business_profile'))&&!/[؀-ۿ]/.test(g(r,'business_profile'))?'dar':'ar';
+ syncMsgSegs();refreshMsg();
+ $('mmWho').textContent=nameOf(r)+' · '+(first(r,'contact_phone')||'بدون رقم');
+ $('msgModal').classList.add('on')}
+function syncMsgSegs(){$('mmType').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===MSG_TYPE));$('mmLang').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===MSG_LANG));$('mmTitle').textContent=MSG_TYPE==='accept'?'رسالة القبول':'رسالة المتابعة'}
+function refreshMsg(){$('mmText').value=buildMsg(MSG_R,MSG_TYPE,MSG_LANG);
+ const ph=String(first(MSG_R,'contact_phone')).replace(/[^0-9]/g,''),em=first(MSG_R,'contact_email');
+ $('mmWa').disabled=!ph;$('mmMail').disabled=!em;
+ $('mmHint').textContent=(!ph?'لا يوجد رقم واتساب لهذا العميل. ':'')+(!em?'لا يوجد بريد (اختياري في الفورم). ':'')+'راجع الرسالة وعدّلها قبل الإرسال.'}
+$('mmType').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;MSG_TYPE=b.dataset.v;syncMsgSegs();refreshMsg()});
+$('mmLang').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;MSG_LANG=b.dataset.v;syncMsgSegs();refreshMsg()});
+$('mmClose').onclick=()=>$('msgModal').classList.remove('on');
+$('msgModal').onclick=e=>{if(e.target.id==='msgModal')$('msgModal').classList.remove('on')};
+$('mmCopy').onclick=async()=>{await navigator.clipboard.writeText($('mmText').value);toast('نُسخت الرسالة')};
+$('mmWa').onclick=()=>{const ph=String(first(MSG_R,'contact_phone')).replace(/[^0-9]/g,'');if(!ph)return;window.open('https://wa.me/'+ph+'?text='+encodeURIComponent($('mmText').value),'_blank')};
+$('mmMail').onclick=()=>{const em=first(MSG_R,'contact_email');if(!em)return;const su=MSG_TYPE==='accept'?'قبول طلب الاستشارة · Amine Editing Team':'تذكير بموعد المكالمة · Amine Editing Team';location.href='mailto:'+em+'?subject='+encodeURIComponent(su)+'&body='+encodeURIComponent($('mmText').value)};
+$('sideLogout').onclick=()=>$('logoutBtn').click();
+
+function safeHref(v){try{const u=new URL(String(v));return /^https?:$/.test(u.protocol)?u.href:''}catch(_){return''}}function kv(k,v,link=false){const has=v&&String(v).trim(),href=has&&link?safeHref(v):'';const value=has?(href?`<a class="link" href="${esc(href)}" target="_blank" rel="noopener">${esc(v)}</a>`:esc(v)):'·';return`<div class="kv"><div class="k">${esc(k)}</div><div class="v">${value}</div></div>`}
+function derive(r){const H=[],ASK=[],FLAG=[];const decision=g(r,'decision_authority'),budget=g(r,'monthly_budget'),status=g(r,'booking_status');if(decision==='أنا أبحث حاليًا فقط')FLAG.push('العميل صرّح أنه في مرحلة بحث فقط، لا قرار شراء حالي.');if(decision==='أحتاج إلى اتخاذ القرار مع شريك أو شخص آخر')ASK.push('من الشخص الآخر الذي يشارك في القرار؟ وهل يحتاج أن يحضر جزءًا من المكالمة؟');if(budget==='لست مستعدًا للاستثمار حاليًا')FLAG.push('العميل صرّح أنه غير مستعد للاستثمار حاليًا.');if(!budget)ASK.push('ما نطاق الاستثمار الشهري المسؤول إذا وجدنا Fit واضحًا؟');if(status&&status!=='confirmed_by_user')ASK.push('هل تم اختيار موعد بالفعل؟ حالة النموذج الحالية: '+status);return{H,ASK,FLAG}}
+function buildIntel(r){const {H,ASK,FLAG}=derive(r);let h='';
+ h+='<div class="sec"><h3>معلومات التواصل</h3>';h+=kv('الاسم الكامل',nameOf(r));h+=kv('WhatsApp / الهاتف',first(r,'contact_phone'));h+=kv('الحساب الرئيسي',first(r,'contact_main_link'),true);h+=kv('البريد الإلكتروني (اختياري)',first(r,'contact_email'));h+='</div>';
+ h+='<div class="sec"><h3>01 · العمل والعرض</h3>';h+=kv('إجابة العميل',businessOf(r));h+='</div>';
+ h+='<div class="sec"><h3>02 · الوضع الحالي للمحتوى</h3>';h+=kv('إجابة العميل',first(r,'content_current'));h+='</div>';
+ h+='<div class="sec"><h3>03 · إدارة المحتوى والتجارب السابقة</h3>';h+=kv('إجابة العميل',first(r,'operation_current_and_past'));h+='</div>';
+ h+='<div class="sec"><h3>04 · التغيير المطلوب</h3>';h+=kv('من',first(r,'change_from'));h+=kv('إلى',first(r,'change_to'));h+='</div>';
+ h+='<div class="sec"><h3>05 · لماذا الآن</h3>';h+=kv('إجابة العميل',first(r,'trigger_reason'));h+='</div>';
+ h+='<div class="sec"><h3>06 · كيف وصل إلينا</h3>';h+=kv('المصدر',first(r,'source_channel'));h+='</div>';
+ h+='<div class="sec"><h3>07 · القرار والاستثمار</h3>';h+=kv('هل هو صاحب القرار؟',first(r,'decision_authority'));h+=kv('الميزانية الشهرية',budgetOf(r));h+='</div>';
+ h+='<div class="sec"><h3>مواد التحضير</h3>';[['صفحة العرض / الموقع','prep_offer'],['Instagram / YouTube / LinkedIn','prep_social']].forEach(([l,k])=>{if(g(r,k))h+=kv(l,g(r,k),false)});if(!['prep_offer','prep_social'].some(k=>g(r,k)))h+='<div style="color:var(--faint);font-size:13px">لم يرفق مواد إضافية.</div>';h+='</div>';
+ h+='<div class="sec"><h3>الحجز</h3>';h+=kv('حالة الحجز',g(r,'booking_status')||'UNKNOWN');h+=kv('ظهور صفحة الحجز',g(r,'bookingOpenedAt'));h+=kv('تأكيد الحجز',g(r,'bookingConfirmedAt'));h+='</div>';
+ if(H.length)h+='<div class="sec"><h3>HYPOTHESES</h3><ul class="li">'+H.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul></div>';if(ASK.length)h+='<div class="sec"><h3>QUESTIONS FOR THE CALL</h3><ul class="li">'+ASK.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul></div>';if(FLAG.length)h+='<div class="sec"><h3>RED FLAGS</h3><ul class="li">'+FLAG.map(x=>`<li>${esc(x)}</li>`).join('')+'</ul></div>';
+ h+='<details class="raw"><summary>الإجابات الخام</summary>';Object.keys(QLAB).forEach(k=>{const v=g(r,k);if(v)h+=`<div class="qa"><div class="ql">${esc(QLAB[k])}</div><div class="qv">${esc(v)}</div></div>`});h+='</details>';return h}
+function briefText(r){const {H,ASK,FLAG}=derive(r);let o='CLIENT SNAPSHOT\n';o+='• الاسم: '+nameOf(r)+'\n';o+='• الهاتف: '+first(r,'contact_phone')+'\n';o+='• البريد (اختياري): '+first(r,'contact_email')+'\n';o+='• العرض/العمل: '+businessOf(r)+'\n';o+='• المحتوى الآن: '+first(r,'content_current')+'\n';o+='• النظام والتجارب السابقة: '+first(r,'operation_current_and_past')+'\n';o+='• التغيير المطلوب: '+changeOf(r)+'\n';o+='• لماذا الآن: '+first(r,'trigger_reason')+'\n';o+='• المصدر: '+first(r,'source_channel')+'\n';o+='• القرار: '+first(r,'decision_authority')+'\n';o+='• الميزانية: '+budgetOf(r)+'\n';o+='• حالة الحجز: '+(g(r,'booking_status')||'UNKNOWN')+'\n';if(H.length)o+='\nHYPOTHESES\n'+H.map(x=>'- '+x).join('\n');if(ASK.length)o+='\n\nQUESTIONS FOR THE CALL\n'+ASK.map((x,i)=>(i+1)+'. '+x).join('\n');if(FLAG.length)o+='\n\nRED FLAGS\n'+FLAG.map(x=>'- '+x).join('\n');return o}
+function rawQA(r){let o='';Object.keys(QLAB).forEach(k=>{const v=g(r,k);if(v)o+=QLAB[k]+':\n'+v+'\n\n'});return o}
+const ANALYZER_PROMPT=`أنت محلّل ذكاء عميل لاستشارة محتوى ومونتاج مع خبراء وكوتشز ومستشارين وبراندات شخصية.\n\nستستلم إجابات نموذج تأهيل قبل المكالمة. ابنِ تحليلًا قائمًا على الأدلة، ولا تضف معلومات غير موجودة.\n\nافصل بوضوح بين: معلومات العميل، العمل والعرض (وفيه وصف العميل المستهدف ومشكلته ونتيجته كما كتبها العميل)، وضع المحتوى الحالي، إدارة الإنتاج والتجارب السابقة، النتيجة المطلوبة خلال 3 أشهر، Trigger الحالي، مصدر الوصول إلينا، الاستعداد لاتخاذ القرار والاستثمار، ومواد البحث المرفقة.\n\nقواعد:\n1) صنّف أي استنتاج إلى Confirmed / Inference / Hypothesis / Unknown.\n2) لا تستنتج القدرة على الدفع من سعر العرض؛ استخدم فقط إجابة الميزانية.\n3) لا تخترع مشاكل أو اعتراضات أو أسباب شراء غير مكتوبة.\n4) استخرج التناقضات والفجوات والأسئلة التي يجب حسمها في المكالمة.\n5) ركّز على أثر المعلومات على Strategy / Content System / Editing، وليس على زخرفة المونتاج.\n\nالمخرجات: 1) Snapshot 2) Q1 Business & Offer 3) Q2 Current Content 4) Q3 Production System & Past Attempts 5) Q4 Desired A→B 6) Q5 Trigger 7) Q6 Acquisition Source 8) Q7 Decision & Budget 9) Evidence/Links 10) Booking Status 11) Hypotheses 12) Red Flags 13) Critical Unknowns 14) Top Opportunities 15) أسئلة المكالمة مرتبة بالأهمية.\n\n=== إجابات العميل ===\n`;
+let CURRENT=null;function openIntel(r){CURRENT=r;$('dTitle').textContent=nameOf(r);renderDStatus(r);const d=r.submittedAt?new Date(r.submittedAt):null;$('dSub').textContent=(budgetOf(r)!=='·'?budgetOf(r)+' · ':'')+(d?d.toLocaleDateString('ar')+' · '+d.toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'}):'');$('dBody').innerHTML=buildIntel(r);$('detail').classList.add('on')}function renderDStatus(r){const st=statusOf(r);$('dStatusRow').innerHTML=
+ '<span class="badge '+(st==='accepted'?'ok':st==='rejected'?'err':st==='archived'?'arch':'new')+'" style="font-size:12px;padding:6px 12px">'+(st==='accepted'?'مقبول':st==='rejected'?'مرفوض':st==='archived'?'مؤرشف':'جديد')+'</span>'+
+ (st!=='accepted'?'<button class="ibtn p" id="dAccept">قبول الطلب</button>':'')+
+ (st!=='rejected'?'<button class="ibtn" id="dReject">رفض</button>':'')+
+ '<button class="ibtn" id="dMsgA">رسالة القبول</button><button class="ibtn" id="dMsgF">رسالة المتابعة</button>';
+ const w=(id,fn)=>{const b=$('' + id);if(b)b.onclick=fn};
+ w('dAccept',async()=>{if(await setStatus([r.id],'accepted')){renderDStatus(r);toast('تم القبول')}});
+ w('dReject',async()=>{if(await setStatus([r.id],'rejected')){renderDStatus(r);toast('تم الرفض')}});
+ w('dMsgA',()=>openMsg(r,'accept'));w('dMsgF',()=>openMsg(r,'follow'));}
+$('dClose').onclick=()=>$('detail').classList.remove('on');$('detail').onclick=e=>{if(e.target.id==='detail')$('detail').classList.remove('on')};document.addEventListener('keydown',e=>{if(e.key==='Escape')$('detail').classList.remove('on')});$('copyPrompt').onclick=async()=>{await navigator.clipboard.writeText(ANALYZER_PROMPT+rawQA(CURRENT));toast('نُسخ برومت التحليل')};$('copyBrief').onclick=async()=>{await navigator.clipboard.writeText(briefText(CURRENT));toast('نُسخ الـBrief')};$('dlBrief').onclick=()=>{const blob=new Blob(['﻿'+briefText(CURRENT)],{type:'text/plain;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='client-brief.txt';a.click()};
+$('csvBtn').onclick=()=>{const keys=Object.keys(QLAB),head=['submittedAt',...keys.map(k=>QLAB[k])],e2=s=>`"${String(s??'').replace(/"/g,'""')}"`,lines=[head.map(e2).join(',')];ROWS.forEach(r=>lines.push([r.submittedAt||'',...keys.map(k=>g(r,k))].map(e2).join(',')));const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='consultation-leads.csv';a.click()};
+const DEMO={id:'demo_1',submittedAt:new Date().toISOString(),form_version:'7q_booking_v2_embed',contact_name:'محمد العتيبي',contact_email:'mohammed@example.com',contact_phone:'+966 50 000 0000',contact_main_link:'https://instagram.com/example',business_profile:'أساعد أصحاب الشركات الخدمية الذين لديهم مبيعات لكن محتواهم غير منتظم على بناء حضور يجذب Leads مؤهلين من خلال استشارة وتنفيذ محتوى، بسعر 2,000 دولار.',content_current:'أنشر 2–3 Reels أسبوعيًا على Instagram. الهدف جذب Leads وبناء الثقة. يأتيني بعض العملاء لكن النتائج غير ثابتة والمحتوى يأخذ وقتًا كبيرًا.',operation_current_and_past:'عندي Editor فريلانسر، لكن لا توجد استراتيجية موثقة. جرّبت العمل مع مونتير سابقًا؛ الجودة كانت جيدة لكن احتاج مني توجيهًا كثيرًا.',change_from:'محتوى متقطع يعتمد علي في كل قرار.',change_to:'نظام ينشر باستمرار ويجذب Leads بدون أن أراجع كل تفصيلة.',trigger_reason:'بدأت أوسع الفريق وأريد إخراج المحتوى من وقتي.',source_channel:'شاهدت فيديو / Reel على Instagram',decision_authority:'نعم، القرار بيدي',monthly_budget:'أكثر من 1,000 دولار',prep_offer:'https://example.com/offer',prep_social:'https://instagram.com/example',booking_status:'confirmed_by_user',bookingConfirmedAt:new Date().toISOString()};window.__demo=DEMO;
+</script>
+<script>
+(function(){
+  const tabs=document.getElementById('admTabs');
+  tabs.addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b)return;
+    tabs.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+    const ci=b.dataset.t==='ci';
+    document.getElementById('ciTab').classList.toggle('on',ci);
+    document.getElementById('siteTab').classList.toggle('hidden',ci);
+    document.getElementById('siteTools').style.display=ci?'none':'';
+    document.getElementById('mbTitle').textContent=ci?'طلبات الاستشارة':'محتوى الموقع';
+  });
+})();
+</script>
+</body>
+</html>

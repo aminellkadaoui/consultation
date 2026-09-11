@@ -1,0 +1,135 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // EXISTING PROJECT: merge the marked block into your existing database match.
+    // Do not replace rules for other apps/collections. See SETUP.md first.
+
+    // Existing application rules retained.
+    match /elite_responses/{id} {
+      allow create: if true;
+      allow read, delete: if request.auth != null;
+    }
+    match /client_context/{id} {
+      allow create: if true;
+      allow update: if request.auth != null
+                    || request.resource.data.diff(resource.data).affectedKeys()
+                        .hasOnly(['booking_status','bookingOpenedAt','bookingConfirmedAt']);
+      allow read, delete: if request.auth != null;
+    }
+
+    // BEGIN CONSULTATION RULES
+
+    function isConsultationAdmin() {
+      return request.auth != null
+        && request.auth.uid in ['9ZN6AKrcdgYg6cVeQKOzgZGGQfl1'];
+    }
+
+    function consultationText(value, min, max) {
+      return value is string && value.size() >= min && value.size() <= max;
+    }
+
+    function consultationRequestFields() {
+      return [
+        'fullName', 'whatsapp', 'instagram', 'experience', 'clientCount', 'editingType',
+        'problem', 'impact', 'goal', 'approach', 'obstacle', 'sessionOutcome',
+        'status', 'schemaVersion', 'submittedAt'
+      ];
+    }
+
+    function validConsultationRequest(d) {
+      return d.keys().hasAll(consultationRequestFields())
+        && d.keys().hasOnly(consultationRequestFields())
+        && consultationText(d.fullName, 1, 120)
+        && consultationText(d.whatsapp, 1, 32)
+        && consultationText(d.instagram, 1, 80)
+        && consultationText(d.experience, 1, 80)
+        && consultationText(d.clientCount, 1, 40)
+        && consultationText(d.editingType, 1, 200)
+        && consultationText(d.problem, 1, 2000)
+        && consultationText(d.impact, 1, 2000)
+        && consultationText(d.goal, 1, 2000)
+        && consultationText(d.approach, 1, 2000)
+        && consultationText(d.obstacle, 1, 2000)
+        && consultationText(d.sessionOutcome, 1, 2000)
+        && d.status == 'new'
+        && d.schemaVersion is int && d.schemaVersion == 1
+        && d.submittedAt is timestamp && d.submittedAt == request.time;
+    }
+
+    function validConsultationStatus(status) {
+      return status in ['new', 'reviewing', 'accepted', 'scheduled', 'completed', 'archived'];
+    }
+
+    match /consultation_requests/{requestId} {
+      allow create: if validConsultationRequest(request.resource.data);
+      allow get, list: if isConsultationAdmin();
+      allow update: if isConsultationAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'privateNotes', 'updatedAt'])
+        && validConsultationStatus(request.resource.data.status)
+        && (!('privateNotes' in request.resource.data)
+          || consultationText(request.resource.data.privateNotes, 0, 6000))
+        && request.resource.data.updatedAt is timestamp
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
+
+    function validConsultationTestimonialAt(items, i) {
+      return items.size() <= i || (
+        items[i] is map
+        && items[i].keys().hasAll(['name', 'role', 'quote', 'videoUrl', 'imageUrl'])
+        && items[i].keys().hasOnly(['name', 'role', 'quote', 'videoUrl', 'imageUrl'])
+        && consultationText(items[i].name, 1, 120)
+        && consultationText(items[i].role, 0, 200)
+        && consultationText(items[i].quote, 0, 3000)
+        && consultationText(items[i].videoUrl, 0, 2048)
+        && consultationText(items[i].imageUrl, 0, 2048)
+        && (items[i].videoUrl == '' || items[i].videoUrl.matches('https://[^ ]+'))
+        && (items[i].imageUrl == '' || items[i].imageUrl.matches('https://[^ ]+'))
+        && (items[i].quote.size() > 0 || items[i].videoUrl.size() > 0 || items[i].imageUrl.size() > 0)
+      );
+    }
+
+    function validConsultationSettings(d) {
+      let fields = [
+        'brand', 'headline', 'subheadline', 'price', 'currency', 'durationMinutes',
+        'actionDocHours', 'videoUrl', 'videoPoster', 'bookingUrl', 'contactWhatsapp',
+        'testimonials', 'updatedAt'
+      ];
+      return d.keys().hasAll(fields) && d.keys().hasOnly(fields)
+        && consultationText(d.brand, 1, 120)
+        && consultationText(d.headline, 1, 240)
+        && consultationText(d.subheadline, 1, 1000)
+        && consultationText(d.currency, 1, 12)
+        && consultationText(d.videoUrl, 0, 2048)
+        && consultationText(d.videoPoster, 0, 2048)
+        && consultationText(d.bookingUrl, 0, 2048)
+        && consultationText(d.contactWhatsapp, 0, 64)
+        && (d.price is int || d.price is float) && d.price >= 0 && d.price <= 100000
+        && d.durationMinutes is int && d.durationMinutes >= 1 && d.durationMinutes <= 480
+        && d.actionDocHours is int && d.actionDocHours >= 1 && d.actionDocHours <= 168
+        && d.testimonials is list && d.testimonials.size() <= 12
+        && validConsultationTestimonialAt(d.testimonials, 0)
+        && validConsultationTestimonialAt(d.testimonials, 1)
+        && validConsultationTestimonialAt(d.testimonials, 2)
+        && validConsultationTestimonialAt(d.testimonials, 3)
+        && validConsultationTestimonialAt(d.testimonials, 4)
+        && validConsultationTestimonialAt(d.testimonials, 5)
+        && validConsultationTestimonialAt(d.testimonials, 6)
+        && validConsultationTestimonialAt(d.testimonials, 7)
+        && validConsultationTestimonialAt(d.testimonials, 8)
+        && validConsultationTestimonialAt(d.testimonials, 9)
+        && validConsultationTestimonialAt(d.testimonials, 10)
+        && validConsultationTestimonialAt(d.testimonials, 11)
+        && d.updatedAt is timestamp && d.updatedAt == request.time;
+    }
+
+    match /consultation_settings/{settingsId} {
+      allow get: if settingsId == 'public';
+      allow list: if false;
+      allow create, update: if settingsId == 'public' && isConsultationAdmin()
+        && validConsultationSettings(request.resource.data);
+      allow delete: if false;
+    }
+    // END CONSULTATION RULES
+  }
+}
