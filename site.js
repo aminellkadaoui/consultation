@@ -21,7 +21,7 @@ function renderSettings(config){
   const headline=config.headline||base.headline;
   const parts=headline.split('على ماذا تركز الآن؟');
   $('headline').replaceChildren();
-  if(parts.length===2){$('headline').append(document.createTextNode(parts[0]),node('span','', 'على ماذا تركز الآن؟'),document.createTextNode(parts[1]));}
+  if(parts.length===2){$('headline').append(document.createTextNode(parts[0]),node('span','s', 'على ماذا تركز الآن؟'),document.createTextNode(parts[1]));}
   else $('headline').textContent=headline;
   $('subheadline').textContent=config.subheadline||base.subheadline;
   $('brandName').textContent=config.brand||base.brand;$('footerBrand').textContent=config.brand||base.brand;
