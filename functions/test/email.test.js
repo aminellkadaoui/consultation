@@ -5,8 +5,17 @@ const assert = require('node:assert/strict');
 const { escapeHtml, validRequest, validEmail, buildNotification, notificationKey,
   deliveryDecision, sendWithResend, SAFE_RETRY_WINDOW_MS } = require('../email');
 
-const data = { schemaVersion: 1, status: 'new', fullName: 'محمد', problem: 'أريد تحديد الأولوية',
-  submittedAt: { toDate: () => new Date('2026-09-11T11:00:00Z') }, privateNotes: 'PRIVATE_NOTES', whatsapp: 'PRIVATE_PHONE' };
+const data = {
+  schemaVersion: 1,
+  status: 'new',
+  fullName: 'محمد',
+  whatsapp: '+212612345678',
+  instagram: '@mohamed',
+  problem: 'أريد تحديد الأولوية',
+  goal: 'أريد خطة واضحة للخطوة التالية',
+  submittedAt: { toDate: () => new Date('2026-09-11T11:00:00Z') },
+  privateNotes: 'PRIVATE_NOTES'
+};
 const params = { requestId: 'request-1', data, recipient: 'owner@example.com', from: 'notice@example.com' };
 
 test('accepts the supported intake schema versions; rejects malformed or unrelated documents', () => {
@@ -27,15 +36,18 @@ test('escapes all HTML characters and never embeds client markup as HTML', () =>
   assert.ok(payload.html.includes('A&amp;B<br>'));
 });
 
-test('contains a short private notification and a request deep link, without the whole intake', () => {
+test('contains the requested short summary and a request deep link without private notes', () => {
   const payload = buildNotification({ ...params, requestId: 'a/b?#&' });
-  assert.equal(payload.subject, 'طلب استشارة جديد');
+  assert.equal(payload.subject, '🔵 طلب استشارة جديد — محمد');
   assert.deepEqual(payload.to, ['owner@example.com']);
+  assert.ok(payload.text.includes('واتساب: +212612345678'));
+  assert.ok(payload.text.includes('Instagram: @mohamed'));
+  assert.ok(payload.text.includes('الهدف: أريد خطة واضحة للخطوة التالية'));
   assert.ok(payload.text.includes('#request=a%2Fb%3F%23%26'));
-  assert.equal(JSON.stringify(payload).includes('PRIVATE_'), false);
+  assert.equal(JSON.stringify(payload).includes('PRIVATE_NOTES'), false);
   const long = buildNotification({ ...params, data: { ...data, problem: 'x'.repeat(700) } });
-  assert.ok(long.text.includes('x'.repeat(400) + '…'));
-  assert.equal(long.text.includes('x'.repeat(401)), false);
+  assert.ok(long.text.includes('x'.repeat(300) + '…'));
+  assert.equal(long.text.includes('x'.repeat(301)), false);
 });
 
 test('rejects incomplete or injected sender/recipient addresses', () => {
