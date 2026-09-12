@@ -12,6 +12,10 @@ import {
 
 const $ = (id) => document.getElementById(id);
 const stepNames = ['معلوماتك', 'وضعك الحالي', 'مشكلتك الأساسية', 'هدفك والعائق', 'ماذا تريد من الجلسة؟'];
+const requestLimits = Object.freeze({
+  fullName: 120, whatsapp: 32, instagram: 80,
+  lastSituation: 2000, approach: 2000, sessionOutcome: 2000
+});
 const tracking = $('trackingView');
 const formView = $('formView');
 let currentStep = 0;
@@ -75,6 +79,10 @@ function setupForm() {
   const stepCounter = $('stepCounter');
   const error = $('formError');
   const bars = [...document.querySelectorAll('.progress-bars i')];
+
+  for (const [key, max] of Object.entries(requestLimits)) {
+    if ($(key)) $(key).maxLength = max;
+  }
 
   function selectedValue(key) {
     const group = form.querySelector(`[data-field="${key}"]`);
