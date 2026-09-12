@@ -7,9 +7,12 @@
   <meta name="color-scheme" content="light">
   <title>إدارة الاستشارات | أمين القداوي</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%232155ef'/%3E%3Cpath d='M11 20h18M20 11v18' stroke='white' stroke-width='3'/%3E%3C/svg%3E">
-  <link rel="stylesheet" href="admin.css?v=archive-2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css?v=sentence-2">
   <script src="consultation-config.js" defer></script>
-  <script src="admin.js" type="module"></script>
+  <script src="admin.js?v=sentence-2" type="module"></script>
 </head>
 <body>
   <svg class="svg-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs>
@@ -38,7 +41,7 @@
     <div class="login-card panel">
       <span class="icon-tile"><svg><use href="#i-lock"/></svg></span>
       <p class="eyebrow">مساحة الإدارة</p>
-      <h1 id="login-title">كل استشارة، تبدأ من هنا.</h1>
+      <h1 id="login-title">لوحة إدارة الاستشارات</h1>
       <p class="muted">راجع الطلبات، جهّز جلساتك، وحدّث صفحة الاستشارة.</p>
       <form id="login-form">
         <label for="login-email">البريد الإلكتروني</label>
@@ -64,7 +67,7 @@
         <button type="button" class="nav-item" data-view="setup"><svg><use href="#i-help"/></svg>الإعداد والمساعدة</button>
       </nav>
       <div class="sidebar-bottom">
-        <div class="sidebar-note"><span class="tiny-dot"></span><p>وضوح أكثر.<br>خطوة تالية أفضل.</p></div>
+        <div class="sidebar-note"><span class="tiny-dot"></span><p>الطلبات والمحتوى<br>في مكان واحد.</p></div>
         <a href="index.html" class="nav-item" target="_blank" rel="noopener"><svg><use href="#i-out"/></svg>عرض صفحة الاستشارة</a>
         <div class="account-row"><span class="avatar">أ</span><div><b>حساب الإدارة</b><span id="account-email" dir="ltr"></span></div><button id="logout" class="icon-button" aria-label="تسجيل الخروج" title="تسجيل الخروج"><svg><use href="#i-logout"/></svg></button></div>
       </div>
@@ -74,7 +77,7 @@
       <header class="topbar"><p>مساحة العمل <span>/</span> <strong id="view-label">طلبات الاستشارة</strong></p><div class="topbar-actions"><span class="private-label"><svg><use href="#i-lock"/></svg>خاص بك</span><button type="button" id="logout-mobile" class="icon-button mobile-logout" aria-label="تسجيل الخروج" title="تسجيل الخروج"><svg><use href="#i-logout"/></svg></button></div></header>
       <main id="main" tabindex="-1">
         <section id="requests-view" class="view" aria-labelledby="requests-title">
-          <div class="page-heading"><div><p class="eyebrow">من الطلب إلى خطة العمل</p><h1 id="requests-title">طلبات الاستشارة<span class="title-dot">.</span></h1><p class="muted">افهم حالة كل إديتور، وحدد معه الخطوة التالية.</p></div><button class="button secondary" id="refresh-requests"><svg><use href="#i-refresh"/></svg>تحديث الطلبات</button></div>
+          <div class="page-heading"><div><p class="eyebrow">إدارة الاستشارات</p><h1 id="requests-title">طلبات الاستشارة<span class="title-dot">.</span></h1><p class="muted">افهم حالة كل إديتور، وحدد معه الخطوة التالية.</p></div><button class="button secondary" id="refresh-requests"><svg><use href="#i-refresh"/></svg>تحديث الطلبات</button></div>
           <div class="stats-grid">
             <article class="stat-card"><span>إجمالي الطلبات</span><svg><use href="#i-inbox"/></svg><strong id="stat-total">—</strong><small>كل الطلبات المستلمة</small></article>
             <article class="stat-card featured"><span>بانتظار المراجعة</span><svg><use href="#i-clock"/></svg><strong id="stat-new">—</strong><small>طلبات جديدة تحتاج قرارك</small></article>
@@ -87,13 +90,13 @@
             <p id="requests-error" class="notice error inline-notice" role="alert" hidden></p>
             <div id="requests-loading" class="empty-state" role="status"><span class="loader"></span><h3>جاري تحميل الطلبات</h3><p>نسترجع الطلبات المحفوظة في حسابك.</p></div>
             <div id="requests-empty" class="empty-state" hidden><span class="icon-tile"><svg><use href="#i-inbox"/></svg></span><h3 id="empty-title">أول طلب، بداية جديدة.</h3><p id="empty-description">عندما يرسل أحدهم الفورم، ستجد طلبه هنا لتراجعه قبل الحجز.</p><a class="button secondary" id="empty-link" href="index.html#apply" target="_blank" rel="noopener">عرض فورم الاستشارة <svg><use href="#i-out"/></svg></a></div>
-            <div class="table-scroll" id="requests-table-wrap" hidden><table><thead><tr><th>الإديتور</th><th>المشكلة الأساسية</th><th>تاريخ الطلب</th><th>الحالة</th><th><span class="sr-only">فتح الطلب</span></th></tr></thead><tbody id="requests-body"></tbody></table></div>
+            <div class="table-scroll" id="requests-table-wrap" hidden><table><thead><tr><th>الإديتور</th><th>Instagram</th><th>المشكلة الأساسية</th><th>تاريخ الطلب</th><th>الحالة</th><th><span class="sr-only">فتح الطلب</span></th></tr></thead><tbody id="requests-body"></tbody></table></div>
           </div>
           <p class="workspace-footnote">تحديث حالة الطلب ينظم متابعتك؛ تواصل مع صاحب الطلب لتأكيد الحجز والموعد.</p>
         </section>
 
         <section id="content-view" class="view" aria-labelledby="content-title" hidden>
-          <div class="page-heading"><div><p class="eyebrow">صفحة الاستشارة</p><h1 id="content-title">الكلام الذي يعرفونك به<span class="title-dot">.</span></h1><p class="muted">حدّث الرسالة والفيديو والآراء من مكان واحد.</p></div><a class="button secondary" href="index.html" target="_blank" rel="noopener">معاينة الصفحة <svg><use href="#i-out"/></svg></a></div>
+          <div class="page-heading"><div><p class="eyebrow">صفحة الاستشارة</p><h1 id="content-title">محتوى صفحة الاستشارة<span class="title-dot">.</span></h1><p class="muted">حدّث الرسالة والفيديو والآراء من مكان واحد.</p></div><a class="button secondary" href="index.html" target="_blank" rel="noopener">معاينة الصفحة <svg><use href="#i-out"/></svg></a></div>
           <p class="notice error" id="content-error" role="alert" hidden></p>
           <form id="content-form">
             <div class="editor-grid">
@@ -102,7 +105,7 @@
                 <section class="panel editor-section"><div class="section-label"><span>02</span><div><h2>فيديو الاستشارة</h2><p class="muted">الفيديو الذي يشرح لمن الجلسة وكيف تساعده.</p></div></div><div class="field"><label for="content-video">رابط الفيديو</label><input type="url" id="content-video" dir="ltr" placeholder="https://www.youtube.com/watch?v=…"><small>رابط YouTube أو Vimeo أو ملف فيديو مباشر بصيغة MP4 أو WebM أو OGG. اتركه فارغًا إلى أن يصبح الفيديو جاهزًا.</small></div><div class="field"><label for="content-poster">صورة غلاف الفيديو <span class="optional">اختياري</span></label><input type="url" id="content-poster" dir="ltr" placeholder="https://…"></div><div id="video-link-preview" class="video-link-preview" hidden><span class="icon-tile"><svg><use href="#i-out"/></svg></span><div><b>الرابط الحالي</b><a id="video-preview-anchor" target="_blank" rel="noopener noreferrer">افتح الفيديو للتأكد منه</a></div></div></section>
                 <section class="panel editor-section"><div class="section-label"><span>03</span><div><h2>آراء من جرّبوا الاستشارة</h2><p class="muted">أضف الآراء الحقيقية بعد موافقة أصحابها على نشرها.</p></div></div><div id="testimonials-editor"></div><div id="no-testimonials" class="small-empty">لم تضف آراء بعد. تظهر في الصفحة عندما تضيفها وتحفظ التغييرات.</div><button type="button" class="button secondary full-width" id="add-testimonial"><svg><use href="#i-plus"/></svg>إضافة رأي</button></section>
               </div>
-              <aside class="editor-aside"><section class="panel editor-section"><h2>تفاصيل الجلسة</h2><div class="field"><label for="content-price">سعر الاستشارة</label><div class="input-suffix"><input type="number" id="content-price" min="0" max="100000" step="1" required><span>درهم</span></div></div><div class="field"><label for="content-duration">مدة الجلسة بالدقائق</label><input type="number" id="content-duration" min="15" max="240" step="1" required></div><div class="field"><label for="content-delivery">تسليم خطة العمل خلال</label><div class="input-suffix"><input type="number" id="content-delivery" min="1" max="168" step="1" required><span>ساعة</span></div></div><div class="field"><label for="content-booking">رابط الحجز <span class="optional">اختياري</span></label><input type="url" id="content-booking" dir="ltr" placeholder="https://…"><small>للاستخدام بعد مراجعة الحالة وقبول الطلب.</small></div></section><div class="publish-card"><span class="tiny-dot"></span><h3>جاهز للظهور؟</h3><p>الحفظ يحدّث محتوى صفحة الاستشارة مباشرة. راجع النصوص والروابط قبل الحفظ.</p><button type="submit" class="button primary full-width" id="save-content">حفظ ونشر التغييرات <svg><use href="#i-check"/></svg></button><p id="content-save-state" class="save-state" role="status">لا توجد تغييرات غير محفوظة.</p></div></aside>
+              <aside class="editor-aside"><section class="panel editor-section"><h2>تفاصيل الجلسة</h2><div class="field"><label for="content-price">سعر الاستشارة</label><div class="input-suffix"><input type="number" id="content-price" min="0" max="100000" step="1" required><span>درهم</span></div></div><div class="field"><label for="content-duration">مدة الجلسة بالدقائق</label><input type="number" id="content-duration" min="15" max="240" step="1" required></div><div class="field"><label for="content-delivery">تسليم خطة العمل خلال</label><div class="input-suffix"><input type="number" id="content-delivery" min="1" max="168" step="1" required><span>ساعة</span></div></div><div class="field"><label for="content-booking">رابط الحجز <span class="optional">اختياري</span></label><input type="url" id="content-booking" dir="ltr" placeholder="https://…"><small>للاستخدام بعد مراجعة الحالة وقبول الطلب.</small></div></section><div class="publish-card"><span class="tiny-dot"></span><h3>نشر التغييرات</h3><p>الحفظ يحدّث محتوى صفحة الاستشارة مباشرة. راجع النصوص والروابط قبل الحفظ.</p><button type="submit" class="button primary full-width" id="save-content">حفظ ونشر التغييرات <svg><use href="#i-check"/></svg></button><p id="content-save-state" class="save-state" role="status">لا توجد تغييرات غير محفوظة.</p></div></aside>
             </div>
           </form>
         </section>

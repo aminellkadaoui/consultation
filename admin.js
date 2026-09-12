@@ -1,14 +1,9 @@
-import { login, logout, onAuth, getCurrentUser, listRequests, updateRequest, loadSettings, saveSettings } from './data.js';
-import { mediaSource } from './public-utils.js';
+import { login, logout, onAuth, getCurrentUser, listRequests, updateRequest, loadSettings, saveSettings } from './data.js?v=sentence-2';
+import { mediaSource, normalizeInstagram, normalizeWhatsapp } from './public-utils.js';
+import { statusLabels, requestFieldList, normalizeRequest, presentRequest, plainValue, csvCell, briefFor } from './request-presenter.js';
 
 const $ = (id) => document.getElementById(id);
-const statusLabels = { new: 'جديد', reviewing: 'قيد المراجعة', accepted: 'مقبول', scheduled: 'موعد محدد', completed: 'مكتمل', archived: 'مؤرشف' };
-const formFields = [
-  ['fullName', 'الاسم الكامل'], ['whatsapp', 'رقم الواتساب'], ['instagram', 'حساب Instagram'],
-  ['experience', 'المدة في المونتاج'], ['clientCount', 'عدد العملاء'], ['editingType', 'نوع المونتاج'],
-  ['problem', 'المشكلة الأساسية'], ['impact', 'أثر المشكلة'], ['goal', 'الهدف الحالي'],
-  ['approach', 'كيف يفكر في الوصول إلى هدفه'], ['obstacle', 'العائق أمامه'], ['sessionOutcome', 'ما الذي يريد حسمه في الجلسة']
-];
+const formFields = requestFieldList;
 const settingsKeys = ['brand', 'headline', 'subheadline', 'videoUrl', 'videoPoster', 'testimonials', 'price', 'currency', 'durationMinutes', 'actionDocHours', 'bookingUrl', 'contactWhatsapp'];
 let requests = [];
 let settings = {};
@@ -93,17 +88,10 @@ function formatDate(value, detailed = false) {
   if (Number.isNaN(date.getTime())) return 'غير متاح';
   return new Intl.DateTimeFormat('ar-MA', { day: 'numeric', month: 'short', year: 'numeric', ...(detailed ? { hour: '2-digit', minute: '2-digit' } : {}) }).format(date);
 }
-function normalizeRequest(item) {
-  const flat = { ...item, ...(item.answers || {}) };
-  for (const [key] of formFields) flat[key] = flat[key] == null ? '' : String(flat[key]);
-  flat.status = statusLabels[flat.status] ? flat.status : 'new';
-  flat.privateNotes = String(flat.privateNotes || '');
-  return flat;
-}
 function filteredRequests() {
   const query = $('request-search').value.trim().toLocaleLowerCase();
   const status = $('status-filter').value;
-  return requests.filter((item) => (status === 'all' || item.status === status) && (!query || [item.fullName, item.instagram, item.whatsapp, item.problem, item.goal, item.editingType].join(' ').toLocaleLowerCase().includes(query)));
+  return requests.filter((item) => (status === 'all' || item.status === status) && (!query || [item.fullName, item.instagram, item.whatsapp, item.problem, item.goal, plainValue(item.editingType), item.lastSituation].join(' ').toLocaleLowerCase().includes(query)));
 }
 function renderRequests() {
   if (!requestsLoaded) return;
@@ -125,14 +113,15 @@ function renderRequests() {
     const row = element('tr');
     const person = element('td');
     person.append(element('span', 'person-name', item.fullName || 'بدون اسم'));
-    if (item.instagram) { const account = element('span', 'person-instagram', item.instagram); account.dir = 'ltr'; person.append(account); }
+    const instagram = element('td', 'instagram-cell');
+    instagram.append(instagramLink(item.instagram));
     const problem = element('td'); problem.append(element('span', 'problem-preview', item.problem || 'لم يحدد المشكلة'));
     const date = element('td', 'date-cell', formatDate(item.submittedAt || item.createdAt));
     const status = element('td'); status.append(element('span', `status-badge status-${item.status}`, statusLabels[item.status]));
     const action = element('td'); const button = element('button', 'row-open');
     button.type = 'button'; button.setAttribute('aria-label', `فتح طلب ${item.fullName || 'الاستشارة'}`); button.append(icon('arrow'));
     button.addEventListener('click', () => openDetail(item.id, button)); action.append(button);
-    row.append(person, problem, date, status, action); $('requests-body').append(row);
+    row.append(person, instagram, problem, date, status, action); $('requests-body').append(row);
   }
 }
 async function refreshRequests() {
@@ -151,6 +140,7 @@ async function refreshRequests() {
     requests = (Array.isArray(result) ? result : []).map(normalizeRequest);
     requestsLoaded = true;
     renderRequests();
+    openRequestFromHash();
   } catch (error) {
     if (version !== loadingVersion || currentUser?.uid !== uid) return;
     showMessage('requests-error', explainError(error));
@@ -163,15 +153,44 @@ async function refreshRequests() {
     }
   }
 }
-function answerSection(title, fields, item, compact = false) {
-  const section = element('section', 'detail-section'); section.append(element('h3', '', title));
-  const list = element('dl', `answer-list${compact ? ' compact' : ''}`);
-  for (const key of fields) {
-    const entry = element('div', 'answer-item');
-    entry.append(element('dt', '', formFields.find(([field]) => field === key)[1]), element('dd', '', item[key] || 'لم يذكر'));
-    list.append(entry);
+function instagramLink(value) {
+  const username = normalizeInstagram(value);
+  if (/^[A-Za-z0-9._]{1,30}$/.test(username)) {
+    const link = element('a', 'instagram-link', `@${username}`);
+    link.href = `https://www.instagram.com/${encodeURIComponent(username)}/`;
+    link.target = '_blank'; link.rel = 'noopener noreferrer'; link.dir = 'ltr';
+    return link;
   }
-  section.append(list); return section;
+  return element('span', 'muted', value || 'غير متاح');
+}
+function renderRequestSummary(item) {
+  const presentation = presentRequest(item);
+  const parts = presentation.sections.map(({title, text, details}) => {
+    const section = element('section', 'detail-section');
+    section.append(element('h3', '', title), element('p', 'summary-text', text));
+    for (const detail of details) {
+      const block = element('div', 'summary-situation');
+      block.append(element('h4', '', detail.label), element('p', '', detail.text));
+      section.append(block);
+    }
+    return section;
+  });
+  const raw = element('details', 'raw-answers');
+  raw.append(element('summary', '', 'عرض الإجابات الأصلية'));
+  const list = element('dl', 'answer-list');
+  for (const answer of presentation.raw) {
+    const entry = element('div', 'answer-item');
+    entry.append(element('dt', '', answer.label), element('dd', '', answer.value)); list.append(entry);
+  }
+  raw.append(list); parts.push(raw); return parts;
+}
+function openRequestFromHash() {
+  if (!currentUser || !requestsLoaded || $('request-dialog').open) return;
+  const match = location.hash.match(/^#request=(.+)$/);
+  if (!match) return;
+  let id;
+  try { id = decodeURIComponent(match[1]); } catch { return; }
+  if (requests.some(request => request.id === id)) openDetail(id, null);
 }
 function openDetail(id, trigger) {
   const item = requests.find((request) => request.id === id);
@@ -180,27 +199,22 @@ function openDetail(id, trigger) {
   $('detail-name').textContent = item.fullName || 'طلب استشارة';
   $('detail-date').textContent = `أُرسل في ${formatDate(item.submittedAt || item.createdAt, true)}`;
   $('detail-contact').replaceChildren();
-  if (item.whatsapp) { const phone = element('span', 'contact-chip', item.whatsapp); phone.dir = 'ltr'; $('detail-contact').append(phone); }
-  if (item.instagram) {
-    const chip = element('span', 'contact-chip');
-    const username = item.instagram.replace(/^@/, '');
-    if (/^[A-Za-z0-9._]{1,30}$/.test(username)) {
-      const link = element('a', '', `@${username}`); link.href = `https://www.instagram.com/${encodeURIComponent(username)}/`; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.dir = 'ltr'; chip.append(link);
-    } else { chip.textContent = item.instagram; }
-    $('detail-contact').append(chip);
+  const phone = normalizeWhatsapp(item.whatsapp).replace(/[^0-9]/g, '').replace(/^00/, '');
+  const hasPhone = /^[1-9][0-9]{7,14}$/.test(phone);
+  if (item.whatsapp) {
+    const phoneNode = element(hasPhone ? 'a' : 'span', 'contact-chip', item.whatsapp); phoneNode.dir = 'ltr';
+    if (hasPhone) {phoneNode.href = `https://wa.me/${phone}`; phoneNode.target = '_blank'; phoneNode.rel = 'noopener noreferrer';}
+    $('detail-contact').append(phoneNode);
   }
-  const phone = item.whatsapp.replace(/[^0-9]/g, '').replace(/^00/, '');
-  $('detail-whatsapp').hidden = !/^[1-9][0-9]{7,14}$/.test(phone);
-  if (!$('detail-whatsapp').hidden) {
+  if (item.instagram) {const chip = element('span', 'contact-chip'); chip.append(instagramLink(item.instagram)); $('detail-contact').append(chip);}
+  const statusChip = element('span', `status-badge status-${item.status}`, statusLabels[item.status]);
+  statusChip.id = 'detail-status-badge'; $('detail-contact').append(statusChip);
+  $('detail-whatsapp').hidden = !hasPhone;
+  if (hasPhone) {
     const message = `السلام عليكم ${item.fullName.split(' ')[0]}، توصلت بطلبك للاستشارة. قريت الحالة ديالك وبغيت نهضر معك على الخطوة الجاية.`;
     $('detail-whatsapp').href = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
   } else { $('detail-whatsapp').removeAttribute('href'); }
-  $('detail-answers').replaceChildren(
-    answerSection('01 / وضعه الحالي', ['experience', 'clientCount', 'editingType'], item, true),
-    answerSection('02 / المشكلة وأثرها', ['problem', 'impact'], item),
-    answerSection('03 / الهدف والعائق', ['goal', 'approach', 'obstacle'], item),
-    answerSection('04 / ما الذي ينتظره من الجلسة؟', ['sessionOutcome'], item)
-  );
+  $('detail-answers').replaceChildren(...renderRequestSummary(item));
   $('detail-status').value = item.status;
   $('detail-notes').value = item.privateNotes;
   $('detail-save-state').textContent = '';
@@ -215,21 +229,12 @@ function closeDetail(force = false) {
   $('request-dialog').close(); document.body.style.overflow = ''; selectedId = null; detailDirty = false;
   if (lastDetailTrigger?.isConnected) lastDetailTrigger.focus();
 }
-function briefFor(item) {
-  return ['طلب استشارة', ...formFields.map(([key, label]) => `${label}: ${item[key] || 'لم يذكر'}`)].join('\n\n');
-}
 async function copyText(text, successMessage) {
   try {
     await navigator.clipboard.writeText(text); toast(successMessage);
   } catch {
     toast('تعذّر النسخ تلقائيًا. يمكنك تحديد النص ونسخه يدويًا.');
   }
-}
-// Prevent spreadsheet applications from evaluating user input as a formula.
-function csvCell(value) {
-  let text = String(value ?? '');
-  if (/^[\s\uFEFF]*[=+\-@]/.test(text) || /^[\t\r\n]/.test(text)) text = `'${text}`;
-  return `"${text.replace(/"/g, '""')}"`;
 }
 function exportCSV() {
   const items = filteredRequests();
@@ -366,7 +371,7 @@ $('status-filter').addEventListener('change', renderRequests);
 $('export-csv').addEventListener('click', exportCSV);
 $('close-detail').addEventListener('click', () => closeDetail());
 $('request-dialog').addEventListener('cancel', (event) => { event.preventDefault(); closeDetail(); });
-$('request-dialog').addEventListener('click', (event) => { if (event.target === $('request-dialog')) { const rect = $('request-dialog').getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right) closeDetail(); } });
+$('request-dialog').addEventListener('click', (event) => { if (event.target === $('request-dialog')) { const rect = $('request-dialog').getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closeDetail(); } });
 $('detail-form').addEventListener('input', () => { detailRevision += 1; detailDirty = true; $('detail-save-state').textContent = 'تغييرات غير محفوظة'; });
 $('detail-form').addEventListener('change', () => { detailRevision += 1; detailDirty = true; $('detail-save-state').textContent = 'تغييرات غير محفوظة'; });
 $('detail-form').addEventListener('submit', async (event) => {
@@ -381,6 +386,7 @@ $('detail-form').addEventListener('submit', async (event) => {
     if (currentUser?.uid !== uid) return;
     const item = requests.find((entry) => entry.id === id); if (item) Object.assign(item, changes);
     if (selectedId === id) { detailDirty = detailRevision !== savingRevision; $('detail-save-state').textContent = detailDirty ? 'حُفظت النسخة السابقة. لديك تغييرات جديدة لم تُحفظ.' : 'تم حفظ المتابعة.'; }
+    if (selectedId === id && $('detail-status-badge')) { $('detail-status-badge').textContent = statusLabels[changes.status]; $('detail-status-badge').className = `status-badge status-${changes.status}`; }
     renderRequests(); toast('تم حفظ حالة الطلب وملاحظاتك.');
   } catch (error) { if (selectedId === id) showMessage('detail-error', explainError(error, 'save')); }
   finally { pending($('save-detail'), false, 'حفظ المتابعة'); }
@@ -407,6 +413,7 @@ $('content-form').addEventListener('submit', async (event) => {
   } catch (error) { showMessage('content-error', explainError(error, 'save')); $('content-save-state').textContent = 'لم تُنشر تغييراتك. حاول مجددًا.'; }
   finally { pending($('save-content'), false, 'حفظ ونشر التغييرات'); }
 });
+window.addEventListener('hashchange', openRequestFromHash);
 window.addEventListener('beforeunload', (event) => { if (contentDirty || detailDirty) { event.preventDefault(); event.returnValue = ''; } });
 
 async function handleAuth(user) {

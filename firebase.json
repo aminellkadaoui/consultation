@@ -1,0 +1,9 @@
+{
+  "functions": [{
+    "source": "functions",
+    "codebase": "consultation-notifications",
+    "runtime": "nodejs22",
+    "ignore": ["node_modules", ".git", "*-debug.log", ".env", ".env.*", ".secret.local", "test"],
+    "predeploy": ["npm --prefix \"$RESOURCE_DIR\" test"]
+  }]
+}

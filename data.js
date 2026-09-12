@@ -15,7 +15,7 @@ const DEFAULT_FIREBASE = Object.freeze({
 export const REQUEST_LIMITS = Object.freeze({
   fullName: 120, whatsapp: 32, instagram: 80,
   experience: 80, clientCount: 40, editingType: 200,
-  problem: 2000, impact: 2000, goal: 2000,
+  problem: 2000, impact: 2000, lastSituation: 2000, goal: 2000,
   approach: 2000, obstacle: 2000, sessionOutcome: 2000
 });
 export const REQUEST_STATUSES = Object.freeze([
@@ -114,19 +114,25 @@ export async function logout() {
 
 export async function submitRequest(data) {
   const fields = {};
+  const schemaVersion = Object.hasOwn(data || {}, 'lastSituation') ? 2 : 1;
   for (const [name, max] of Object.entries(REQUEST_LIMITS)) {
+    if (name === 'editingType' || name === (schemaVersion === 2 ? 'impact' : 'lastSituation')) continue;
     fields[name] = textValue(data?.[name], name, max);
   }
+  if (schemaVersion === 2) {
+    if (!Array.isArray(data.editingType) || data.editingType.length < 1 || data.editingType.length > 7) throw invalid('اختر نوع المونتاج.');
+    fields.editingType = [...new Set(data.editingType.map(value => textValue(value, 'نوع المونتاج', 200)))];
+  } else fields.editingType = textValue(data?.editingType, 'نوع المونتاج', 200);
   if (globalThis.navigator?.onLine === false) {
     const error = new Error('اتصل بالإنترنت ثم أعد إرسال الطلب.');
     error.code = 'consultation/offline';
     throw error;
   }
   const { dbSDK, db } = await ensureFirebase();
-  const payload = { ...fields, status: 'new', schemaVersion: 1, submittedAt: dbSDK.serverTimestamp() };
+  const payload = { ...fields, status: 'new', schemaVersion, submittedAt: dbSDK.serverTimestamp() };
   const doc = await dbSDK.addDoc(dbSDK.collection(db, REQUESTS), payload);
   // Public clients cannot read requests. This receipt time is local; admin reads the server timestamp.
-  return { id: doc.id, ...fields, status: 'new', schemaVersion: 1, submittedAt: new Date().toISOString() };
+  return { id: doc.id, ...fields, status: 'new', schemaVersion, submittedAt: new Date().toISOString() };
 }
 
 export async function listRequests() {

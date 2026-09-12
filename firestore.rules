@@ -28,7 +28,7 @@ service cloud.firestore {
       return value is string && value.size() >= min && value.size() <= max;
     }
 
-    function consultationRequestFields() {
+    function consultationRequestFieldsV1() {
       return [
         'fullName', 'whatsapp', 'instagram', 'experience', 'clientCount', 'editingType',
         'problem', 'impact', 'goal', 'approach', 'obstacle', 'sessionOutcome',
@@ -36,9 +36,9 @@ service cloud.firestore {
       ];
     }
 
-    function validConsultationRequest(d) {
-      return d.keys().hasAll(consultationRequestFields())
-        && d.keys().hasOnly(consultationRequestFields())
+    function validConsultationRequestV1(d) {
+      return d.keys().hasAll(consultationRequestFieldsV1())
+        && d.keys().hasOnly(consultationRequestFieldsV1())
         && consultationText(d.fullName, 1, 120)
         && consultationText(d.whatsapp, 1, 32)
         && consultationText(d.instagram, 1, 80)
@@ -54,6 +54,38 @@ service cloud.firestore {
         && d.status == 'new'
         && d.schemaVersion is int && d.schemaVersion == 1
         && d.submittedAt is timestamp && d.submittedAt == request.time;
+    }
+
+    function consultationArrayItem(items, index) {
+      return items.size() <= index || consultationText(items[index], 1, 200);
+    }
+    function validConsultationRequestV2(d) {
+      let fields = ['fullName', 'whatsapp', 'instagram', 'experience', 'clientCount', 'editingType',
+        'problem', 'lastSituation', 'goal', 'approach', 'obstacle', 'sessionOutcome',
+        'status', 'schemaVersion', 'submittedAt'];
+      return d.keys().hasAll(fields) && d.keys().hasOnly(fields)
+        && consultationText(d.fullName, 1, 120)
+        && consultationText(d.whatsapp, 1, 32)
+        && consultationText(d.instagram, 1, 80)
+        && consultationText(d.experience, 1, 80)
+        && consultationText(d.clientCount, 1, 40)
+        && d.editingType is list && d.editingType.size() >= 1 && d.editingType.size() <= 7
+        && consultationArrayItem(d.editingType, 0) && consultationArrayItem(d.editingType, 1)
+        && consultationArrayItem(d.editingType, 2) && consultationArrayItem(d.editingType, 3)
+        && consultationArrayItem(d.editingType, 4) && consultationArrayItem(d.editingType, 5)
+        && consultationArrayItem(d.editingType, 6)
+        && consultationText(d.problem, 1, 2000)
+        && consultationText(d.lastSituation, 1, 2000)
+        && consultationText(d.goal, 1, 2000)
+        && consultationText(d.approach, 1, 2000)
+        && consultationText(d.obstacle, 1, 2000)
+        && consultationText(d.sessionOutcome, 1, 2000)
+        && d.status == 'new' && d.schemaVersion is int && d.schemaVersion == 2
+        && d.submittedAt is timestamp && d.submittedAt == request.time;
+    }
+    function validConsultationRequest(d) {
+      return ('schemaVersion' in d) && ((d.schemaVersion == 1 && validConsultationRequestV1(d))
+        || (d.schemaVersion == 2 && validConsultationRequestV2(d)));
     }
 
     function validConsultationStatus(status) {
