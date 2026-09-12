@@ -1,5 +1,5 @@
 window.CONSULTATION_CONFIG = {
-  brand: 'أمين القداوي',
+  brand: 'أمين القضاوي',
   headline: 'تعمل كإديتور، لكنك محتار على ماذا تركز الآن؟',
   subheadline: 'نراجع المشكلة التي تواجهك، ونحدد ما يحتاج تركيزك الآن، وما تفعله أولًا.',
   price: 300, currency: 'درهم', durationMinutes: 60, actionDocHours: 24,
