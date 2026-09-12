@@ -19,7 +19,7 @@ function config() {
 
 function setStatus(message, state = '') {
   if (!ui) return;
-  ui.status.textContent = message;
+  ui.statusText.textContent = message;
   ui.status.classList.toggle('is-success', state === 'success');
   ui.status.classList.toggle('is-error', state === 'error');
   ui.dot.classList.toggle('is-on', state === 'success');
@@ -44,7 +44,7 @@ function mountUi() {
       <div>
         <p class="eyebrow">الإشعارات</p>
         <h2>إشعارات الطلبات</h2>
-        <p class="notification-settings-status" id="notification-settings-status"><span class="notification-settings-dot" aria-hidden="true"></span>تحقق من حالة هذا الجهاز.</p>
+        <p class="notification-settings-status" id="notification-settings-status"><span class="notification-settings-dot" aria-hidden="true"></span><span id="notification-settings-status-text">تحقق من حالة هذا الجهاز.</span></p>
       </div>
     </div>
     <div class="notification-settings-actions">
@@ -57,6 +57,7 @@ function mountUi() {
   ui = {
     panel,
     status,
+    statusText: panel.querySelector('#notification-settings-status-text'),
     dot: status.querySelector('.notification-settings-dot'),
     enable: panel.querySelector('#enable-device-notifications'),
     test: panel.querySelector('#test-device-notification')
@@ -161,7 +162,7 @@ async function bindForegroundMessages() {
   const { messagingSDK, messaging } = await ensureRuntime();
   messagingSDK.onMessage(messaging, async payload => {
     const data = payload.data || {};
-    if (Notification.permission !== 'granted') return;
+    if (!('Notification' in globalThis) || Notification.permission !== 'granted') return;
     const registration = serviceWorkerRegistration || await registerServiceWorker();
     await registration.showNotification(data.title || 'طلب استشارة جديد', {
       body: data.body || 'وصل طلب جديد',
@@ -236,7 +237,7 @@ async function handleAuth(user) {
   }
   if (ui) ui.enable.disabled = false;
   refreshPermissionStatus();
-  if (Notification.permission === 'granted' && config().vapidKey) {
+  if ('Notification' in globalThis && Notification.permission === 'granted' && config().vapidKey) {
     await activateDevice(false);
   }
 }
