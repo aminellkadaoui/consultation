@@ -18,6 +18,15 @@ if (/(?:^|\/)admin\.html$/.test(location.pathname)) {
 }
 
 if (/\/Form\/(?:index\.html)?$/.test(location.pathname)) {
+  const phoneStyles = document.createElement('link');
+  phoneStyles.rel = 'stylesheet';
+  phoneStyles.href = './phone-country.css?v=phone-1';
+  document.head.append(phoneStyles);
+
+  import('./Form/phone-country.js?v=phone-1').catch((error) => {
+    console.error('Phone country picker failed:', error);
+  });
+
   import('./Form/submit-compat.js?v=form-admin-1').catch((error) => {
     console.error('Form compatibility layer failed:', error);
   });
