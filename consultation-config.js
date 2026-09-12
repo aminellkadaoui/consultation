@@ -23,6 +23,20 @@ if (/\/Form\/(?:index\.html)?$/.test(location.pathname)) {
   phoneStyles.href = './phone-country.css?v=phone-1';
   document.head.append(phoneStyles);
 
+  const renameFirstStep = () => {
+    const legend = document.querySelector('#intakeForm fieldset[data-step="0"] legend');
+    if (!legend) return false;
+    legend.textContent = 'المعلومات الاساسية';
+    return true;
+  };
+
+  if (!renameFirstStep()) {
+    const observer = new MutationObserver(() => {
+      if (renameFirstStep()) observer.disconnect();
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+  }
+
   import('./Form/phone-country.js?v=phone-1').catch((error) => {
     console.error('Phone country picker failed:', error);
   });
