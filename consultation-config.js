@@ -12,7 +12,7 @@ window.CONSULTATION_CONFIG = {
 };
 
 if (/(?:^|\/)admin\.html$/.test(location.pathname)) {
-  import('./admin-progress.js?v=progress-1').catch((error) => {
+  import('./admin-progress.js?v=progress-2').catch((error) => {
     console.error('Progress admin extension failed:', error);
   });
 }
