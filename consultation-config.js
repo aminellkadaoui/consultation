@@ -10,3 +10,9 @@ window.CONSULTATION_CONFIG = {
     messagingSenderId: '705152552088', appId: '1:705152552088:web:c9b082ee8d5f0a1565d4ed', databaseId: 'default'
   }
 };
+
+if (/(?:^|\/)admin\.html$/.test(location.pathname)) {
+  import('./admin-progress.js?v=progress-1').catch((error) => {
+    console.error('Progress admin extension failed:', error);
+  });
+}
