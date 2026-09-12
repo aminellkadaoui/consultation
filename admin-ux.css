@@ -1,0 +1,32 @@
+/* Archive-inspired UX additions. Additive only: existing admin layout and behavior stay intact. */
+.request-quick-filters{display:flex;align-items:center;gap:8px;overflow-x:auto;padding:2px 0 12px;scrollbar-width:thin}
+.request-quick-filter{flex:0 0 auto;border:1px solid #e1e6ef;background:#fff;color:#667085;border-radius:999px;padding:8px 14px;font:600 13px/1.2 'IBM Plex Sans Arabic',sans-serif;cursor:pointer;transition:background .16s,border-color .16s,color .16s,transform .16s}
+.request-quick-filter:hover{border-color:#bfd3ff;color:#0f6bff;background:#f7faff}
+.request-quick-filter:active{transform:scale(.98)}
+.request-quick-filter.is-active{border-color:#0f6bff;background:#eef4ff;color:#0f6bff}
+#requests-body tr.ux-clickable{cursor:pointer;transition:background .15s,box-shadow .15s}
+#requests-body tr.ux-clickable:hover{background:#fafcff}
+#requests-body tr.ux-clickable:focus-visible{outline:2px solid rgba(15,107,255,.35);outline-offset:-2px}
+.ux-detail-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.ux-detail-tools .button{min-height:40px}
+.ux-status-shortcuts{display:flex;gap:7px;flex-wrap:wrap;margin:2px 0 16px;padding:12px;background:#f8faff;border:1px solid #e5ebf4;border-radius:14px}
+.ux-status-shortcuts-label{width:100%;font-size:12px;color:#7a8595;margin-bottom:2px}
+.ux-status-chip{border:1px solid #dfe5ef;background:#fff;color:#4b5565;border-radius:999px;padding:7px 12px;font:600 12.5px/1.2 'IBM Plex Sans Arabic',sans-serif;cursor:pointer;transition:.15s}
+.ux-status-chip:hover{border-color:#abc7ff;color:#0f6bff}
+.ux-status-chip.is-current{background:#eef4ff;border-color:#0f6bff;color:#0f6bff}
+#ux-message-dialog{width:min(620px,calc(100vw - 28px));border:0;border-radius:22px;padding:0;box-shadow:0 28px 80px rgba(15,23,42,.22);background:#fff;color:#111827}
+#ux-message-dialog::backdrop{background:rgba(15,23,42,.42);backdrop-filter:blur(3px)}
+.ux-message-card{padding:24px}
+.ux-message-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}
+.ux-message-head h2{font-size:21px;margin:0 0 4px}
+.ux-message-head p{margin:0;color:#7a8595;font-size:13px}
+.ux-message-close{width:36px;height:36px;border-radius:50%;border:1px solid #e1e6ef;background:#fff;cursor:pointer;font-size:18px}
+.ux-message-options{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.ux-segment{display:inline-flex;gap:3px;padding:3px;background:#f0f3f8;border-radius:10px}
+.ux-segment button{border:0;background:transparent;border-radius:8px;padding:7px 12px;color:#667085;font:600 12.5px/1.2 'IBM Plex Sans Arabic',sans-serif;cursor:pointer}
+.ux-segment button.is-active{background:#fff;color:#0f6bff;box-shadow:0 1px 3px rgba(15,23,42,.08)}
+#ux-message-text{width:100%;min-height:180px;resize:vertical;border:1px solid #dfe5ef;background:#fbfcfe;border-radius:14px;padding:14px;font:500 14px/1.9 'IBM Plex Sans Arabic',sans-serif;color:#172033;outline:none}
+#ux-message-text:focus{border-color:#0f6bff;box-shadow:0 0 0 3px rgba(15,107,255,.11);background:#fff}
+.ux-message-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.ux-message-hint{font-size:12px;color:#8a93a2;margin:12px 0 0}
+@media(max-width:720px){.request-quick-filters{margin-inline:-2px;padding-bottom:10px}.ux-detail-tools{display:grid;grid-template-columns:1fr 1fr}.ux-detail-tools .button:first-child{grid-column:1/-1}.ux-message-card{padding:20px 16px}.ux-message-options{display:grid}.ux-segment{width:100%}.ux-segment button{flex:1}.ux-message-actions{display:grid;grid-template-columns:1fr 1fr}.ux-message-actions .button:first-child{grid-column:1/-1}}
