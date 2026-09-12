@@ -12,7 +12,7 @@ function escapeHtml(value) {
 }
 
 function validRequest(data) {
-  return !!data && [1, 2].includes(data.schemaVersion) && data.status === 'new'
+  return !!data && [1, 2, 3].includes(data.schemaVersion) && data.status === 'new'
     && typeof data.fullName === 'string' && data.fullName.trim().length > 0
     && data.fullName.length <= 120 && typeof data.problem === 'string'
     && data.problem.trim().length > 0 && data.problem.length <= 2000;
