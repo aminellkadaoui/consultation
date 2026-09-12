@@ -9,10 +9,11 @@ const data = { schemaVersion: 1, status: 'new', fullName: 'محمد', problem: '
   submittedAt: { toDate: () => new Date('2026-09-11T11:00:00Z') }, privateNotes: 'PRIVATE_NOTES', whatsapp: 'PRIVATE_PHONE' };
 const params = { requestId: 'request-1', data, recipient: 'owner@example.com', from: 'notice@example.com' };
 
-test('accepts the two intake schema versions; rejects malformed or unrelated documents', () => {
+test('accepts the supported intake schema versions; rejects malformed or unrelated documents', () => {
   assert.equal(validRequest(data), true);
   assert.equal(validRequest({ ...data, schemaVersion: 2 }), true);
-  for (const change of [{ schemaVersion: 3 }, { status: 'completed' }, { fullName: '' }, { problem: {} }, { problem: 'x'.repeat(2001) }]) {
+  assert.equal(validRequest({ ...data, schemaVersion: 3 }), true);
+  for (const change of [{ schemaVersion: 4 }, { status: 'completed' }, { fullName: '' }, { problem: {} }, { problem: 'x'.repeat(2001) }]) {
     assert.equal(validRequest({ ...data, ...change }), false);
   }
 });
