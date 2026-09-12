@@ -7,13 +7,24 @@ window.CONSULTATION_CONFIG = {
   firebase: {
     apiKey: 'AIzaSyAou6PxuGGpDSNnmZ1ja4eMYIke3OR_sXY', authDomain: 'elite-editor-9fe62.firebaseapp.com',
     projectId: 'elite-editor-9fe62', storageBucket: 'elite-editor-9fe62.firebasestorage.app',
-    messagingSenderId: '705152552088', appId: '1:705152552088:web:c9b082ee8d5f0a1565d4ed', databaseId: 'default'
+    messagingSenderId: '705152552088', appId: '1:705152552088:web:c9b082ee8d5f0a1565d4ed', databaseId: 'default',
+    // Public Web Push certificate key from Firebase Console > Cloud Messaging > Web configuration.
+    // This is intentionally public and is not an FCM server credential.
+    vapidKey: ''
   }
 };
 
 if (/(?:^|\/)admin\.html$/.test(location.pathname)) {
   import('./admin-progress.js?v=progress-2').catch((error) => {
     console.error('Progress admin extension failed:', error);
+  });
+
+  const notificationStyles = document.createElement('link');
+  notificationStyles.rel = 'stylesheet';
+  notificationStyles.href = './admin-notifications.css?v=push-1';
+  document.head.append(notificationStyles);
+  import('./admin-notifications.js?v=push-1').catch((error) => {
+    console.error('Admin notification settings failed:', error);
   });
 }
 
@@ -23,16 +34,18 @@ if (/\/Form\/(?:index\.html)?$/.test(location.pathname)) {
   phoneStyles.href = './phone-country.css?v=phone-1';
   document.head.append(phoneStyles);
 
-  const renameFirstStep = () => {
-    const legend = document.querySelector('#intakeForm fieldset[data-step="0"] legend');
-    if (!legend) return false;
-    legend.textContent = 'المعلومات الاساسية';
+  const adjustFirstStep = () => {
+    const firstStep = document.querySelector('#intakeForm fieldset[data-step="0"]');
+    if (!firstStep) return false;
+    const legend = firstStep.querySelector('legend');
+    if (legend) legend.textContent = 'المعلومات الاساسية';
+    firstStep.querySelector('.field-intro')?.remove();
     return true;
   };
 
-  if (!renameFirstStep()) {
+  if (!adjustFirstStep()) {
     const observer = new MutationObserver(() => {
-      if (renameFirstStep()) observer.disconnect();
+      if (adjustFirstStep()) observer.disconnect();
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
   }
