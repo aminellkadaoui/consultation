@@ -4,7 +4,7 @@ import {
   normalizeProgressStages,
   updateTrackedRequest,
   PROGRESS_LABELS
-} from './progress-data.js?v=progress-1';
+} from './progress-data.js?v=progress-2';
 
 const $ = (id) => document.getElementById(id);
 let selectedRequest = null;
@@ -67,7 +67,7 @@ async function resolveFromDialog() {
 }
 
 function progressUrl(token) {
-  return new URL(`Form/?token=${encodeURIComponent(token)}`, new URL('./', location.href)).href;
+  return new URL(`progress/?token=${encodeURIComponent(token)}`, new URL('./', location.href)).href;
 }
 
 function renderProgressControls(item) {
@@ -115,6 +115,12 @@ function renderProgressControls(item) {
       option.selected = stage.status === value;
       select.append(option);
     }
+    select.addEventListener('change', () => {
+      if (select.value !== 'current') return;
+      wrapper.querySelectorAll('[data-progress-stage]').forEach((other) => {
+        if (other !== select && other.value === 'current') other.value = 'pending';
+      });
+    });
     field.append(label, select);
     wrapper.append(field);
   }
