@@ -1,7 +1,7 @@
 'use strict';
 
 const { createHash } = require('node:crypto');
-const ADMIN_URL = 'https://aminellkadaoui.github.io/consultation/admin.html';
+const ADMIN_URL = 'https://aminellkadaoui.github.io/consultation/admin/';
 // Resend retains idempotency keys for 24h. Stop uncertain retries before that expires.
 const SAFE_RETRY_WINDOW_MS = 23 * 60 * 60 * 1000;
 
@@ -27,6 +27,11 @@ function notificationKey(requestId) {
   return 'consultation-request/' + createHash('sha256').update(requestId).digest('hex');
 }
 
+function short(value, max) {
+  const text = typeof value === 'string' ? value.trim() : '';
+  return text.length > max ? text.slice(0, max) + '…' : text;
+}
+
 function buildNotification({ requestId, data, recipient, from, eventTime }) {
   if (!validRequest(data)) throw new Error('Invalid consultation request');
   if (!validEmail(recipient) || !validEmail(from)) throw new Error('Email configuration is incomplete');
@@ -37,13 +42,33 @@ function buildNotification({ requestId, data, recipient, from, eventTime }) {
   const submitted = new Intl.DateTimeFormat('ar-MA', {
     dateStyle: 'medium', timeStyle: 'short', timeZone: 'Africa/Casablanca'
   }).format(date);
-  const name = data.fullName.trim();
-  const problem = data.problem.trim().slice(0, 400) + (data.problem.trim().length > 400 ? '…' : '');
+  const name = short(data.fullName, 120);
+  const whatsapp = short(data.whatsapp, 32);
+  const instagram = short(data.instagram, 80);
+  const problem = short(data.problem, 300);
+  const goal = short(data.goal, 300);
   const url = `${ADMIN_URL}#request=${encodeURIComponent(requestId)}`;
+  const lines = [
+    'وصل طلب استشارة جديد.', '',
+    `الاسم: ${name}`,
+    whatsapp ? `واتساب: ${whatsapp}` : '',
+    instagram ? `Instagram: ${instagram}` : '',
+    `المشكلة: ${problem}`,
+    goal ? `الهدف: ${goal}` : '',
+    `رقم الطلب: ${requestId}`,
+    `تاريخ الإرسال: ${submitted}`,
+    '', 'فتح الطلب في لوحة الإدارة:', url
+  ].filter((line, index, list) => line !== '' || (index > 0 && list[index - 1] !== ''));
+
+  const row = (label, value) => value
+    ? `<p><strong>${label}:</strong> ${escapeHtml(value).replace(/\r?\n/g, '<br>')}</p>` : '';
+
   return {
-    from, to: [recipient], subject: 'طلب استشارة جديد',
-    text: `طلب استشارة جديد\n\nالاسم: ${name}\nالتاريخ: ${submitted}\nالمشكلة الأساسية: ${problem}\n\nعرض الطلب:\n${url}`,
-    html: `<div lang="ar" dir="rtl" style="font-family:Arial,sans-serif;line-height:1.8;color:#172235"><h2>طلب استشارة جديد</h2><p><strong>الاسم:</strong> ${escapeHtml(name)}</p><p><strong>التاريخ:</strong> ${escapeHtml(submitted)}</p><p><strong>المشكلة الأساسية:</strong><br>${escapeHtml(problem).replace(/\r?\n/g, '<br>')}</p><p><a href="${escapeHtml(url)}">عرض الطلب</a></p></div>`
+    from,
+    to: [recipient],
+    subject: `🔵 طلب استشارة جديد — ${name}`,
+    text: lines.join('\n'),
+    html: `<div lang="ar" dir="rtl" style="font-family:Arial,sans-serif;line-height:1.8;color:#172235"><h2>🔵 طلب استشارة جديد</h2><p>وصل طلب استشارة جديد.</p>${row('الاسم', name)}${row('واتساب', whatsapp)}${row('Instagram', instagram)}${row('المشكلة', problem)}${row('الهدف', goal)}${row('رقم الطلب', requestId)}${row('تاريخ الإرسال', submitted)}<p><a href="${escapeHtml(url)}">فتح الطلب في لوحة الإدارة</a></p></div>`
   };
 }
 
