@@ -26,6 +26,14 @@ if (/(?:^|\/)admin\.html$/.test(location.pathname)) {
   import('./admin-notifications.js?v=push-1').catch((error) => {
     console.error('Admin notification settings failed:', error);
   });
+
+  const adminUxStyles = document.createElement('link');
+  adminUxStyles.rel = 'stylesheet';
+  adminUxStyles.href = './admin-ux.css?v=archive-ux-1';
+  document.head.append(adminUxStyles);
+  import('./admin-ux.js?v=archive-ux-1').catch((error) => {
+    console.error('Admin UX extension failed:', error);
+  });
 }
 
 if (/\/Form\/(?:index\.html)?$/.test(location.pathname)) {
