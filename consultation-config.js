@@ -16,3 +16,9 @@ if (/(?:^|\/)admin\.html$/.test(location.pathname)) {
     console.error('Progress admin extension failed:', error);
   });
 }
+
+if (/\/Form\/(?:index\.html)?$/.test(location.pathname)) {
+  import('./Form/submit-compat.js?v=form-admin-1').catch((error) => {
+    console.error('Form compatibility layer failed:', error);
+  });
+}
