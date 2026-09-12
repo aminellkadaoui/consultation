@@ -1,0 +1,132 @@
+.phone-combo{
+  display:flex;
+  align-items:stretch;
+  gap:12px;
+  width:100%;
+  margin:0;
+}
+
+.phone-country-picker{
+  position:relative;
+  flex:0 0 190px;
+}
+
+.phone-country-toggle,
+.phone-local-input{
+  height:64px;
+  border:1px solid #d9e2ee;
+  border-radius:18px;
+  background:#fff;
+  color:#172235;
+  font:inherit;
+}
+
+.phone-country-toggle{
+  width:100%;
+  padding:0 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  cursor:pointer;
+}
+
+.phone-country-toggle:focus-visible,
+.phone-local-input:focus{
+  outline:none;
+  border-color:#0f6bff;
+  box-shadow:0 0 0 4px rgba(15,107,255,.10);
+}
+
+.phone-country-selected{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  direction:ltr;
+}
+
+.phone-country-flag{
+  font-size:24px;
+  line-height:1;
+}
+
+.phone-country-code{
+  font-size:17px;
+  font-weight:600;
+}
+
+.phone-country-arrow{
+  color:#7b8798;
+  font-size:18px;
+  transform:translateY(-2px);
+}
+
+.phone-local-input{
+  flex:1 1 auto;
+  min-width:0;
+  padding:0 20px;
+  font-size:17px;
+}
+
+.phone-country-menu{
+  position:absolute;
+  z-index:50;
+  top:calc(100% + 10px);
+  left:0;
+  width:min(360px, calc(100vw - 56px));
+  max-height:330px;
+  overflow:auto;
+  padding:8px;
+  border:1px solid #d9e2ee;
+  border-radius:18px;
+  background:#fff;
+  box-shadow:0 18px 50px rgba(23,34,53,.12);
+}
+
+.phone-country-option{
+  width:100%;
+  min-height:48px;
+  border:0;
+  border-radius:12px;
+  background:transparent;
+  padding:0 12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  color:#172235;
+  font:inherit;
+  cursor:pointer;
+}
+
+.phone-country-option:hover,
+.phone-country-option:focus-visible{
+  outline:none;
+  background:#f3f6fb;
+}
+
+.phone-country-option-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  direction:ltr;
+  white-space:nowrap;
+}
+
+.phone-country-name{
+  direction:rtl;
+  text-align:right;
+  color:#4d596a;
+}
+
+@media (max-width:640px){
+  .phone-combo{gap:8px;}
+  .phone-country-picker{flex-basis:138px;}
+  .phone-country-toggle,
+  .phone-local-input{height:58px;border-radius:16px;}
+  .phone-country-toggle{padding:0 12px;}
+  .phone-country-selected{gap:7px;}
+  .phone-country-flag{font-size:21px;}
+  .phone-country-code{font-size:15px;}
+  .phone-local-input{padding:0 14px;font-size:16px;}
+  .phone-country-menu{width:min(330px, calc(100vw - 40px));}
+}
