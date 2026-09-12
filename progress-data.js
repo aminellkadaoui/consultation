@@ -118,7 +118,7 @@ export function validTrackingToken(token) {
 export function defaultProgressStages() {
   return [
     { key: 'submitted', status: 'completed' },
-    { key: 'booking_payment', status: 'current' },
+    { key: 'booking_payment', status: 'pending' },
     { key: 'meeting', status: 'pending' },
     { key: 'action_plan', status: 'pending' }
   ];
@@ -138,8 +138,8 @@ export function normalizeProgressStages(value) {
 export function currentStageFromStages(stages) {
   const normalized = normalizeProgressStages(stages);
   return normalized.find((stage) => stage.status === 'current')?.key
-    || normalized.find((stage) => stage.status === 'pending')?.key
-    || normalized.at(-1).key;
+    || [...normalized].reverse().find((stage) => stage.status === 'completed')?.key
+    || 'submitted';
 }
 
 function validateStages(value) {
