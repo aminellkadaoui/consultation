@@ -1,3 +1,4 @@
+import { makeHeroMedia } from './video-preview.js?v=flow-1';
 import { translate } from './translations.js?v=sentence-2';
 import { loadSettings, submitRequest, REQUEST_LIMITS } from './data.js?v=sentence-2';
 import { normalizeWhatsapp, validWhatsapp, normalizeInstagram, validInstagram, safeUrl, mediaSource } from './public-utils.js';
@@ -65,7 +66,7 @@ function renderSettings(config){
   renderHeading(config);
   const values={'[data-duration]':config.durationMinutes,'[data-price]':config.price,'[data-currency]':config.currency,'[data-hours]':config.actionDocHours};
   for(const [selector,value] of Object.entries(values)){if(value!==undefined)document.querySelectorAll(selector).forEach(el=>el.textContent=value);}
-  if(config.videoUrl){const media=makeMedia(config.videoUrl,'التعريف باستشارة الإديتورز',config.videoPoster);if(media){$('videoContent').replaceChildren(media);$('videoContent').classList.add('has-media');}}
+  if(config.videoUrl){const media=makeHeroMedia(config.videoUrl,'التعريف باستشارة الإديتورز',config.videoPoster,makeMedia);if(media){$('videoContent').replaceChildren(media);$('videoContent').classList.add('has-media');}}
   renderReviews(Array.isArray(config.testimonials)?config.testimonials:[]);
 }
 let cleanupCarousel=()=>{};
