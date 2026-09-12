@@ -189,6 +189,57 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    function validNotificationDevice(d) {
+      let fields = ['token', 'ownerUid', 'enabled', 'userAgent', 'createdAt', 'lastSeenAt', 'updatedAt'];
+      return d.keys().hasAll(fields)
+        && d.keys().hasOnly(fields)
+        && consultationText(d.token, 20, 4096)
+        && consultationText(d.ownerUid, 1, 128)
+        && d.ownerUid == request.auth.uid
+        && d.enabled is bool
+        && consultationText(d.userAgent, 0, 500)
+        && d.createdAt is timestamp
+        && d.lastSeenAt is timestamp && d.lastSeenAt == request.time
+        && d.updatedAt is timestamp && d.updatedAt == request.time;
+    }
+
+    match /consultation_notification_devices/{deviceId} {
+      allow get, list: if isConsultationAdmin();
+      allow create: if isConsultationAdmin()
+        && deviceId.matches('^[a-f0-9]{64}$')
+        && validNotificationDevice(request.resource.data)
+        && request.resource.data.createdAt == request.time;
+      allow update: if isConsultationAdmin()
+        && deviceId.matches('^[a-f0-9]{64}$')
+        && validNotificationDevice(request.resource.data)
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.ownerUid == resource.data.ownerUid
+        && request.resource.data.token == resource.data.token;
+      allow delete: if isConsultationAdmin();
+    }
+
+    match /consultation_notification_tests/{testId} {
+      allow create: if isConsultationAdmin()
+        && request.resource.data.keys().hasAll(['uid', 'token', 'requestedAt'])
+        && request.resource.data.keys().hasOnly(['uid', 'token', 'requestedAt'])
+        && request.resource.data.uid == request.auth.uid
+        && consultationText(request.resource.data.token, 20, 4096)
+        && request.resource.data.requestedAt is timestamp
+        && request.resource.data.requestedAt == request.time;
+      allow get, list, update, delete: if false;
+    }
+
+    // Delivery/idempotency and test-rate documents are server-only.
+    match /consultation_email_deliveries/{id} {
+      allow read, write: if false;
+    }
+    match /consultation_push_deliveries/{id} {
+      allow read, write: if false;
+    }
+    match /consultation_notification_test_limits/{id} {
+      allow read, write: if false;
+    }
+
     function validConsultationTestimonialAt(items, i) {
       return items.size() <= i || (
         items[i] is map
