@@ -3,15 +3,288 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#ffffff">
 <title>طلب الاستشارة | أمين القداوي</title>
+<link rel="preload" href="https://aminellkadaoui.github.io/consultation/fonts/thmanyah-sans-Regular.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="https://aminellkadaoui.github.io/consultation/styles.css?v=sentence-2">
+<style>
+/* فقط تنسيق الصفحة الجديدة وحالة ما بعد الإرسال */
+body {
+  min-height: 100vh;
+}
+
+.progress-page-main {
+  padding-top: 72px;
+  padding-bottom: 96px;
+}
+
+.progress-page-hero {
+  width: min(900px, calc(100% - 40px));
+  margin: 0 auto 26px;
+  text-align: center;
+}
+
+.progress-page-hero h1 {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+
+.progress-page-hero .headline-main {
+  display: block;
+  color: #111;
+  font-size: clamp(30px, 3.1vw, 42px);
+  font-weight: 500;
+  line-height: 1.16;
+}
+
+.progress-page-hero .headline-accent {
+  display: block;
+  margin-top: 3px;
+  color: #0f6bff;
+  font-size: clamp(60px, 6.9vw, 90px);
+  font-weight: 700;
+  line-height: .98;
+  letter-spacing: -.055em;
+  white-space: nowrap;
+}
+
+.progress-page-hero p {
+  max-width: 700px;
+  margin: 18px auto 0;
+  color: #64748b;
+  font-size: clamp(14px, 1.2vw, 16px);
+  line-height: 1.7;
+}
+
+body.submitted .progress-page-hero,
+body.submitted #formView {
+  display: none !important;
+}
+
+#formView {
+  display: block;
+}
+
+#trackingView {
+  width: min(820px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.tracking-card {
+  background: #fff;
+  border: 1px solid #dce6f4;
+  border-radius: 28px;
+  padding: clamp(28px, 5vw, 56px);
+}
+
+.tracking-head {
+  margin-bottom: 34px;
+}
+
+.tracking-head h2 {
+  margin: 0;
+  color: #0d0d0d;
+  font-size: clamp(32px, 4vw, 46px);
+  line-height: 1.2;
+  letter-spacing: -.025em;
+}
+
+.tracking-head p {
+  margin: 10px 0 0;
+  color: #718096;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.client-stages {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.client-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  gap: 18px;
+  min-height: 110px;
+}
+
+.client-stage:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  right: 28px;
+  top: 56px;
+  bottom: -4px;
+  width: 2px;
+  background: #e1e8f2;
+}
+
+.stage-dot {
+  position: relative;
+  z-index: 1;
+  width: 58px;
+  height: 58px;
+  border-radius: 999px;
+  border: 1px solid #d6e0ec;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  color: #9aabc0;
+  font-size: 20px;
+}
+
+.client-stage.completed .stage-dot {
+  color: #18a957;
+  border-color: #b9e6c8;
+  background: #effaf3;
+}
+
+.client-stage.current .stage-dot {
+  color: #0f6bff;
+  border-color: #bfd6ff;
+  background: #f2f7ff;
+}
+
+.client-stage.current .stage-copy h3 {
+  color: #0f6bff;
+}
+
+.client-stage.completed:not(:last-child)::before {
+  background: linear-gradient(#a9dfbb 0 45%, #e1e8f2 45%);
+}
+
+.stage-copy {
+  padding: 7px 0 28px;
+}
+
+.stage-copy h3 {
+  margin: 0 0 7px;
+  font-size: clamp(20px, 2.2vw, 25px);
+  line-height: 1.4;
+}
+
+.stage-copy p {
+  margin: 0;
+  color: #77859a;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+@media (max-width: 640px) {
+  .progress-page-hero .headline-main {
+    font-size: 24px;
+    line-height: 1.2;
+  }
+  .progress-page-hero .headline-accent {
+    margin-top: 3px;
+    font-size: clamp(42px, 12.5vw, 56px);
+    line-height: 1;
+    white-space: normal;
+  }
+  .progress-page-hero p {
+    max-width: 94%;
+    margin-top: 15px;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .progress-page-main {
+    padding-top: 42px;
+    padding-bottom: 64px;
+  }
+  .progress-page-hero {
+    width: min(100% - 30px, 720px);
+    margin-bottom: 28px;
+  }
+  #trackingView {
+    width: min(100% - 24px, 820px);
+  }
+  .tracking-card {
+    border-radius: 22px;
+    padding: 28px 20px;
+  }
+  .client-stage {
+    grid-template-columns: 48px 1fr;
+    gap: 14px;
+    min-height: 104px;
+  }
+  .stage-dot {
+    width: 48px;
+    height: 48px;
+  }
+  .client-stage:not(:last-child)::before {
+    right: 23px;
+    top: 48px;
+  }
+}
+
+html.has-tracking-token .progress-page-hero,
+html.has-tracking-token #formView {
+  display: none !important;
+}
+</style>
 <script>
-  const target = new URL('../progress/', location.href);
-  target.search = location.search;
-  target.hash = location.hash;
-  location.replace(target.href);
+if (new URLSearchParams(location.search).has('token')) document.documentElement.classList.add('has-tracking-token');
 </script>
-<noscript><meta http-equiv="refresh" content="0;url=../progress/"></noscript>
+<script src="../consultation-config.js" defer></script>
+<script type="module" src="./form.js?v=form-1"></script>
 </head>
-<body><a href="../progress/">فتح صفحة متابعة الاستشارة</a></body>
+<body class="rtl">
+<main class="progress-page-main">
+  <header class="progress-page-hero">
+    <h1>
+      <span class="headline-main">تريد تطوير عملك كممنتج، لكنك لا تعرف</span>
+      <span class="headline-accent">ما الخطوة التالية؟</span>
+    </h1>
+    <p>60 دقيقة نحدد فيها أولويتك وخطوتك التالية، مع خطة عمل واضحة بعد الجلسة.</p>
+  </header>
+  <div id="formView" aria-live="polite"></div>
+  <section id="trackingView" hidden aria-live="polite">
+    <div class="tracking-card">
+      <div class="tracking-head">
+        <h2>تم الإرسال</h2>
+        <p>وصل طلبك بنجاح. هذه هي الخطوات التالية حتى استلام خطة العمل.</p>
+      </div>
+
+      <ol class="client-stages">
+        <li class="client-stage completed">
+          <div class="stage-dot" aria-hidden="true">✓</div>
+          <div class="stage-copy">
+            <h3>تم الإرسال</h3>
+            <p>وصلت المعلومات التي أرسلتها بنجاح.</p>
+          </div>
+        </li>
+
+        <li class="client-stage pending">
+          <div class="stage-dot" aria-hidden="true">○</div>
+          <div class="stage-copy">
+            <h3>الحجز والدفع</h3>
+            <p>بعد التأكد أن الاستشارة مناسبة لحالتك، تختار الموعد وتكمل الدفع.</p>
+          </div>
+        </li>
+
+        <li class="client-stage pending">
+          <div class="stage-dot" aria-hidden="true">○</div>
+          <div class="stage-copy">
+            <h3>الاجتماع</h3>
+            <p>جلسة فردية لمدة 60 دقيقة نفهم فيها المشكلة، ونحدد الأولوية والخطوات المناسبة.</p>
+          </div>
+        </li>
+
+        <li class="client-stage pending">
+          <div class="stage-dot" aria-hidden="true">○</div>
+          <div class="stage-copy">
+            <h3>خطة العمل</h3>
+            <p>خلال 24 ساعة من الاجتماع، تصلك خطة عمل مكتوبة توضح ما الذي تبدأ به وما الخطوات التالية.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+</main>
+</body>
 </html>
