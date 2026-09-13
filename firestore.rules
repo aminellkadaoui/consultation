@@ -149,6 +149,10 @@ service cloud.firestore {
     }
 
     function validConsultationStatus(status) {
+      return status in ['new', 'reviewing', 'accepted', 'scheduled', 'completed', 'archived', 'trash'];
+    }
+
+    function validRestorableConsultationStatus(status) {
       return status in ['new', 'reviewing', 'accepted', 'scheduled', 'completed', 'archived'];
     }
 
@@ -157,16 +161,18 @@ service cloud.firestore {
       allow get, list: if isConsultationAdmin();
       allow update: if isConsultationAdmin()
         && request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['status', 'privateNotes', 'stages', 'currentStage', 'trackingToken', 'updatedAt'])
+          .hasOnly(['status', 'privateNotes', 'stages', 'currentStage', 'trackingToken', 'trashPreviousStatus', 'updatedAt'])
         && validConsultationStatus(request.resource.data.status)
         && (!('privateNotes' in request.resource.data)
           || consultationText(request.resource.data.privateNotes, 0, 6000))
         && (!('stages' in request.resource.data) || validProgressStages(request.resource.data.stages))
         && (!('currentStage' in request.resource.data) || validCurrentStage(request.resource.data.currentStage))
         && (!('trackingToken' in request.resource.data) || validTrackingToken(request.resource.data.trackingToken))
+        && (!('trashPreviousStatus' in request.resource.data)
+          || validRestorableConsultationStatus(request.resource.data.trashPreviousStatus))
         && request.resource.data.updatedAt is timestamp
         && request.resource.data.updatedAt == request.time;
-      allow delete: if false;
+      allow delete: if isConsultationAdmin();
     }
 
     function validProgressDocument(d, token) {
@@ -186,7 +192,7 @@ service cloud.firestore {
       allow create: if validProgressDocument(request.resource.data, token);
       allow update: if isConsultationAdmin()
         && validProgressDocument(request.resource.data, token);
-      allow delete: if false;
+      allow delete: if isConsultationAdmin();
     }
 
     function validNotificationDevice(d) {
