@@ -1,10 +1,11 @@
-import { onAuth } from './data.js?v=sentence-2';
+import { onAuth } from './data.js?v=admin-3';
 
 const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
 const APP_NAME = 'consultation';
 const DEVICES = 'consultation_notification_devices';
 const TESTS = 'consultation_notification_tests';
 const STORAGE_KEY = 'consultationPushDeviceId';
+const DISABLED_KEY = 'consultationPushDisabled';
 
 let currentUser = null;
 let currentToken = '';
@@ -30,6 +31,8 @@ function setBusy(busy) {
   if (!ui) return;
   ui.enable.disabled = busy || !currentUser;
   ui.test.disabled = busy || !currentUser || !currentToken;
+  ui.disable.disabled = busy || !currentUser || !currentToken;
+  refreshDiagnostics();
 }
 
 function mountUi() {
@@ -50,7 +53,9 @@ function mountUi() {
     <div class="notification-settings-actions">
       <button type="button" class="button primary" id="enable-device-notifications">تفعيل إشعارات هذا الجهاز</button>
       <button type="button" class="button secondary" id="test-device-notification" disabled>إرسال إشعار تجريبي</button>
+      <button type="button" class="button ghost" id="disable-device-notifications" disabled>إيقاف إشعارات هذا الجهاز</button>
     </div>
+    <ul id="notification-diagnostics" class="notification-settings-meta" aria-live="polite"></ul>
     <p class="notification-settings-meta">سيظهر إشعار مختصر عند وصول طلب جديد. التفاصيل الكاملة تبقى داخل لوحة الإدارة.</p>`;
   host.append(panel);
   const status = panel.querySelector('#notification-settings-status');
@@ -60,10 +65,13 @@ function mountUi() {
     statusText: panel.querySelector('#notification-settings-status-text'),
     dot: status.querySelector('.notification-settings-dot'),
     enable: panel.querySelector('#enable-device-notifications'),
-    test: panel.querySelector('#test-device-notification')
+    test: panel.querySelector('#test-device-notification'),
+    disable: panel.querySelector('#disable-device-notifications')
   };
   ui.enable.addEventListener('click', () => activateDevice(true));
   ui.test.addEventListener('click', sendTestNotification);
+  ui.disable.addEventListener('click', disableDevice);
+  refreshDiagnostics();
   refreshPermissionStatus();
 }
 
@@ -78,6 +86,7 @@ async function ensureRuntime() {
   if (!app) throw new Error('Firebase admin session is not initialized.');
   const firebaseConfig = config();
   const databaseId = firebaseConfig.databaseId || '(default)';
+  if (!(await messagingSDK.isSupported())) throw new Error('Firebase Push غير مدعوم في هذا المتصفح.');
   runtime = {
     dbSDK,
     messagingSDK,
@@ -103,7 +112,7 @@ function saveLocalDeviceId(value) {
 
 async function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) throw new Error('هذا المتصفح لا يدعم Service Worker.');
-  const registration = await navigator.serviceWorker.register('./firebase-messaging-sw.js?v=push-1', { scope: './' });
+  const registration = await navigator.serviceWorker.register('./firebase-messaging-sw.js?v=push-2', { scope: './' });
   await registration.update().catch(() => {});
   serviceWorkerRegistration = registration;
   return registration;
@@ -111,6 +120,7 @@ async function registerServiceWorker() {
 
 function refreshPermissionStatus() {
   if (!ui) return;
+  refreshDiagnostics();
   if (!('Notification' in globalThis)) {
     setStatus('هذا المتصفح لا يدعم إشعارات الويب.', 'error');
     ui.enable.disabled = true;
@@ -119,15 +129,17 @@ function refreshPermissionStatus() {
   if (Notification.permission === 'denied') {
     setStatus('الإشعارات مرفوضة لهذا الموقع. فعّلها من إعدادات المتصفح ثم أعد المحاولة.', 'error');
   } else if (Notification.permission === 'granted' && currentToken) {
-    setStatus('✓ إشعارات هذا الجهاز مفعلة', 'success');
+    setStatus('الجهاز مسجل. أرسل إشعارًا تجريبيًا للتحقق من وصوله.', 'success');
+  } else if (!String(config().vapidKey || '').trim()) {
+    setStatus('ينقص ربط مفتاح Web Push من إعدادات Firebase.', 'error');
   } else if (Notification.permission === 'granted') {
-    setStatus('إذن الإشعارات موجود. جارٍ ربط هذا الجهاز…');
+    setStatus('إذن الإشعارات موجود. اضغط تفعيل لربط هذا الجهاز.');
   } else {
     setStatus('إشعارات هذا الجهاز غير مفعلة بعد.');
   }
 }
 
-async function persistDevice(token) {
+async function persistDevice(token, uid) {
   const { dbSDK, db } = await ensureRuntime();
   const deviceId = await sha256(token);
   const ref = dbSDK.doc(db, DEVICES, deviceId);
@@ -137,7 +149,7 @@ async function persistDevice(token) {
   const userAgent = String(navigator.userAgent || '').slice(0, 500);
   await dbSDK.setDoc(ref, {
     token,
-    ownerUid: currentUser.uid,
+    ownerUid: uid,
     enabled: true,
     userAgent,
     createdAt,
@@ -162,7 +174,10 @@ async function bindForegroundMessages() {
   const { messagingSDK, messaging } = await ensureRuntime();
   messagingSDK.onMessage(messaging, async payload => {
     const data = payload.data || {};
+    if (!currentUser || !currentToken) return;
+    if (data.kind === 'consultation_test') setStatus('وصل الإشعار التجريبي إلى هذا الجهاز.', 'success');
     if (!('Notification' in globalThis) || Notification.permission !== 'granted') return;
+    try {
     const registration = serviceWorkerRegistration || await registerServiceWorker();
     await registration.showNotification(data.title || 'طلب استشارة جديد', {
       body: data.body || 'وصل طلب جديد',
@@ -170,12 +185,16 @@ async function bindForegroundMessages() {
       data: { url: data.url || './admin/', requestId: data.requestId || '' },
       renotify: false
     });
+    } catch {
+      setStatus('وصلت الرسالة، لكن المتصفح منع إظهار التنبيه.', 'error');
+    }
   });
   foregroundBound = true;
 }
 
 async function activateDevice(requestPermission) {
   if (!currentUser || !ui) return;
+  const activatingUid = currentUser.uid;
   setBusy(true);
   try {
     if (!('Notification' in globalThis)) throw new Error('هذا المتصفح لا يدعم إشعارات الويب.');
@@ -191,10 +210,13 @@ async function activateDevice(requestPermission) {
     const registration = await registerServiceWorker();
     const token = await messagingSDK.getToken(messaging, { vapidKey, serviceWorkerRegistration: registration });
     if (!token) throw new Error('تعذّر إنشاء Push token لهذا الجهاز.');
-    await persistDevice(token);
+    if (!currentUser || currentUser.uid !== activatingUid) return;
+    await persistDevice(token, activatingUid);
+    if (currentUser?.uid !== activatingUid) return;
     currentToken = token;
+    try { localStorage.removeItem(DISABLED_KEY); } catch {}
     await bindForegroundMessages();
-    setStatus('✓ إشعارات هذا الجهاز مفعلة', 'success');
+    setStatus('الجهاز مسجل. أرسل إشعارًا تجريبيًا للتحقق من وصوله.', 'success');
     ui.enable.textContent = '✓ إشعارات هذا الجهاز مفعلة';
   } catch (error) {
     console.error('Notification activation failed:', error.code || error.message);
@@ -214,13 +236,47 @@ async function sendTestNotification() {
       token: currentToken,
       requestedAt: dbSDK.serverTimestamp()
     });
-    setStatus('تم إرسال طلب الإشعار التجريبي. يفترض أن يظهر خلال لحظات.', 'success');
+    setStatus('تم حفظ طلب الاختبار. النجاح يتأكد عند ظهور الإشعار على الجهاز؛ إن لم يصل فراجع نشر Functions.', '');
   } catch (error) {
     console.error('Test notification failed:', error.code || error.message);
     setStatus('تعذّر إرسال الإشعار التجريبي. راجع نشر Firebase Functions والقواعد.', 'error');
   } finally {
     setBusy(false);
   }
+}
+
+function deviceOptedOut() {
+  try { return localStorage.getItem(DISABLED_KEY) === 'true'; } catch { return false; }
+}
+function refreshDiagnostics() {
+  const list = document.getElementById('notification-diagnostics');
+  if (!list) return;
+  const permission = 'Notification' in globalThis ? Notification.permission : 'unsupported';
+  const lines = [
+    config().vapidKey ? 'مفتاح Web Push: موجود في إعدادات الموقع.' : 'مفتاح Web Push: غير مضاف في consultation-config.js.',
+    `إذن المتصفح: ${{ granted: 'مسموح', denied: 'مرفوض', default: 'لم يُطلب بعد', unsupported: 'غير مدعوم' }[permission]}.`,
+    currentToken ? 'تسجيل الجهاز في Firebase: مكتمل.' : 'تسجيل الجهاز في Firebase: غير مكتمل.',
+    'البريد والإرسال من الخادم: يتطلبان نشر Functions وإعداداتها؛ تسجيل الجهاز وحده لا يؤكدهما.'
+  ];
+  list.replaceChildren(...lines.map(text => { const li = document.createElement('li'); li.textContent = text; return li; }));
+}
+async function disableDevice() {
+  if (!currentUser || !currentToken) return;
+  setBusy(true);
+  try {
+    const { dbSDK, db, messagingSDK, messaging } = await ensureRuntime();
+    const id = await sha256(currentToken);
+    await dbSDK.updateDoc(dbSDK.doc(db, DEVICES, id), {
+      enabled: false, lastSeenAt: dbSDK.serverTimestamp(), updatedAt: dbSDK.serverTimestamp()
+    });
+    try { localStorage.setItem(DISABLED_KEY, 'true'); } catch {}
+    currentToken = '';
+    await messagingSDK.deleteToken(messaging).catch(() => {});
+    ui.enable.textContent = 'تفعيل إشعارات هذا الجهاز';
+    setStatus('تم إيقاف الإشعارات على هذا الجهاز. الأجهزة الأخرى تبقى مفعلة.');
+  } catch {
+    setStatus('تعذّر إيقاف الإشعارات. تحقق من الاتصال وصلاحيات Firebase.', 'error');
+  } finally { setBusy(false); }
 }
 
 async function handleAuth(user) {
@@ -231,13 +287,15 @@ async function handleAuth(user) {
     if (ui) {
       ui.enable.disabled = true;
       ui.test.disabled = true;
+      ui.disable.disabled = true;
+      ui.enable.textContent = 'تفعيل إشعارات هذا الجهاز';
       setStatus('سجّل الدخول لتفعيل إشعارات هذا الجهاز.');
     }
     return;
   }
   if (ui) ui.enable.disabled = false;
   refreshPermissionStatus();
-  if ('Notification' in globalThis && Notification.permission === 'granted' && config().vapidKey) {
+  if ('Notification' in globalThis && Notification.permission === 'granted' && config().vapidKey && !deviceOptedOut()) {
     await activateDevice(false);
   }
 }

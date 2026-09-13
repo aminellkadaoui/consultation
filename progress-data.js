@@ -1,3 +1,4 @@
+import { guardStatusChange } from './request-workflow.js';
 const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
 const APP_NAME = 'consultation';
 const REQUESTS = 'consultation_requests';
@@ -249,7 +250,8 @@ export async function updateTrackedRequest(id, fields) {
   ensureAdminSession(auth);
 
   const requestRef = dbSDK.doc(db, REQUESTS, id);
-  const snapshot = await dbSDK.getDocFromServer(requestRef);
+  return dbSDK.runTransaction(db, async transaction => {
+  const snapshot = await transaction.get(requestRef);
   if (!snapshot.exists()) throw invalid('الطلب غير موجود.');
   const existing = snapshot.data();
 
@@ -287,11 +289,11 @@ export async function updateTrackedRequest(id, fields) {
 
   if (!Object.keys(changes).length) throw invalid('لا توجد تغييرات للحفظ.');
 
-  const batch = dbSDK.writeBatch(db);
-  batch.update(requestRef, { ...changes, updatedAt: dbSDK.serverTimestamp() });
+  guardStatusChange(existing, changes);
+  transaction.update(requestRef, { ...changes, updatedAt: dbSDK.serverTimestamp() });
 
   if (token) {
-    batch.set(dbSDK.doc(db, PROGRESS, token), {
+    transaction.set(dbSDK.doc(db, PROGRESS, token), {
       stages: hasProgressChange ? stages : normalizeProgressStages(existing.stages),
       currentStage: hasProgressChange
         ? currentStage
@@ -302,6 +304,6 @@ export async function updateTrackedRequest(id, fields) {
     }, { merge: true });
   }
 
-  await batch.commit();
   return { id, ...changes };
+  });
 }

@@ -156,6 +156,21 @@ service cloud.firestore {
       return status in ['new', 'reviewing', 'accepted', 'scheduled', 'completed', 'archived'];
     }
 
+    function validTrashTransition(before, after) {
+      let current = before.get('status', 'new');
+      let original = validRestorableConsultationStatus(current) ? current : 'new';
+      let previous = before.get('trashPreviousStatus', 'new');
+      let restored = validRestorableConsultationStatus(previous) ? previous : 'new';
+      return (current != 'trash' && after.status == 'trash'
+          && after.trashPreviousStatus == original)
+        || (current == 'trash' && after.status != 'trash'
+          && after.status == restored && !('trashPreviousStatus' in after))
+        || (current == after.status
+          && after.get('trashPreviousStatus', '') == before.get('trashPreviousStatus', ''))
+        || (current != 'trash' && after.status != 'trash'
+          && after.get('trashPreviousStatus', '') == before.get('trashPreviousStatus', ''));
+    }
+
     match /consultation_requests/{requestId} {
       allow create: if validConsultationRequest(request.resource.data);
       allow get, list: if isConsultationAdmin();
@@ -163,6 +178,7 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys()
           .hasOnly(['status', 'privateNotes', 'stages', 'currentStage', 'trackingToken', 'trashPreviousStatus', 'updatedAt'])
         && validConsultationStatus(request.resource.data.status)
+        && validTrashTransition(resource.data, request.resource.data)
         && (!('privateNotes' in request.resource.data)
           || consultationText(request.resource.data.privateNotes, 0, 6000))
         && (!('stages' in request.resource.data) || validProgressStages(request.resource.data.stages))
@@ -172,7 +188,7 @@ service cloud.firestore {
           || validRestorableConsultationStatus(request.resource.data.trashPreviousStatus))
         && request.resource.data.updatedAt is timestamp
         && request.resource.data.updatedAt == request.time;
-      allow delete: if isConsultationAdmin();
+      allow delete: if isConsultationAdmin() && resource.data.status == 'trash';
     }
 
     function validProgressDocument(d, token) {
@@ -198,7 +214,9 @@ service cloud.firestore {
     function validNotificationDevice(d) {
       let fields = ['token', 'ownerUid', 'enabled', 'userAgent', 'createdAt', 'lastSeenAt', 'updatedAt'];
       return d.keys().hasAll(fields)
-        && d.keys().hasOnly(fields)
+        && d.keys().hasOnly(fields.concat(['disabledReason', 'disabledAt']))
+        && (!('disabledReason' in d) || d.disabledReason == 'invalid_fcm_token')
+        && (!('disabledAt' in d) || d.disabledAt is timestamp)
         && consultationText(d.token, 20, 4096)
         && consultationText(d.ownerUid, 1, 128)
         && d.ownerUid == request.auth.uid

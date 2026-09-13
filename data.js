@@ -1,4 +1,6 @@
 /* Shared data layer. Firebase loads only when a method needs it. */
+import { guardStatusChange, previousStatus } from './request-workflow.js';
+
 const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
 const APP_NAME = 'consultation';
 const REQUESTS = 'consultation_requests';
@@ -170,7 +172,13 @@ export async function updateRequest(id, fields) {
   if (!Object.keys(changes).length) throw invalid('لا توجد تغييرات للحفظ.');
   const { dbSDK, db, auth } = await ensureFirebase();
   ensureAdminSession(auth);
-  await dbSDK.updateDoc(dbSDK.doc(db, REQUESTS, id), { ...changes, updatedAt: dbSDK.serverTimestamp() });
+  const ref = dbSDK.doc(db, REQUESTS, id);
+  await dbSDK.runTransaction(db, async transaction => {
+    const snapshot = await transaction.get(ref);
+    if (!snapshot.exists()) throw invalid('الطلب غير موجود.');
+    guardStatusChange(snapshot.data(), changes);
+    transaction.update(ref, { ...changes, updatedAt: dbSDK.serverTimestamp() });
+  });
   return { id, ...changes };
 }
 
@@ -204,9 +212,8 @@ export async function restoreRequest(id) {
     const snapshot = await transaction.get(ref);
     if (!snapshot.exists()) throw invalid('الطلب غير موجود.');
     const data = snapshot.data();
-    if (data.status !== 'trash') return;
-    restoredStatus = RESTORABLE_REQUEST_STATUSES.includes(data.trashPreviousStatus)
-      ? data.trashPreviousStatus : 'new';
+    if (data.status !== 'trash') { restoredStatus = data.status; return; }
+    restoredStatus = previousStatus(data);
     transaction.update(ref, {
       status: restoredStatus,
       trashPreviousStatus: dbSDK.deleteField(),
@@ -221,15 +228,15 @@ export async function deleteRequest(id) {
   const { dbSDK, db, auth } = await ensureFirebase();
   ensureAdminSession(auth);
   const requestRef = dbSDK.doc(db, REQUESTS, id);
-  const snapshot = await dbSDK.getDocFromServer(requestRef);
-  if (!snapshot.exists()) return { id, deleted: true };
-  const data = snapshot.data();
-  if (data.status !== 'trash') throw invalid('انقل الطلب إلى المهملات قبل الحذف النهائي.');
-  const batch = dbSDK.writeBatch(db);
-  batch.delete(requestRef);
-  const token = typeof data.trackingToken === 'string' ? data.trackingToken.trim() : '';
-  if (/^[A-Za-z0-9_-]{32,128}$/.test(token)) batch.delete(dbSDK.doc(db, PROGRESS, token));
-  await batch.commit();
+  await dbSDK.runTransaction(db, async transaction => {
+    const snapshot = await transaction.get(requestRef);
+    if (!snapshot.exists()) return;
+    const data = snapshot.data();
+    if (data.status !== 'trash') throw invalid('انقل الطلب إلى المهملات قبل الحذف النهائي.');
+    transaction.delete(requestRef);
+    const token = typeof data.trackingToken === 'string' ? data.trackingToken.trim() : '';
+    if (/^[A-Za-z0-9_-]{32,128}$/.test(token)) transaction.delete(dbSDK.doc(db, PROGRESS, token));
+  });
   return { id, deleted: true };
 }
 

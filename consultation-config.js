@@ -15,23 +15,23 @@ window.CONSULTATION_CONFIG = {
 };
 
 if (/(?:^|\/)admin\.html$/.test(location.pathname)) {
-  import('./admin-progress.js?v=progress-2').catch((error) => {
+  import('./admin-progress.js?v=progress-4').catch((error) => {
     console.error('Progress admin extension failed:', error);
   });
 
   const notificationStyles = document.createElement('link');
   notificationStyles.rel = 'stylesheet';
-  notificationStyles.href = './admin-notifications.css?v=push-1';
+  notificationStyles.href = './admin-notifications.css?v=push-2';
   document.head.append(notificationStyles);
-  import('./admin-notifications.js?v=push-1').catch((error) => {
+  import('./admin-notifications.js?v=push-3').catch((error) => {
     console.error('Admin notification settings failed:', error);
   });
 
   const adminUxStyles = document.createElement('link');
   adminUxStyles.rel = 'stylesheet';
-  adminUxStyles.href = './admin-ux.css?v=archive-ux-2';
+  adminUxStyles.href = './admin-ux.css?v=archive-ux-4';
   document.head.append(adminUxStyles);
-  import('./admin-ux.js?v=archive-ux-2').catch((error) => {
+  import('./admin-ux.js?v=archive-ux-4').catch((error) => {
     console.error('Admin UX extension failed:', error);
   });
 }

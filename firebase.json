@@ -1,12 +1,27 @@
 {
-  "firestore": {
-    "rules": "firestore.rules"
-  },
-  "functions": [{
-    "source": "functions",
-    "codebase": "consultation-notifications",
-    "runtime": "nodejs22",
-    "ignore": ["node_modules", ".git", "*-debug.log", ".env", ".env.*", ".secret.local", "test"],
-    "predeploy": ["npm --prefix \"$RESOURCE_DIR\" test"]
-  }]
+  "firestore": [
+    {
+      "database": "default",
+      "rules": "firestore.rules"
+    }
+  ],
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "consultation-notifications",
+      "runtime": "nodejs22",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "*-debug.log",
+        ".env",
+        ".env.*",
+        ".secret.local",
+        "test"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" test"
+      ]
+    }
+  ]
 }

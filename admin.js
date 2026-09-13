@@ -1,6 +1,9 @@
-import { login, logout, onAuth, getCurrentUser, listRequests, updateRequest, loadSettings, saveSettings } from './data.js?v=sentence-2';
+import { login, logout, onAuth, getCurrentUser, listRequests, updateRequest, loadSettings, saveSettings } from './data.js?v=admin-3';
 import { mediaSource, normalizeInstagram, normalizeWhatsapp } from './public-utils.js';
 import { statusLabels, requestFieldList, normalizeRequest, presentRequest, plainValue, csvCell, briefFor } from './request-presenter.js';
+
+import { filterRequests } from './request-workflow.js';
+import { connectAdmin, publishAdmin } from './admin-store.js';
 
 const $ = (id) => document.getElementById(id);
 const formFields = requestFieldList;
@@ -91,17 +94,18 @@ function formatDate(value, detailed = false) {
 function filteredRequests() {
   const query = $('request-search').value.trim().toLocaleLowerCase();
   const status = $('status-filter').value;
-  return requests.filter((item) => (status === 'all' || item.status === status) && (!query || [item.fullName, item.instagram, item.whatsapp, item.problem, item.goal, plainValue(item.editingType), item.lastSituation].join(' ').toLocaleLowerCase().includes(query)));
+  return filterRequests(requests, status, query);
 }
 function renderRequests() {
   if (!requestsLoaded) return;
-  $('stat-total').textContent = requests.length;
+  const activeCount = requests.filter(item => item.status !== 'trash').length;
+  $('stat-total').textContent = activeCount;
   $('stat-new').textContent = requests.filter((item) => item.status === 'new').length;
   $('stat-scheduled').textContent = requests.filter((item) => item.status === 'scheduled').length;
   $('stat-completed').textContent = requests.filter((item) => item.status === 'completed').length;
   $('nav-count').textContent = requests.filter((item) => item.status === 'new').length;
   const visible = filteredRequests();
-  $('request-count').textContent = `${visible.length} طلب ظاهر من أصل ${requests.length}`;
+  $('request-count').textContent = $('status-filter').value === 'trash' ? `${visible.length} طلب في المهملات` : `${visible.length} طلب ظاهر من أصل ${activeCount}`;
   $('requests-body').replaceChildren();
   $('requests-table-wrap').hidden = !visible.length;
   $('requests-empty').hidden = !!visible.length;
@@ -111,6 +115,7 @@ function renderRequests() {
   $('empty-link').hidden = !!requests.length;
   for (const item of visible) {
     const row = element('tr');
+    row.dataset.requestId = item.id; row.dataset.requestStatus = item.status;
     const person = element('td');
     person.append(element('span', 'person-name', item.fullName || 'بدون اسم'));
     const instagram = element('td', 'instagram-cell');
@@ -123,6 +128,12 @@ function renderRequests() {
     button.addEventListener('click', () => openDetail(item.id, button)); action.append(button);
     row.append(person, instagram, problem, date, status, action); $('requests-body').append(row);
   }
+  if (!visible.length && $('status-filter').value === 'trash') {
+    $('empty-title').textContent = 'سلة المهملات فارغة.';
+    $('empty-description').textContent = 'الطلبات المحذوفة تظهر هنا حتى تسترجعها أو تحذفها نهائيًا.';
+    $('empty-link').hidden = true;
+  }
+  publishAdmin({ requests, selectedId }, 'requests');
 }
 async function refreshRequests() {
   if (!currentUser) return;
@@ -195,7 +206,9 @@ function openRequestFromHash() {
 function openDetail(id, trigger) {
   const item = requests.find((request) => request.id === id);
   if (!item) return;
-  selectedId = id; detailDirty = false; lastDetailTrigger = trigger;
+  selectedId = id; detailDirty = false;
+  $('request-dialog').dataset.requestId = id;
+  $('request-dialog').dataset.requestStatus = item.status; lastDetailTrigger = trigger;
   $('detail-name').textContent = item.fullName || 'طلب استشارة';
   $('detail-date').textContent = `أُرسل في ${formatDate(item.submittedAt || item.createdAt, true)}`;
   $('detail-contact').replaceChildren();
@@ -215,7 +228,11 @@ function openDetail(id, trigger) {
     $('detail-whatsapp').href = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
   } else { $('detail-whatsapp').removeAttribute('href'); }
   $('detail-answers').replaceChildren(...renderRequestSummary(item));
+  if (item.status === 'trash' && !$('detail-status').querySelector('[value=trash]')) {
+    const option = element('option', '', 'المهملات'); option.value = 'trash'; option.disabled = true; $('detail-status').append(option);
+  }
   $('detail-status').value = item.status;
+  $('detail-status').disabled = item.status === 'trash';
   $('detail-notes').value = item.privateNotes;
   $('detail-save-state').textContent = '';
   showMessage('detail-error', '');
@@ -223,10 +240,15 @@ function openDetail(id, trigger) {
   document.body.style.overflow = 'hidden';
   $('request-dialog').scrollTop = 0;
   $('close-detail').focus();
+  publishAdmin({ requests, selectedId }, 'detail');
 }
 function closeDetail(force = false) {
-  if (!force && detailDirty && !window.confirm('هناك ملاحظات لم تُحفظ. هل تريد إغلاق الطلب دون حفظها؟')) return;
+  if (!force && (detailDirty || document.getElementById('progress-admin-controls')?.dataset.dirty === 'true') && !window.confirm('هناك ملاحظات لم تُحفظ. هل تريد إغلاق الطلب دون حفظها؟')) return;
+  const hadOpenRequest = Boolean(selectedId);
   $('request-dialog').close(); document.body.style.overflow = ''; selectedId = null; detailDirty = false;
+  delete $('request-dialog').dataset.requestId; delete $('request-dialog').dataset.requestStatus;
+  if (hadOpenRequest && location.hash.startsWith('#request=')) history.replaceState(null, '', location.pathname + location.search);
+  publishAdmin({ requests, selectedId }, 'close');
   if (lastDetailTrigger?.isConnected) lastDetailTrigger.focus();
 }
 async function copyText(text, successMessage) {
@@ -356,7 +378,7 @@ $('login-form').addEventListener('submit', async (event) => {
   finally { pending(button, false, 'تسجيل الدخول'); }
 });
 async function signOut() {
-  if ((contentDirty || detailDirty) && !window.confirm('لديك تغييرات لم تُحفظ. هل تريد تسجيل الخروج دون حفظها؟')) return;
+  if ((contentDirty || detailDirty || document.getElementById('progress-admin-controls')?.dataset.dirty === 'true') && !window.confirm('لديك تغييرات لم تُحفظ. هل تريد تسجيل الخروج دون حفظها؟')) return;
   $('logout').disabled = true; $('logout-mobile').disabled = true;
   try { await logout(); }
   catch (error) { toast('تعذّر تسجيل الخروج. حاول مرة أخرى.'); }
@@ -372,8 +394,8 @@ $('export-csv').addEventListener('click', exportCSV);
 $('close-detail').addEventListener('click', () => closeDetail());
 $('request-dialog').addEventListener('cancel', (event) => { event.preventDefault(); closeDetail(); });
 $('request-dialog').addEventListener('click', (event) => { if (event.target === $('request-dialog')) { const rect = $('request-dialog').getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closeDetail(); } });
-$('detail-form').addEventListener('input', () => { detailRevision += 1; detailDirty = true; $('detail-save-state').textContent = 'تغييرات غير محفوظة'; });
-$('detail-form').addEventListener('change', () => { detailRevision += 1; detailDirty = true; $('detail-save-state').textContent = 'تغييرات غير محفوظة'; });
+$('detail-form').addEventListener('input', (event) => { if (event.target.closest('#progress-admin-controls')) return; detailRevision += 1; detailDirty = true; $('detail-save-state').textContent = 'تغييرات غير محفوظة'; });
+$('detail-form').addEventListener('change', (event) => { if (event.target.closest('#progress-admin-controls')) return; detailRevision += 1; detailDirty = true; $('detail-save-state').textContent = 'تغييرات غير محفوظة'; });
 $('detail-form').addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!selectedId || !currentUser) return;
@@ -386,6 +408,7 @@ $('detail-form').addEventListener('submit', async (event) => {
     if (currentUser?.uid !== uid) return;
     const item = requests.find((entry) => entry.id === id); if (item) Object.assign(item, changes);
     if (selectedId === id) { detailDirty = detailRevision !== savingRevision; $('detail-save-state').textContent = detailDirty ? 'حُفظت النسخة السابقة. لديك تغييرات جديدة لم تُحفظ.' : 'تم حفظ المتابعة.'; }
+    if (selectedId === id) $('request-dialog').dataset.requestStatus = changes.status;
     if (selectedId === id && $('detail-status-badge')) { $('detail-status-badge').textContent = statusLabels[changes.status]; $('detail-status-badge').className = `status-badge status-${changes.status}`; }
     renderRequests(); toast('تم حفظ حالة الطلب وملاحظاتك.');
   } catch (error) { if (selectedId === id) showMessage('detail-error', explainError(error, 'save')); }
@@ -414,11 +437,12 @@ $('content-form').addEventListener('submit', async (event) => {
   finally { pending($('save-content'), false, 'حفظ ونشر التغييرات'); }
 });
 window.addEventListener('hashchange', openRequestFromHash);
-window.addEventListener('beforeunload', (event) => { if (contentDirty || detailDirty) { event.preventDefault(); event.returnValue = ''; } });
+window.addEventListener('beforeunload', (event) => { if (contentDirty || detailDirty || document.getElementById('progress-admin-controls')?.dataset.dirty === 'true') { event.preventDefault(); event.returnValue = ''; } });
 
 async function handleAuth(user) {
   if (user?.uid && currentUser?.uid === user.uid) return;
   currentUser = user || null;
+  if (!user) publishAdmin({ requests: [], selectedId: null }, 'logout');
   $('login-screen').hidden = !!user;
   $('app-shell').hidden = !user;
   if (user) {
@@ -437,6 +461,17 @@ async function handleAuth(user) {
     switchView('requests');
   }
 }
+connectAdmin({
+  refresh: refreshRequests,
+  close: () => closeDetail(true),
+  isDetailDirty: () => detailDirty || document.getElementById('progress-admin-controls')?.dataset.dirty === 'true',
+  updateProgress: (id, changes) => {
+    const item = requests.find(entry => entry.id === id);
+    if (item) Object.assign(item, changes);
+    publishAdmin({ requests, selectedId }, 'progress');
+  }
+});
+
 try {
   await onAuth(handleAuth);
   const existing = getCurrentUser();

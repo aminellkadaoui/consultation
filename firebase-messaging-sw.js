@@ -1,3 +1,23 @@
+self.addEventListener('notificationclick', event => {
+  event.stopImmediatePropagation();
+  event.notification.close();
+  const data = event.notification.data || {};
+  const id = String(data.requestId || '');
+  const target = 'https://aminellkadaoui.github.io/consultation/admin.html'
+    + (id && !id.startsWith('test-') ? '#request=' + encodeURIComponent(id) : '');
+  event.waitUntil((async () => {
+    const windows = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+    const adminPrefix = 'https://aminellkadaoui.github.io/consultation/admin';
+    for (const client of windows) {
+      if (client.url.startsWith(adminPrefix)) {
+        if ('navigate' in client) await client.navigate(target).catch(() => {});
+        return client.focus();
+      }
+    }
+    return clients.openWindow(target);
+  })());
+});
+
 /* Firebase Cloud Messaging service worker. Public Firebase web config only; no server secrets live here. */
 importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js');
@@ -25,20 +45,4 @@ messaging.onBackgroundMessage(payload => {
     },
     renotify: false
   });
-});
-
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
-  const target = event.notification.data?.url || 'https://aminellkadaoui.github.io/consultation/admin/';
-  event.waitUntil((async () => {
-    const windows = await clients.matchAll({ type: 'window', includeUncontrolled: true });
-    const adminPrefix = 'https://aminellkadaoui.github.io/consultation/admin';
-    for (const client of windows) {
-      if (client.url.startsWith(adminPrefix)) {
-        if ('navigate' in client) await client.navigate(target).catch(() => {});
-        return client.focus();
-      }
-    }
-    return clients.openWindow(target);
-  })());
 });

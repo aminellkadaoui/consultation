@@ -1,5 +1,5 @@
-import { listRequests, moveRequestToTrash, restoreRequest, deleteRequest } from './data.js?v=sentence-2';
-import { normalizeRequest, plainValue } from './request-presenter.js';
+import { updateRequest, moveRequestToTrash, restoreRequest, deleteRequest } from './data.js?v=admin-3';
+import { adminSnapshot, adminActions, subscribeAdmin } from './admin-store.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -19,7 +19,7 @@ let messageType = 'accept';
 let messageLang = 'ar';
 let mounted = false;
 let requestCache = [];
-let requestCacheAt = 0;
+
 let syncTimer = 0;
 let requestOperationBusy = false;
 
@@ -153,6 +153,7 @@ function ensureTrashOptions() {
     const option = document.createElement('option');
     option.value = 'trash';
     option.textContent = 'المهملات';
+    if (id === 'detail-status') option.disabled = true;
     select.append(option);
   }
 }
@@ -194,35 +195,10 @@ function syncQuickFilters() {
   document.querySelectorAll('.request-quick-filter').forEach((button) => {
     button.classList.toggle('is-active', button.dataset.status === value);
     button.setAttribute('aria-pressed', String(button.dataset.status === value));
+    const entry = quickFilters.find(([status]) => status === button.dataset.status);
+    const count = requestCache.filter(item => entry[0] === 'all' ? item.status !== 'trash' : item.status === entry[0]).length;
+    button.textContent = `${entry[1]} (${count})`;
   });
-}
-
-function matchesCurrentQuery(item) {
-  const query = $('request-search')?.value.trim().toLocaleLowerCase() || '';
-  if (!query) return true;
-  return [item.fullName, item.instagram, item.whatsapp, item.problem, item.goal, plainValue(item.editingType), item.lastSituation]
-    .join(' ').toLocaleLowerCase().includes(query);
-}
-
-function coreVisibleRequests() {
-  const status = $('status-filter')?.value || 'all';
-  return requestCache.filter(item => (status === 'all' || item.status === status) && matchesCurrentQuery(item));
-}
-
-async function refreshRequestCache(force = false) {
-  if (!force && requestCache.length && Date.now() - requestCacheAt < 1800) return requestCache;
-  const result = await listRequests();
-  requestCache = (Array.isArray(result) ? result : []).map(normalizeRequest);
-  requestCacheAt = Date.now();
-  return requestCache;
-}
-
-function setDialogRequest(row) {
-  const dialog = $('request-dialog');
-  if (!dialog || !row?.dataset.requestId) return;
-  dialog.dataset.requestId = row.dataset.requestId;
-  dialog.dataset.requestStatus = row.dataset.requestStatus || '';
-  syncTrashControls();
 }
 
 function addRowTrashActions(row, item) {
@@ -257,10 +233,9 @@ function enhanceRows() {
     row.dataset.uxEnhanced = 'true';
     row.classList.add('ux-clickable');
     row.tabIndex = 0;
-    row.setAttribute('role', 'button');
+    row.setAttribute('aria-label', `طلب ${row.querySelector('.person-name')?.textContent || ''}`);
     const open = () => row.querySelector('.row-open')?.click();
     row.addEventListener('click', (event) => {
-      setDialogRequest(row);
       if (event.target.closest('a,button,input,select,textarea,label')) return;
       open();
     });
@@ -268,53 +243,23 @@ function enhanceRows() {
       if (event.key !== 'Enter' && event.key !== ' ') return;
       if (event.target.closest('a,button,input,select,textarea,label')) return;
       event.preventDefault();
-      setDialogRequest(row);
       open();
     });
   });
 }
 
-async function syncRowsWithData(force = false) {
-  try {
-    await refreshRequestCache(force);
-  } catch {
-    return;
-  }
+function syncRowsWithData() {
+  requestCache = adminSnapshot().requests;
   ensureTrashOptions();
-  const status = $('status-filter')?.value || 'all';
-  const coreVisible = coreVisibleRequests();
-  const rows = [...document.querySelectorAll('#requests-body tr')];
-  rows.forEach((row, index) => {
-    const item = coreVisible[index];
-    if (!item) return;
-    row.dataset.requestId = item.id;
-    row.dataset.requestStatus = item.status;
-    row.hidden = status === 'all' && item.status === 'trash';
-    addRowTrashActions(row, item);
-  });
+  for (const row of document.querySelectorAll('#requests-body tr')) {
+    const item = requestCache.find(item => item.id === row.dataset.requestId);
+    if (item) addRowTrashActions(row, item);
+  }
   enhanceRows();
-
-  const active = requestCache.filter(item => item.status !== 'trash');
-  const trashed = requestCache.filter(item => item.status === 'trash');
-  const displayed = coreVisible.filter(item => !(status === 'all' && item.status === 'trash'));
-  if ($('stat-total')) $('stat-total').textContent = active.length;
-  if ($('request-count')) {
-    $('request-count').textContent = status === 'trash'
-      ? `${displayed.length} في المهملات من أصل ${trashed.length}`
-      : `${displayed.length} طلب ظاهر من أصل ${active.length}`;
-  }
-  if ($('requests-table-wrap')) $('requests-table-wrap').hidden = displayed.length === 0;
-  if ($('requests-empty')) $('requests-empty').hidden = displayed.length > 0;
-  if (!displayed.length && $('empty-title') && $('empty-description')) {
-    if (status === 'trash') {
-      $('empty-title').textContent = 'سلة المهملات فارغة.';
-      $('empty-description').textContent = 'الطلبات التي تحذفها تظهر هنا ويمكن استرجاعها قبل الحذف النهائي.';
-      if ($('empty-link')) $('empty-link').hidden = true;
-    } else if (status === 'all' && active.length === 0) {
-      $('empty-title').textContent = 'أول طلب، بداية جديدة.';
-      $('empty-description').textContent = 'عندما يرسل أحدهم الفورم، ستجد طلبه هنا لتراجعه قبل الحجز.';
-    }
-  }
+  syncQuickFilters();
+  syncTrashControls();
+  syncStatusShortcuts();
+  syncBulkSelection();
 }
 
 function scheduleRowsSync(force = false) {
@@ -435,6 +380,26 @@ function syncTrashControls() {
     : 'يمكن نقل الطلب إلى المهملات واسترجاعه لاحقًا.';
 }
 
+function confirmAction(message, permanent = false) {
+  if (document.getElementById('ux-confirm-dialog')) return Promise.resolve(false);
+  return new Promise(resolve => {
+    const dialog = document.createElement('dialog'); dialog.id = 'ux-confirm-dialog';
+    dialog.setAttribute('aria-labelledby', 'ux-confirm-title'); dialog.setAttribute('aria-describedby', 'ux-confirm-message');
+    const title = document.createElement('h2'); title.id = 'ux-confirm-title';
+    title.textContent = permanent ? 'تأكيد الحذف النهائي' : 'تأكيد الإجراء';
+    const copy = document.createElement('p'); copy.id = 'ux-confirm-message'; copy.textContent = message;
+    const actions = document.createElement('div'); actions.className = 'ux-confirm-actions';
+    const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'button secondary'; cancel.textContent = 'إلغاء';
+    const confirm = document.createElement('button'); confirm.type = 'button'; confirm.className = permanent ? 'button ux-delete-button' : 'button primary';
+    confirm.textContent = permanent ? 'نعم، احذف نهائيًا' : 'تأكيد';
+    const finish = result => { dialog.close(); dialog.remove(); resolve(result); };
+    cancel.addEventListener('click', () => finish(false)); confirm.addEventListener('click', () => finish(true));
+    dialog.addEventListener('cancel', event => { event.preventDefault(); finish(false); });
+    actions.append(cancel, confirm); dialog.append(title, copy, actions); document.body.append(dialog);
+    dialog.showModal(); cancel.focus();
+  });
+}
+
 async function runRequestAction(action, id, name, fromDialog = false) {
   if (!id || requestOperationBusy) {
     if (!id) showLocalToast('تعذّر تحديد الطلب. حدّث الصفحة وحاول مرة أخرى.');
@@ -445,9 +410,13 @@ async function runRequestAction(action, id, name, fromDialog = false) {
     restore: `استرجاع طلب ${name} من المهملات؟`,
     delete: `حذف طلب ${name} نهائيًا؟ لا يمكن التراجع عن هذا الإجراء.`
   };
-  if (!window.confirm(confirms[action])) return;
+  if (fromDialog && adminActions().isDetailDirty?.()) {
+    showLocalToast('احفظ الملاحظات ومراحل المتابعة أولًا، ثم أعد العملية.'); return;
+  }
+  if (!(await confirmAction(confirms[action], action === 'delete'))) return;
 
   requestOperationBusy = true;
+  document.querySelectorAll('#ux-trash-controls button, [data-ux-trash-action]').forEach(button => button.disabled = true);
   try {
     if (action === 'trash') await moveRequestToTrash(id);
     else if (action === 'restore') await restoreRequest(id);
@@ -460,14 +429,13 @@ async function runRequestAction(action, id, name, fromDialog = false) {
       delete: 'تم حذف الطلب نهائيًا.'
     };
     showLocalToast(messages[action]);
-    if (fromDialog && $('request-dialog')?.open) $('close-detail')?.click();
-    requestCacheAt = 0;
-    $('refresh-requests')?.click();
-    setTimeout(() => scheduleRowsSync(true), 280);
+    if (fromDialog && $('request-dialog')?.open) adminActions().close();
+    await adminActions().refresh();
   } catch (error) {
     showLocalToast(requestError(error));
   } finally {
     requestOperationBusy = false;
+    document.querySelectorAll('#ux-trash-controls button, [data-ux-trash-action]').forEach(button => button.disabled = false);
   }
 }
 
@@ -522,6 +490,91 @@ function mountMessageDialog() {
   });
 }
 
+const selectedRequests = new Set();
+let bulkBusy = false;
+function mountBulkActions() {
+  const head = document.querySelector('#requests-table-wrap thead tr');
+  if (!head || $('ux-select-all')) return;
+  const cell = document.createElement('th'); cell.className = 'ux-select-cell';
+  const all = document.createElement('input'); all.type = 'checkbox'; all.id = 'ux-select-all';
+  all.setAttribute('aria-label', 'تحديد كل الطلبات الظاهرة');
+  all.addEventListener('change', () => {
+    for (const row of document.querySelectorAll('#requests-body tr')) {
+      if (all.checked) selectedRequests.add(row.dataset.requestId);
+      else selectedRequests.delete(row.dataset.requestId);
+    }
+    syncBulkSelection();
+  });
+  cell.append(all); head.prepend(cell);
+  const bar = document.createElement('div'); bar.id = 'ux-bulk-bar'; bar.className = 'ux-bulk-bar'; bar.hidden = true;
+  bar.setAttribute('aria-label', 'إجراءات الطلبات المحددة');
+  bar.innerHTML = `<strong id="ux-bulk-count" role="status"></strong>
+    <button type="button" class="button secondary" data-bulk="accepted">قبول المحدد</button>
+    <button type="button" class="button secondary" data-bulk="archived">أرشفة المحدد</button>
+    <button type="button" class="button ux-trash-button" data-bulk="trash">نقل للمهملات</button>
+    <button type="button" class="button ux-restore-button" data-bulk="restore">استرجاع المحدد</button>
+    <button type="button" class="button ghost" data-bulk="clear">إلغاء التحديد</button>`;
+  $('requests-table-wrap').insertAdjacentElement('beforebegin', bar);
+  bar.addEventListener('click', event => {
+    const button = event.target.closest('[data-bulk]');
+    if (button) runBulkAction(button.dataset.bulk);
+  });
+}
+function syncBulkSelection() {
+  const rows = [...document.querySelectorAll('#requests-body tr')];
+  const visibleIds = new Set(rows.map(row => row.dataset.requestId));
+  for (const id of selectedRequests) if (!visibleIds.has(id)) selectedRequests.delete(id);
+  for (const row of rows) {
+    let check = row.querySelector('.ux-select-request');
+    if (!check) {
+      const cell = document.createElement('td'); cell.className = 'ux-select-cell';
+      check = document.createElement('input'); check.type = 'checkbox'; check.className = 'ux-select-request';
+      check.setAttribute('aria-label', `تحديد ${row.querySelector('.person-name')?.textContent || 'الطلب'}`);
+      check.addEventListener('change', () => {
+        if (check.checked) selectedRequests.add(row.dataset.requestId); else selectedRequests.delete(row.dataset.requestId);
+        syncBulkSelection();
+      });
+      cell.append(check); row.prepend(cell);
+    }
+    check.checked = selectedRequests.has(row.dataset.requestId); check.disabled = bulkBusy;
+    row.classList.toggle('ux-selected', check.checked);
+  }
+  const all = $('ux-select-all');
+  if (all) { all.checked = rows.length > 0 && selectedRequests.size === rows.length; all.indeterminate = selectedRequests.size > 0 && selectedRequests.size < rows.length; all.disabled = !rows.length || bulkBusy; }
+  const bar = $('ux-bulk-bar');
+  if (!bar) return;
+  bar.hidden = !selectedRequests.size;
+  $('ux-bulk-count').textContent = `${selectedRequests.size} طلب محدد`;
+  const isTrash = $('status-filter').value === 'trash';
+  bar.querySelectorAll('[data-bulk]').forEach(button => {
+    button.disabled = bulkBusy;
+    button.hidden = button.dataset.bulk === 'restore' ? !isTrash : isTrash && ['accepted','archived','trash'].includes(button.dataset.bulk);
+  });
+}
+async function runBulkAction(action) {
+  if (bulkBusy || requestOperationBusy) return;
+  if (action === 'clear') { selectedRequests.clear(); syncBulkSelection(); return; }
+  const ids = [...selectedRequests]; if (!ids.length) return;
+  const label = { accepted: 'قبول', archived: 'أرشفة', trash: 'نقل إلى المهملات', restore: 'استرجاع' }[action];
+  if (!label || !(await confirmAction(`${label}: ${ids.length} طلب محدد؟`))) return;
+  bulkBusy = true; requestOperationBusy = true; syncBulkSelection();
+  let succeeded = 0;
+  try {
+    for (const id of ids) {
+      if (action === 'trash') await moveRequestToTrash(id);
+      else if (action === 'restore') await restoreRequest(id);
+      else await updateRequest(id, { status: action });
+      succeeded++; selectedRequests.delete(id);
+    }
+    showLocalToast(`تمت العملية على ${succeeded} طلب.`);
+  } catch (error) {
+    showLocalToast(`اكتمل ${succeeded} من ${ids.length}. ${requestError(error)}`);
+  } finally {
+    bulkBusy = false; requestOperationBusy = false;
+    await adminActions().refresh(); syncBulkSelection();
+  }
+}
+
 function mount() {
   if (mounted) return;
   mounted = true;
@@ -531,6 +584,11 @@ function mount() {
   mountDetailTools();
   mountTrashControls();
   mountMessageDialog();
+  mountBulkActions();
+  subscribeAdmin((state, reason) => {
+    if (reason === 'logout') { selectedRequests.clear(); closeMessageDialog(); $('ux-message-text').value = ''; }
+    syncRowsWithData();
+  });
   enhanceRows();
   scheduleRowsSync(true);
 
@@ -540,22 +598,7 @@ function mount() {
     scheduleRowsSync();
   }).observe(body, { childList: true });
 
-  const requestDialog = $('request-dialog');
-  if (requestDialog) {
-    requestDialog.addEventListener('toggle', () => {
-      if (requestDialog.open) {
-        const hashId = currentDialogRequestId();
-        if (hashId && !requestDialog.dataset.requestId) requestDialog.dataset.requestId = hashId;
-        requestDialog.dataset.requestStatus = $('detail-status')?.value || requestDialog.dataset.requestStatus || '';
-        syncStatusShortcuts();
-        syncMessageSegments();
-        syncTrashControls();
-      } else {
-        delete requestDialog.dataset.requestId;
-        delete requestDialog.dataset.requestStatus;
-      }
-    });
-  }
+
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount, { once: true });

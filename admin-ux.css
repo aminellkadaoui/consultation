@@ -47,3 +47,17 @@
 .ux-message-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .ux-message-hint{font-size:12px;color:#8a93a2;margin:12px 0 0}
 @media(max-width:720px){.request-quick-filters{margin-inline:-2px;padding-bottom:10px}.ux-detail-tools{display:grid;grid-template-columns:1fr 1fr}.ux-detail-tools .button:first-child{grid-column:1/-1}.ux-trash-controls{align-items:stretch;flex-direction:column}.ux-trash-buttons{justify-content:stretch}.ux-trash-buttons .button{flex:1}.ux-message-card{padding:20px 16px}.ux-message-options{display:grid}.ux-segment{width:100%}.ux-segment button{flex:1}.ux-message-actions{display:grid;grid-template-columns:1fr 1fr}.ux-message-actions .button:first-child{grid-column:1/-1}}
+/* Selection controls follow the current consultation table and stay usable on touch. */
+.ux-select-cell{width:48px!important;padding:10px!important;text-align:center!important}
+.ux-select-cell input{width:20px;height:20px;accent-color:#0f6bff;cursor:pointer;vertical-align:middle}
+#requests-body tr.ux-selected{background:#eef4ff}
+.ux-bulk-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:14px;margin-bottom:16px;border:1px solid #cbdcff;background:#f4f8ff;border-radius:16px;position:sticky;top:78px;z-index:5}
+.ux-bulk-bar strong{margin-inline-end:auto;font-size:14px}.ux-bulk-bar .button{font-size:13px;min-height:40px}
+.ux-row-action{min-height:36px;min-width:42px;font-size:12px}
+.request-quick-filter{min-height:42px}
+[hidden]{display:none!important}
+@media(max-width:720px){.ux-bulk-bar{top:68px;padding:12px;gap:6px}.ux-bulk-bar strong{width:100%}.ux-bulk-bar .button{flex:1;min-width:100px;min-height:44px}.ux-row-action{min-height:44px}.ux-select-cell{min-width:44px}.request-quick-filter{min-height:44px}}
+
+#ux-confirm-dialog{width:min(460px,calc(100vw - 32px));border:1px solid #e1e6ef;border-radius:22px;padding:24px;background:white;color:#172033;box-shadow:0 24px 70px #17203333}
+#ux-confirm-dialog::backdrop{background:#17203366;backdrop-filter:blur(3px)}
+#ux-confirm-dialog h2{font-size:21px;margin:0 0 12px}#ux-confirm-dialog p{font-size:15px;line-height:1.9;margin:0 0 22px}.ux-confirm-actions{display:flex;gap:10px;justify-content:flex-end}.ux-confirm-actions button{min-height:44px}

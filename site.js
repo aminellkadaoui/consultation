@@ -1,6 +1,6 @@
 import { makeHeroMedia } from './video-preview.js?v=flow-1';
 import { translate } from './translations.js?v=sentence-2';
-import { loadSettings, submitRequest, REQUEST_LIMITS } from './data.js?v=sentence-2';
+import { loadSettings, submitRequest, REQUEST_LIMITS } from './data.js?v=admin-3';
 import { normalizeWhatsapp, validWhatsapp, normalizeInstagram, validInstagram, safeUrl, mediaSource } from './public-utils.js';
 const $=id=>document.getElementById(id);
 const base=window.CONSULTATION_CONFIG||{};

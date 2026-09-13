@@ -2,7 +2,7 @@ import {
   loadProgress,
   normalizeProgressStages,
   submitTrackedRequest
-} from '../progress-data.js?v=progress-2';
+} from '../progress-data.js?v=progress-3';
 import {
   normalizeWhatsapp,
   validWhatsapp,
