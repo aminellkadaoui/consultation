@@ -29,9 +29,9 @@ if (/(?:^|\/)admin\.html$/.test(location.pathname)) {
 
   const adminUxStyles = document.createElement('link');
   adminUxStyles.rel = 'stylesheet';
-  adminUxStyles.href = './admin-ux.css?v=archive-ux-1';
+  adminUxStyles.href = './admin-ux.css?v=archive-ux-2';
   document.head.append(adminUxStyles);
-  import('./admin-ux.js?v=archive-ux-1').catch((error) => {
+  import('./admin-ux.js?v=archive-ux-2').catch((error) => {
     console.error('Admin UX extension failed:', error);
   });
 }
