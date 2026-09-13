@@ -3,6 +3,7 @@ const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
 const APP_NAME = 'consultation';
 const REQUESTS = 'consultation_requests';
 const SETTINGS = 'consultation_settings';
+const PROGRESS = 'consultation_progress';
 const DEFAULT_FIREBASE = Object.freeze({
   apiKey: 'AIzaSyAou6PxuGGpDSNnmZ1ja4eMYIke3OR_sXY',
   authDomain: 'elite-editor-9fe62.firebaseapp.com',
@@ -19,8 +20,9 @@ export const REQUEST_LIMITS = Object.freeze({
   approach: 2000, obstacle: 2000, sessionOutcome: 2000
 });
 export const REQUEST_STATUSES = Object.freeze([
-  'new', 'reviewing', 'accepted', 'scheduled', 'completed', 'archived'
+  'new', 'reviewing', 'accepted', 'scheduled', 'completed', 'archived', 'trash'
 ]);
+const RESTORABLE_REQUEST_STATUSES = Object.freeze(REQUEST_STATUSES.filter(status => status !== 'trash'));
 const SETTINGS_DEFAULTS = Object.freeze({
   brand: 'أمين',
   headline: 'تعمل كإديتور، لكنك محتار على ماذا تركز الآن؟',
@@ -52,6 +54,11 @@ function textValue(value, name, max, required = true) {
     throw invalid(`راجع الحقل ${name}؛ الحد الأقصى ${max} حرفًا.`);
   }
   return text;
+}
+
+function validRequestId(id) {
+  if (typeof id !== 'string' || !id || id.includes('/')) throw invalid('معرّف الطلب غير صالح.');
+  return id;
 }
 
 async function ensureFirebase() {
@@ -148,7 +155,7 @@ export async function listRequests() {
 }
 
 export async function updateRequest(id, fields) {
-  if (typeof id !== 'string' || !id || id.includes('/')) throw invalid('معرّف الطلب غير صالح.');
+  validRequestId(id);
   const changes = {};
   for (const key of Object.keys(fields || {})) {
     if (!['status', 'privateNotes'].includes(key)) throw invalid('يمكن تعديل الحالة والملاحظات فقط.');
@@ -165,6 +172,65 @@ export async function updateRequest(id, fields) {
   ensureAdminSession(auth);
   await dbSDK.updateDoc(dbSDK.doc(db, REQUESTS, id), { ...changes, updatedAt: dbSDK.serverTimestamp() });
   return { id, ...changes };
+}
+
+export async function moveRequestToTrash(id) {
+  validRequestId(id);
+  const { dbSDK, db, auth } = await ensureFirebase();
+  ensureAdminSession(auth);
+  const ref = dbSDK.doc(db, REQUESTS, id);
+  await dbSDK.runTransaction(db, async transaction => {
+    const snapshot = await transaction.get(ref);
+    if (!snapshot.exists()) throw invalid('الطلب غير موجود.');
+    const data = snapshot.data();
+    if (data.status === 'trash') return;
+    const previous = RESTORABLE_REQUEST_STATUSES.includes(data.status) ? data.status : 'new';
+    transaction.update(ref, {
+      status: 'trash',
+      trashPreviousStatus: previous,
+      updatedAt: dbSDK.serverTimestamp()
+    });
+  });
+  return { id, status: 'trash' };
+}
+
+export async function restoreRequest(id) {
+  validRequestId(id);
+  const { dbSDK, db, auth } = await ensureFirebase();
+  ensureAdminSession(auth);
+  const ref = dbSDK.doc(db, REQUESTS, id);
+  let restoredStatus = 'new';
+  await dbSDK.runTransaction(db, async transaction => {
+    const snapshot = await transaction.get(ref);
+    if (!snapshot.exists()) throw invalid('الطلب غير موجود.');
+    const data = snapshot.data();
+    if (data.status !== 'trash') return;
+    restoredStatus = RESTORABLE_REQUEST_STATUSES.includes(data.trashPreviousStatus)
+      ? data.trashPreviousStatus : 'new';
+    transaction.update(ref, {
+      status: restoredStatus,
+      trashPreviousStatus: dbSDK.deleteField(),
+      updatedAt: dbSDK.serverTimestamp()
+    });
+  });
+  return { id, status: restoredStatus };
+}
+
+export async function deleteRequest(id) {
+  validRequestId(id);
+  const { dbSDK, db, auth } = await ensureFirebase();
+  ensureAdminSession(auth);
+  const requestRef = dbSDK.doc(db, REQUESTS, id);
+  const snapshot = await dbSDK.getDocFromServer(requestRef);
+  if (!snapshot.exists()) return { id, deleted: true };
+  const data = snapshot.data();
+  if (data.status !== 'trash') throw invalid('انقل الطلب إلى المهملات قبل الحذف النهائي.');
+  const batch = dbSDK.writeBatch(db);
+  batch.delete(requestRef);
+  const token = typeof data.trackingToken === 'string' ? data.trackingToken.trim() : '';
+  if (/^[A-Za-z0-9_-]{32,128}$/.test(token)) batch.delete(dbSDK.doc(db, PROGRESS, token));
+  await batch.commit();
+  return { id, deleted: true };
 }
 
 export async function loadSettings() {
@@ -231,5 +297,6 @@ export async function saveSettings(changes) {
 
 globalThis.ConsultationData = Object.freeze({
   login, logout, onAuth, getCurrentUser, submitRequest, listRequests,
-  updateRequest, loadSettings, saveSettings, REQUEST_LIMITS, REQUEST_STATUSES
+  updateRequest, moveRequestToTrash, restoreRequest, deleteRequest,
+  loadSettings, saveSettings, REQUEST_LIMITS, REQUEST_STATUSES
 });
