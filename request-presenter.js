@@ -1,5 +1,5 @@
 // All returned content is plain text. The admin renders it with textContent.
-export const statusLabels = Object.freeze({new:'جديد',reviewing:'قيد المراجعة',accepted:'مقبول',scheduled:'موعد محدد',completed:'مكتمل',archived:'مؤرشف'});
+export const statusLabels = Object.freeze({new:'جديد',reviewing:'قيد المراجعة',accepted:'مقبول',scheduled:'موعد محدد',completed:'مكتمل',archived:'مؤرشف',trash:'المهملات'});
 export const requestFieldList = Object.freeze([
   ['fullName','الاسم الكامل'],['whatsapp','رقم الواتساب'],['instagram','حساب Instagram'],
   ['experience','المدة في المونتاج'],['clientCount','عدد العملاء'],['editingType','نوع المونتاج'],
