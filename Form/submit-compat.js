@@ -63,6 +63,16 @@ document.addEventListener('submit', async (event) => {
   event.stopImmediatePropagation();
   if (submitting) return;
 
+  const missing = [...lastStep.querySelectorAll('input[required], textarea[required]')]
+    .find(input => !input.disabled && (!input.value.trim() || !input.checkValidity()));
+  if (missing) {
+    showError('أكمل هذا الحقل حتى أفهم حالتك.');
+    missing.setAttribute('aria-invalid', 'true');
+    missing.setAttribute('aria-describedby', 'formError');
+    missing.focus();
+    return;
+  }
+
   const next = $('nextStep');
   const previous = $('previousStep');
   submitting = true;

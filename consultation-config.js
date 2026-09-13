@@ -62,7 +62,7 @@ if (/\/Form\/(?:index\.html)?$/.test(location.pathname)) {
     console.error('Phone country picker failed:', error);
   });
 
-  import('./Form/submit-compat.js?v=form-admin-1').catch((error) => {
+  import('./Form/submit-compat.js?v=form-admin-2').catch((error) => {
     console.error('Form compatibility layer failed:', error);
   });
 }
