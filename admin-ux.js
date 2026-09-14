@@ -107,13 +107,15 @@ function showLocalToast(message) {
   if (existing) existing.remove();
   const toast = document.createElement('div');
   toast.id = 'ux-local-toast';
+  toast.setAttribute('role', 'status');
   toast.textContent = message;
   Object.assign(toast.style, {
     position: 'fixed', left: '50%', bottom: '22px', transform: 'translateX(-50%)',
     zIndex: '9999', background: '#111827', color: '#fff', padding: '10px 16px',
-    borderRadius: '999px', fontSize: '13px', boxShadow: '0 12px 30px rgba(15,23,42,.2)'
+    borderRadius: '16px', fontSize: '13px', maxWidth: 'calc(100vw - 40px)', width: 'max-content', boxShadow: '0 12px 30px rgba(15,23,42,.2)'
   });
-  document.body.append(toast);
+  const openDialogs = [...document.querySelectorAll('dialog[open]')];
+  (openDialogs.at(-1) || document.body).append(toast);
   setTimeout(() => toast.remove(), 2600);
 }
 
