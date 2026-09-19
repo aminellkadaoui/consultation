@@ -10,7 +10,7 @@ window.CONSULTATION_CONFIG = {
     messagingSenderId: '705152552088', appId: '1:705152552088:web:c9b082ee8d5f0a1565d4ed', databaseId: 'default',
     // Public Web Push certificate key from Firebase Console > Cloud Messaging > Web configuration.
     // This is intentionally public and is not an FCM server credential.
-    vapidKey: ''
+    vapidKey: 'BITwgU-dtq183i8b8q07Ei4VzdLkv2zgjanv-2GVKfu2T3-rfHfN3h9qpb4sfPs6kcgNWZ96xZHMGHk3AbynVp8'
   }
 };
 
