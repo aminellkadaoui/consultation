@@ -1,0 +1,134 @@
+#trackingView {
+  width: min(820px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.tracking-card {
+  background: #fff;
+  border: 1px solid #dce6f4;
+  border-radius: 28px;
+  padding: clamp(28px, 5vw, 56px);
+}
+
+.tracking-head {
+  margin-bottom: 34px;
+}
+
+.tracking-head h2 {
+  margin: 0;
+  color: #0d0d0d;
+  font-size: clamp(32px, 4vw, 46px);
+  line-height: 1.2;
+  letter-spacing: -.025em;
+}
+
+.tracking-head p {
+  margin: 10px 0 0;
+  color: #718096;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.client-stages {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.client-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  gap: 18px;
+  min-height: 110px;
+}
+
+.client-stage:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  right: 28px;
+  top: 56px;
+  bottom: -4px;
+  width: 2px;
+  background: #e1e8f2;
+}
+
+.stage-dot {
+  position: relative;
+  z-index: 1;
+  width: 58px;
+  height: 58px;
+  border-radius: 999px;
+  border: 1px solid #d6e0ec;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  color: #9aabc0;
+  font-size: 20px;
+}
+
+.client-stage.completed .stage-dot {
+  color: #18a957;
+  border-color: #b9e6c8;
+  background: #effaf3;
+}
+
+.client-stage.current .stage-dot {
+  color: #0f6bff;
+  border-color: #bfd6ff;
+  background: #f2f7ff;
+}
+
+.client-stage.current .stage-copy h3 {
+  color: #0f6bff;
+}
+
+.client-stage.completed:not(:last-child)::before {
+  background: linear-gradient(#a9dfbb 0 45%, #e1e8f2 45%);
+}
+
+.stage-copy {
+  padding: 7px 0 28px;
+}
+
+.stage-copy h3 {
+  margin: 0 0 7px;
+  font-size: clamp(20px, 2.2vw, 25px);
+  line-height: 1.4;
+}
+
+.stage-copy p {
+  margin: 0;
+  color: #77859a;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+
+@media (max-width:640px) {
+  #trackingView {
+    width: min(100% - 24px, 820px);
+  }
+  .tracking-card {
+    border-radius: 22px;
+    padding: 28px 20px;
+  }
+  .client-stage {
+    grid-template-columns: 48px 1fr;
+    gap: 14px;
+    min-height: 104px;
+  }
+  .stage-dot {
+    width: 48px;
+    height: 48px;
+  }
+  .client-stage:not(:last-child)::before {
+    right: 23px;
+    top: 48px;
+  }
+}
+
+.consultation-form.is-submitted #formView { display: none; }
+.consultation-form #trackingView { width: 100%; max-width: var(--width-medium, 780px); }
+.consultation-form .form-loading { text-align: center; color: #64748b; }
+.consultation-form .tracking-head:focus { outline: none; }

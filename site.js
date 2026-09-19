@@ -1,23 +1,24 @@
 import { makeHeroMedia } from './video-preview.js?v=flow-1';
 import { translate } from './translations.js?v=sentence-2';
-import { loadSettings, submitRequest, REQUEST_LIMITS } from './data.js?v=admin-3';
-import { normalizeWhatsapp, validWhatsapp, normalizeInstagram, validInstagram, safeUrl, mediaSource } from './public-utils.js';
+import { loadSettings } from './data.js?v=admin-3';
+import { mountConsultationForm } from './Form/component.js?v=shared-form-1';
+import { safeUrl, mediaSource } from './public-utils.js';
 const $=id=>document.getElementById(id);
 const base=window.CONSULTATION_CONFIG||{};
 let settings={...base};
-let currentStep=0,busy=false;
-let language='ar',activeError='';
+let formController = null;
+let language='ar';
 try {const stored=localStorage.getItem('consultationLanguage');if(stored==='darija')language=stored;}catch{}
 const t=text=>translate(text,language);
 const staticText=[];
 const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
 while(walker.nextNode()) {
   const item=walker.currentNode;
-  if(!item.parentElement.closest('script,style,#headline,#subheadline,#stepLabel,#nextStep,#formError,#waRow,.sentence-value')&&/[\u0600-\u06ff]/.test(item.textContent))staticText.push([item,item.textContent]);
+  if(!item.parentElement.closest('script,style,#apply,#headline,#subheadline,#stepLabel,#nextStep,#formError,#waRow,.sentence-value')&&/[\u0600-\u06ff]/.test(item.textContent))staticText.push([item,item.textContent]);
 }
 const staticAttributes=[];
 for(const el of document.querySelectorAll('[placeholder],[aria-label]')) {
-  if(el.closest('#langSeg,#waRow'))continue;
+  if(el.closest('#langSeg,#waRow,#apply'))continue;
   for(const attr of ['placeholder','aria-label'])if(el.hasAttribute(attr))staticAttributes.push([el,attr,el.getAttribute(attr)]);
 }
 function renderHeading(config) {
@@ -30,11 +31,6 @@ function renderHeading(config) {
   document.title=t('استشارة للإديتورز')+' | '+(config.brand||base.brand);
   document.querySelector('meta[name="description"]').content=t(config.subheadline||base.subheadline);
 }
-function renderNextButton(){
-  if(busy){$('nextStep').textContent=t('جارٍ إرسال طلبك…');return;}
-  $('nextStep').replaceChildren(document.createTextNode(t(currentStep===4?'أرسل طلب الاستشارة':'التالي')+' '));
-  const arrow=node('span','','←');arrow.setAttribute('aria-hidden','true');$('nextStep').append(arrow);
-}
 function applyLanguage(nextLanguage,persist=false) {
   language=nextLanguage==='darija'?'darija':'ar';
   document.documentElement.lang=language==='darija'?'ar-MA':'ar';
@@ -43,15 +39,10 @@ function applyLanguage(nextLanguage,persist=false) {
   for(const [textNode,source] of staticText)if(textNode.isConnected)textNode.textContent=t(source);
   for(const [el,attr,source] of staticAttributes)if(el.isConnected)el.setAttribute(attr,t(source));
   renderHeading(settings);
-  $('stepLabel').textContent=t(stepNames[currentStep]);renderNextButton();
-  if(activeError)$('formError').textContent=t(activeError);
+  formController?.setLanguage(language);
   document.querySelectorAll('#videoContent>a,.wa>a').forEach(el=>el.textContent=t('شاهد الفيديو ↗'));
-  updateSentencePreviews();
   if(persist)try{localStorage.setItem('consultationLanguage',language);}catch{}
 }
-const stepNames=['معلوماتك','وضعك الحالي','مشكلتك الأساسية','هدفك والعائق','ماذا تريد من الجلسة؟'];
-const form=$('intakeForm');
-const fieldsets=[...form.querySelectorAll('fieldset')];
 function node(tag,className,text){const el=document.createElement(tag);if(className)el.className=className;if(text!==undefined)el.textContent=text;return el;}
 function makeMedia(url,title,poster='') {
   const source=mediaSource(url);if(!source)return null;
@@ -95,70 +86,7 @@ function renderReviews(reviews){
 }
 // Original reference accordion behavior, with keyboard/assistive-technology state.
 document.querySelectorAll('.faq-q').forEach(q=>q.addEventListener('click',()=>{const open=q.parentElement.classList.toggle('open');q.setAttribute('aria-expanded',String(open));document.getElementById(q.getAttribute('aria-controls')).inert=!open;}));
-function error(message,field){activeError=message;$('formError').textContent=t(message);$('formError').hidden=false;if(field){field.setAttribute('aria-invalid','true');field.setAttribute('aria-describedby','formError');field.focus();}}
-function showStep(index,focus=true){currentStep=index;fieldsets.forEach((f,i)=>f.hidden=i!==index);$('stepLabel').textContent=t(stepNames[index]);$('stepCounter').innerHTML=String(index+1).padStart(2,'0')+' <span>/ 05</span>';$('previousStep').hidden=index===0;renderNextButton();document.querySelectorAll('.progress-bars i').forEach((el,i)=>el.classList.toggle('active',i<=index));$('formError').hidden=true;activeError='';if(focus){const first=fieldsets[index].querySelector('input:not(:disabled),textarea');first.focus({preventScroll:true});$('formArea').scrollIntoView({block:'start',behavior:'auto'});}}
-const choiceKeys=['experience','clientCount','editingType','problem','goal','obstacle'];
-function selectedValue(key){
-  const group=form.querySelector(`[data-field="${key}"]`);
-  if(!group)return $(key)?.value.trim()||'';
-  const values=[...group.querySelectorAll('.choice-input:checked')].map(input=>input.value==='__other__'?$(key+'Other').value.trim():input.value).filter(Boolean);
-  return group.dataset.multiple==='true'?values:(values[0]||'');
-}
-function updateSentencePreviews(){
-  document.querySelectorAll('[data-answer-preview]').forEach(preview=>{
-    const key=preview.dataset.answerPreview,group=form.querySelector(`[data-field="${key}"]`);
-    const display=group?[...group.querySelectorAll('.choice-input:checked')].map(input=>input.value==='__other__'?$(key+'Other').value.trim():t(input.value)).filter(Boolean).join(' و'):($(key)?.value.trim()||'');
-    const answer=key==='sessionOutcome'?display.replace(/^(?:أعرف|اعرف|نعرف)\s+/,''):display;
-    preview.textContent=answer||'['+t(preview.dataset.empty)+']';
-  });
-}
-function validateStep(index,report=true){
-  const step=fieldsets[index];
-  function reject(message,field){if(report)error(message,field);return false;}
-  for(const group of step.querySelectorAll('.choice-field')){
-    const checked=[...group.querySelectorAll('.choice-input:checked')];
-    if(!checked.length){if(report)group.setAttribute('aria-invalid','true');return reject('اختر إجابة للمتابعة.',group.querySelector('input'));}
-    if(checked.some(input=>input.value==='__other__')&&!$(group.dataset.field+'Other').value.trim())return reject('اكتب إجابتك في «أخرى».',$(group.dataset.field+'Other'));
-  }
-  for(const input of step.querySelectorAll('input:not(.choice-input):enabled,textarea:enabled')){
-    const value=input.value.trim();
-    if(input.required&&!value)return reject('أكمل هذا الحقل حتى أفهم حالتك.',input);
-    if(input.id==='whatsapp'&&!validWhatsapp(value))return reject('اكتب رقم واتساب صحيحًا مع رمز الدولة، مثل +212612345678.',input);
-    if(input.id==='instagram'&&!validInstagram(value))return reject('اكتب اسم مستخدم Instagram صحيحًا أو رابط حسابك.',input);
-    if(!input.checkValidity())return reject('راجع الإجابة في هذا الحقل وطولها.',input);
-  }
-  return true;
-}
-function collectRequest(){
-  const result={};
-  for(const key of ['fullName','whatsapp','instagram','lastSituation','approach','sessionOutcome'])result[key]=$(key).value.trim();
-  for(const key of choiceKeys)result[key]=selectedValue(key);
-  result.whatsapp=normalizeWhatsapp(result.whatsapp);result.instagram='@'+normalizeInstagram(result.instagram);
-  return result;
-}
-form.addEventListener('change',event=>{
-  if(!event.target.matches('.choice-input'))return;
-  const group=event.target.closest('.choice-field');
-  const otherSelected=[...group.querySelectorAll('.choice-input:checked')].some(input=>input.value==='__other__');
-  group.querySelector('.other-answer').hidden=!otherSelected;
-  $(group.dataset.field+'Other').disabled=!otherSelected;
-  group.removeAttribute('aria-invalid');
-  $('formError').hidden=true;activeError='';
-  updateSentencePreviews();
-  if(event.target.value==='__other__'&&event.target.checked)$(group.dataset.field+'Other').focus({preventScroll:true});
-});
-form.addEventListener('input',updateSentencePreviews);
-for(const [key,max] of Object.entries(REQUEST_LIMITS)){if($(key))$(key).maxLength=max;}
-form.addEventListener('input',e=>{if(e.target.matches('input,textarea')){e.target.removeAttribute('aria-invalid');e.target.removeAttribute('aria-describedby');$('formError').hidden=true;activeError='';}});
-$('previousStep').addEventListener('click',()=>{if(!busy)showStep(currentStep-1);});
-form.addEventListener('submit',async e=>{e.preventDefault();if(busy||!validateStep(currentStep))return;if(currentStep<4){showStep(currentStep+1);return;}
-  for(let i=0;i<fieldsets.length;i++){if(!validateStep(i,false)){showStep(i,false);validateStep(i);return;}}
-  const data=collectRequest();
-  busy=true;$('nextStep').disabled=true;$('previousStep').disabled=true;form.setAttribute('aria-busy','true');renderNextButton();
-  try{const receipt=await submitRequest(data);$('formArea').hidden=true;$('requestReference').textContent=receipt.id;$('formSuccess').hidden=false;$('formSuccess').focus();form.reset();}
-  catch(err){console.error('Consultation request failed:',err.code||err.message);error(err.code==='consultation/offline'?'أنت غير متصل بالإنترنت. إجاباتك ما زالت هنا؛ اتصل ثم حاول مجددًا.':'تعذّر إرسال الطلب الآن. لم يتم تأكيد استلامه، وإجاباتك ما زالت هنا. حاول مجددًا بعد قليل.');}
-  finally{busy=false;$('nextStep').disabled=false;$('previousStep').disabled=false;form.removeAttribute('aria-busy');renderNextButton();}
-});
 document.querySelectorAll('#langSeg button').forEach(button=>button.addEventListener('click',()=>applyLanguage(button.dataset.lang,true)));
-$('year').textContent=new Date().getFullYear();renderSettings(settings);showStep(0,false);applyLanguage(language);
+$('year').textContent=new Date().getFullYear();renderSettings(settings);applyLanguage(language);
+mountConsultationForm($('apply'), { language }).then(controller => { formController = controller; controller.setLanguage(language); }).catch(console.error);
 loadSettings().then(remote=>{if(remote){settings={...base,...remote};renderSettings(settings);}}).catch(err=>console.warn('Using published default consultation content:',err.code||'unavailable'));

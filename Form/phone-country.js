@@ -28,18 +28,19 @@ function fullNumber(code, value) {
   return normalizeWhatsapp(code + digits);
 }
 
-function setupPhoneCountryPicker() {
-  const original = document.getElementById('whatsapp');
+export function setupPhoneCountryPicker(root = document) {
+  const original = root.querySelector('#whatsapp');
   if (!original || original.dataset.countryPickerReady === 'true') return false;
   original.dataset.countryPickerReady = 'true';
 
-  const label = document.querySelector('label[for="whatsapp"]');
+  const label = root.querySelector('label[for="whatsapp"]');
   if (label) label.htmlFor = 'whatsappLocal';
   const hint = original.parentElement?.querySelector('.field-hint');
   if (hint) hint.textContent = 'اختر رمز الدولة ثم اكتب رقم الواتساب.';
 
   const initial = COUNTRIES[0];
   original.type = 'hidden';
+  original.required = false;
   original.dataset.countryCode = initial.code;
   original.value = '';
 
@@ -94,7 +95,7 @@ function setupPhoneCountryPicker() {
   }
 
   function syncHidden() {
-    original.value = fullNumber(original.dataset.countryCode || initial.code, local.value);
+    original.value = local.value.trim() ? fullNumber(original.dataset.countryCode || initial.code, local.value) : '';
     original.dispatchEvent(new Event('input', { bubbles: true }));
   }
 
@@ -157,9 +158,3 @@ function setupPhoneCountryPicker() {
   syncHidden();
   return true;
 }
-
-const observer = new MutationObserver(() => {
-  if (setupPhoneCountryPicker()) observer.disconnect();
-});
-observer.observe(document.documentElement, { childList: true, subtree: true });
-setupPhoneCountryPicker();

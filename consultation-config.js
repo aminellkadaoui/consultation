@@ -35,34 +35,3 @@ if (/(?:^|\/)admin\.html$/.test(location.pathname)) {
     console.error('Admin UX extension failed:', error);
   });
 }
-
-if (/\/Form\/(?:index\.html)?$/.test(location.pathname)) {
-  const phoneStyles = document.createElement('link');
-  phoneStyles.rel = 'stylesheet';
-  phoneStyles.href = './phone-country.css?v=phone-1';
-  document.head.append(phoneStyles);
-
-  const adjustFirstStep = () => {
-    const firstStep = document.querySelector('#intakeForm fieldset[data-step="0"]');
-    if (!firstStep) return false;
-    const legend = firstStep.querySelector('legend');
-    if (legend) legend.textContent = 'المعلومات الاساسية';
-    firstStep.querySelector('.field-intro')?.remove();
-    return true;
-  };
-
-  if (!adjustFirstStep()) {
-    const observer = new MutationObserver(() => {
-      if (adjustFirstStep()) observer.disconnect();
-    });
-    observer.observe(document.documentElement, { childList: true, subtree: true });
-  }
-
-  import('./Form/phone-country.js?v=phone-1').catch((error) => {
-    console.error('Phone country picker failed:', error);
-  });
-
-  import('./Form/submit-compat.js?v=form-admin-2').catch((error) => {
-    console.error('Form compatibility layer failed:', error);
-  });
-}
