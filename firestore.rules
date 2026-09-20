@@ -280,13 +280,129 @@ service cloud.firestore {
       );
     }
 
+    function validPageListText(items, i) {
+      return items.size() <= i || consultationText(items[i], 1, 1000);
+    }
+    function validPagePair(items, i, first, second) {
+      return items.size() <= i || (items[i] is map
+        && items[i].keys().hasAll([first, second]) && items[i].keys().hasOnly([first, second])
+        && consultationText(items[i][first], 1, 240) && consultationText(items[i][second], 1, 3000));
+    }
+    function validPageContent(p) {
+      return p is map
+        && p.keys().hasAll(['visibility', 'ctaLabel', 'headlineAccent', 'navProcess', 'navScope', 'navFaq', 'processTitle', 'reviewsTitle', 'faqTitle', 'applyTitle', 'footerLabel', 'includedTitle', 'excludedTitle', 'processSteps', 'includedItems', 'excludedItems', 'faqs'])
+        && p.keys().hasOnly(['visibility', 'ctaLabel', 'headlineAccent', 'navProcess', 'navScope', 'navFaq', 'processTitle', 'reviewsTitle', 'faqTitle', 'applyTitle', 'footerLabel', 'includedTitle', 'excludedTitle', 'processSteps', 'includedItems', 'excludedItems', 'faqs'])
+        && p.visibility is map
+        && p.visibility.keys().hasAll(['navigation', 'hero', 'video', 'cta', 'testimonials', 'process', 'scope', 'apply', 'faq', 'footer'])
+        && p.visibility.keys().hasOnly(['navigation', 'hero', 'video', 'cta', 'testimonials', 'process', 'scope', 'apply', 'faq', 'footer'])
+        && p.visibility.navigation is bool
+        && p.visibility.hero is bool
+        && p.visibility.video is bool
+        && p.visibility.cta is bool
+        && p.visibility.testimonials is bool
+        && p.visibility.process is bool
+        && p.visibility.scope is bool
+        && p.visibility.apply is bool
+        && p.visibility.faq is bool
+        && p.visibility.footer is bool
+        && consultationText(p.ctaLabel, 1, 80)
+        && consultationText(p.headlineAccent, 0, 240)
+        && consultationText(p.navProcess, 0, 240)
+        && consultationText(p.navScope, 0, 240)
+        && consultationText(p.navFaq, 0, 240)
+        && consultationText(p.processTitle, 0, 240)
+        && consultationText(p.reviewsTitle, 0, 240)
+        && consultationText(p.faqTitle, 0, 240)
+        && consultationText(p.applyTitle, 0, 240)
+        && consultationText(p.footerLabel, 0, 240)
+        && consultationText(p.includedTitle, 0, 240)
+        && consultationText(p.excludedTitle, 0, 240)
+        && p.processSteps is list
+        && p.processSteps.size() <= 8
+        && validPagePair(p.processSteps, 0, 'title', 'body')
+        && validPagePair(p.processSteps, 1, 'title', 'body')
+        && validPagePair(p.processSteps, 2, 'title', 'body')
+        && validPagePair(p.processSteps, 3, 'title', 'body')
+        && validPagePair(p.processSteps, 4, 'title', 'body')
+        && validPagePair(p.processSteps, 5, 'title', 'body')
+        && validPagePair(p.processSteps, 6, 'title', 'body')
+        && validPagePair(p.processSteps, 7, 'title', 'body')
+        && p.faqs is list
+        && p.faqs.size() <= 20
+        && validPagePair(p.faqs, 0, 'question', 'answer')
+        && validPagePair(p.faqs, 1, 'question', 'answer')
+        && validPagePair(p.faqs, 2, 'question', 'answer')
+        && validPagePair(p.faqs, 3, 'question', 'answer')
+        && validPagePair(p.faqs, 4, 'question', 'answer')
+        && validPagePair(p.faqs, 5, 'question', 'answer')
+        && validPagePair(p.faqs, 6, 'question', 'answer')
+        && validPagePair(p.faqs, 7, 'question', 'answer')
+        && validPagePair(p.faqs, 8, 'question', 'answer')
+        && validPagePair(p.faqs, 9, 'question', 'answer')
+        && validPagePair(p.faqs, 10, 'question', 'answer')
+        && validPagePair(p.faqs, 11, 'question', 'answer')
+        && validPagePair(p.faqs, 12, 'question', 'answer')
+        && validPagePair(p.faqs, 13, 'question', 'answer')
+        && validPagePair(p.faqs, 14, 'question', 'answer')
+        && validPagePair(p.faqs, 15, 'question', 'answer')
+        && validPagePair(p.faqs, 16, 'question', 'answer')
+        && validPagePair(p.faqs, 17, 'question', 'answer')
+        && validPagePair(p.faqs, 18, 'question', 'answer')
+        && validPagePair(p.faqs, 19, 'question', 'answer')
+        && p.includedItems is list
+        && p.includedItems.size() <= 20
+        && validPageListText(p.includedItems, 0)
+        && validPageListText(p.includedItems, 1)
+        && validPageListText(p.includedItems, 2)
+        && validPageListText(p.includedItems, 3)
+        && validPageListText(p.includedItems, 4)
+        && validPageListText(p.includedItems, 5)
+        && validPageListText(p.includedItems, 6)
+        && validPageListText(p.includedItems, 7)
+        && validPageListText(p.includedItems, 8)
+        && validPageListText(p.includedItems, 9)
+        && validPageListText(p.includedItems, 10)
+        && validPageListText(p.includedItems, 11)
+        && validPageListText(p.includedItems, 12)
+        && validPageListText(p.includedItems, 13)
+        && validPageListText(p.includedItems, 14)
+        && validPageListText(p.includedItems, 15)
+        && validPageListText(p.includedItems, 16)
+        && validPageListText(p.includedItems, 17)
+        && validPageListText(p.includedItems, 18)
+        && validPageListText(p.includedItems, 19)
+        && p.excludedItems is list
+        && p.excludedItems.size() <= 20
+        && validPageListText(p.excludedItems, 0)
+        && validPageListText(p.excludedItems, 1)
+        && validPageListText(p.excludedItems, 2)
+        && validPageListText(p.excludedItems, 3)
+        && validPageListText(p.excludedItems, 4)
+        && validPageListText(p.excludedItems, 5)
+        && validPageListText(p.excludedItems, 6)
+        && validPageListText(p.excludedItems, 7)
+        && validPageListText(p.excludedItems, 8)
+        && validPageListText(p.excludedItems, 9)
+        && validPageListText(p.excludedItems, 10)
+        && validPageListText(p.excludedItems, 11)
+        && validPageListText(p.excludedItems, 12)
+        && validPageListText(p.excludedItems, 13)
+        && validPageListText(p.excludedItems, 14)
+        && validPageListText(p.excludedItems, 15)
+        && validPageListText(p.excludedItems, 16)
+        && validPageListText(p.excludedItems, 17)
+        && validPageListText(p.excludedItems, 18)
+        && validPageListText(p.excludedItems, 19);
+    }
+
     function validConsultationSettings(d) {
       let fields = [
         'brand', 'headline', 'subheadline', 'price', 'currency', 'durationMinutes',
         'actionDocHours', 'videoUrl', 'videoPoster', 'bookingUrl', 'contactWhatsapp',
         'testimonials', 'updatedAt'
       ];
-      return d.keys().hasAll(fields) && d.keys().hasOnly(fields)
+      return d.keys().hasAll(fields) && d.keys().hasOnly(fields.concat(['pageContent']))
+        && (!('pageContent' in d) || validPageContent(d.pageContent))
         && consultationText(d.brand, 1, 120)
         && consultationText(d.headline, 1, 240)
         && consultationText(d.subheadline, 1, 1000)

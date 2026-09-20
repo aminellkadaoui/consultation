@@ -1,11 +1,13 @@
+import { resolvePageSettings } from './page-content.js?v=content-1';
+import { renderPageContent } from './page-renderer.js?v=content-1';
 import { makeHeroMedia } from './video-preview.js?v=flow-1';
-import { translate } from './translations.js?v=sentence-2';
-import { loadSettings } from './data.js?v=admin-3';
+import { translate } from './translations.js?v=content-1';
+import { loadSettings } from './data.js?v=content-1';
 import { mountConsultationForm } from './Form/component.js?v=shared-form-1';
 import { safeUrl, mediaSource } from './public-utils.js';
 const $=id=>document.getElementById(id);
 const base=window.CONSULTATION_CONFIG||{};
-let settings={...base};
+let settings=resolvePageSettings(base);
 let formController = null;
 let language='ar';
 try {const stored=localStorage.getItem('consultationLanguage');if(stored==='darija')language=stored;}catch{}
@@ -22,8 +24,8 @@ for(const el of document.querySelectorAll('[placeholder],[aria-label]')) {
   for(const attr of ['placeholder','aria-label'])if(el.hasAttribute(attr))staticAttributes.push([el,attr,el.getAttribute(attr)]);
 }
 function renderHeading(config) {
-  const headline=t(config.headline||base.headline),emphasis=t('على ماذا تركز الآن؟');
-  const parts=headline.split(emphasis);
+  const headline=t(config.headline||base.headline),emphasis=t(config.pageContent?.headlineAccent||'ما الخطوة التالية؟');
+  const parts=emphasis?headline.split(emphasis):[headline];
   $('headline').replaceChildren();
   if(parts.length===2)$('headline').append(document.createTextNode(parts[0]),node('span','s',emphasis),document.createTextNode(parts[1]));
   else $('headline').textContent=headline;
@@ -39,6 +41,7 @@ function applyLanguage(nextLanguage,persist=false) {
   for(const [textNode,source] of staticText)if(textNode.isConnected)textNode.textContent=t(source);
   for(const [el,attr,source] of staticAttributes)if(el.isConnected)el.setAttribute(attr,t(source));
   renderHeading(settings);
+  renderPageContent(settings,t);
   formController?.setLanguage(language);
   document.querySelectorAll('#videoContent>a,.wa>a').forEach(el=>el.textContent=t('شاهد الفيديو ↗'));
   if(persist)try{localStorage.setItem('consultationLanguage',language);}catch{}
@@ -59,6 +62,7 @@ function renderSettings(config){
   for(const [selector,value] of Object.entries(values)){if(value!==undefined)document.querySelectorAll(selector).forEach(el=>el.textContent=value);}
   if(config.videoUrl){const media=makeHeroMedia(config.videoUrl,'التعريف باستشارة الإديتورز',config.videoPoster,makeMedia);if(media){$('videoContent').replaceChildren(media);$('videoContent').classList.add('has-media');}}
   renderReviews(Array.isArray(config.testimonials)?config.testimonials:[]);
+  renderPageContent(config,t);
 }
 let cleanupCarousel=()=>{};
 function renderReviews(reviews){
@@ -85,8 +89,8 @@ function renderReviews(reviews){
   if(cards.length)requestAnimationFrame(()=>{moveTo(0);updateActive();});
 }
 // Original reference accordion behavior, with keyboard/assistive-technology state.
-document.querySelectorAll('.faq-q').forEach(q=>q.addEventListener('click',()=>{const open=q.parentElement.classList.toggle('open');q.setAttribute('aria-expanded',String(open));document.getElementById(q.getAttribute('aria-controls')).inert=!open;}));
+$('faq').addEventListener('click',event=>{const q=event.target.closest('.faq-q');if(!q)return;const open=q.parentElement.classList.toggle('open');q.setAttribute('aria-expanded',String(open));document.getElementById(q.getAttribute('aria-controls')).inert=!open;});
 document.querySelectorAll('#langSeg button').forEach(button=>button.addEventListener('click',()=>applyLanguage(button.dataset.lang,true)));
 $('year').textContent=new Date().getFullYear();renderSettings(settings);applyLanguage(language);
-mountConsultationForm($('apply'), { language }).then(controller => { formController = controller; controller.setLanguage(language); }).catch(console.error);
-loadSettings().then(remote=>{if(remote){settings={...base,...remote};renderSettings(settings);}}).catch(err=>console.warn('Using published default consultation content:',err.code||'unavailable'));
+mountConsultationForm($('apply'), { language }).then(controller => { formController = controller; controller.setLanguage(language); renderPageContent(settings,t); }).catch(console.error);
+loadSettings().then(remote=>{if(remote){settings=resolvePageSettings({...base,...remote});renderSettings(settings);}}).catch(err=>console.warn('Using published default consultation content:',err.code||'unavailable'));

@@ -1,3 +1,4 @@
+import { PAGE_DEFAULTS, validatePageContent } from './page-content.js?v=content-1';
 /* Shared data layer. Firebase loads only when a method needs it. */
 import { guardStatusChange, previousStatus } from './request-workflow.js';
 
@@ -26,9 +27,10 @@ export const REQUEST_STATUSES = Object.freeze([
 ]);
 const RESTORABLE_REQUEST_STATUSES = Object.freeze(REQUEST_STATUSES.filter(status => status !== 'trash'));
 const SETTINGS_DEFAULTS = Object.freeze({
+  pageContent: PAGE_DEFAULTS,
   brand: 'أمين',
-  headline: 'تعمل كإديتور، لكنك محتار على ماذا تركز الآن؟',
-  subheadline: 'نراجع المشكلة التي تواجهك، ونحدد ما يحتاج تركيزك الآن، وما تفعله أولًا.',
+  headline: 'تريد تطوير عملك كممنتج، لكنك لا تعرف ما الخطوة التالية؟',
+  subheadline: 'في 60 دقيقة نحدد فيها أولويتك وخطوتك التالية، مع خطة عمل واضحة بعد الجلسة.',
   price: 300, currency: 'درهم مغربي', durationMinutes: 60, actionDocHours: 24,
   videoUrl: '', videoPoster: '', bookingUrl: '', contactWhatsapp: '', testimonials: []
 });
@@ -298,6 +300,7 @@ export async function saveSettings(changes) {
     }
     return testimonial;
   });
+  settings.pageContent = validatePageContent(source.pageContent);
   await dbSDK.setDoc(dbSDK.doc(db, SETTINGS, 'public'), { ...settings, updatedAt: dbSDK.serverTimestamp() });
   return settings;
 }

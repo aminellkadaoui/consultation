@@ -1,0 +1,28 @@
+/* ===== الزر ===== */
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;
+  background:var(--btn);color:#fff;text-decoration:none;
+  min-width:200px;height:52px;padding:0 32px;border-radius:60px;
+  font-family:var(--serif);font-style:italic;font-size:25px;line-height:1;
+  box-shadow:0 0 19px rgba(46,133,255,.34),inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.12);
+  transition:transform .22s ease-out,box-shadow .22s ease}
+.btn span{position:relative;z-index:1}
+.btn:hover{transform:scale(1.05);box-shadow:0 0 28px rgba(46,133,255,.5),inset 0 1px 0 rgba(255,255,255,.38),inset 0 -1px 0 rgba(0,0,0,.12)}
+.btn:active{transform:scale(.98)}
+.btn::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;pointer-events:none;
+  background:linear-gradient(120deg,transparent,rgba(255,255,255,.5),transparent);
+  transform:skewX(-20deg);transition:left 650ms ease}
+.btn:hover::after{left:150%}
+/* العربية: اللمعة تمشي من اليمين إلى اليسار */
+body.rtl .btn::after{left:150%;transform:skewX(20deg);background:linear-gradient(240deg,transparent,rgba(255,255,255,.5),transparent)}
+body.rtl .btn:hover::after{left:-100%}
+
+
+/* Keep existing fonts, widths and form controls. */
+.btn::after{display:block}
+[hidden]{display:none!important}
+.apply-heading{text-align:center;font-size:28px;margin:0 auto 28px;max-width:780px;line-height:1.6}
+.navbar{background:rgba(255,255,255,.72);backdrop-filter:blur(20px) saturate(150%);-webkit-backdrop-filter:blur(20px) saturate(150%)}
+body.rtl .btn{font-family:'Thmanyah Sans',sans-serif;font-style:normal;font-weight:600;font-size:18px}
+body.rtl .navbar>.btn.sm{font-size:16px}
+@media(max-width:620px){body.rtl .navbar>.btn.sm{font-size:14px}.apply-heading{font-size:22px}}
+@media(prefers-reduced-motion:reduce){.btn,.btn::after{transition:none!important}.btn:hover,.btn:active{transform:none}.btn::after{display:none}}

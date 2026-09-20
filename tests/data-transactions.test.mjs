@@ -21,6 +21,7 @@ async function setup(initial) {
   // Inject a test double only into a separately evaluated copy, never into the deployed module.
   globalThis.__dataTestRuntime={auth,dbSDK,db:{}};
   const code=source.replace("'./request-workflow.js'",JSON.stringify(new URL('../request-workflow.js',import.meta.url).href))
+    .replace("'./page-content.js?v=content-1'",JSON.stringify(new URL('../page-content.js',import.meta.url).href))
     .replace('let runtime = null;', 'let runtime = globalThis.__dataTestRuntime;');
   const api=await import('data:text/javascript;base64,'+Buffer.from(code+'\n// '+Math.random()).toString('base64'));
   delete globalThis.__dataTestRuntime;

@@ -11,8 +11,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="admin.css?v=sentence-3">
-  <script src="consultation-config.js?v=admin-8" defer></script>
-  <script src="admin.js?v=admin-4" type="module"></script>
+  <script src="consultation-config.js?v=content-1" defer></script>
+  <link rel="stylesheet" href="admin-ux.css?v=content-1">
+  <link rel="stylesheet" href="admin-notifications.css?v=push-2">
+  <link rel="stylesheet" href="admin-content.css?v=content-1">
+  <script type="module" src="admin-progress.js?v=content-1"></script>
+  <script type="module" src="admin-notifications.js?v=content-1"></script>
+  <script type="module" src="admin-ux.js?v=content-1"></script>
+  <script src="admin.js?v=content-1" type="module"></script>
 </head>
 <body>
   <svg class="svg-library" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs>
@@ -63,6 +69,7 @@
       <p class="sidebar-caption">مساحة العمل</p>
       <nav class="main-nav">
         <button type="button" class="nav-item active" data-view="requests" aria-current="page"><svg><use href="#i-grid"/></svg>طلبات الاستشارة<span class="nav-count" id="nav-count">—</span></button>
+        <button type="button" class="nav-item" id="trash-nav"><svg><use href="#i-trash"/></svg>سلة المهملات<span class="nav-count" id="trash-count">0</span></button>
         <button type="button" class="nav-item" data-view="content"><svg><use href="#i-edit"/></svg>محتوى الصفحة</button>
         <button type="button" class="nav-item" data-view="setup"><svg><use href="#i-help"/></svg>الإعداد والمساعدة</button>
       </nav>
@@ -101,6 +108,7 @@
           <form id="content-form">
             <div class="editor-grid">
               <div class="editor-main">
+                <section class="panel editor-panel"><h2>أقسام الصفحة</h2><div id="page-content-editor"></div></section>
                 <section class="panel editor-section"><div class="section-label"><span>01</span><div><h2>الرسالة الرئيسية</h2><p class="muted">اجعل ما تقدمه واضحًا من أول نظرة.</p></div></div><div class="field"><label for="content-brand">الاسم في الصفحة</label><input id="content-brand" maxlength="80" required></div><div class="field"><label for="content-headline">العنوان الرئيسي</label><textarea id="content-headline" rows="2" maxlength="200" required></textarea></div><div class="field"><label for="content-subheadline">النص تحت العنوان</label><textarea id="content-subheadline" rows="3" maxlength="500" required></textarea></div></section>
                 <section class="panel editor-section"><div class="section-label"><span>02</span><div><h2>فيديو الاستشارة</h2><p class="muted">الفيديو الذي يشرح لمن الجلسة وكيف تساعده.</p></div></div><div class="field"><label for="content-video">رابط الفيديو</label><input type="url" id="content-video" dir="ltr" placeholder="https://www.youtube.com/watch?v=…"><small>رابط YouTube أو Vimeo أو ملف فيديو مباشر بصيغة MP4 أو WebM أو OGG. اتركه فارغًا إلى أن يصبح الفيديو جاهزًا.</small></div><div class="field"><label for="content-poster">صورة غلاف الفيديو <span class="optional">اختياري</span></label><input type="url" id="content-poster" dir="ltr" placeholder="https://…"></div><div id="video-link-preview" class="video-link-preview" hidden><span class="icon-tile"><svg><use href="#i-out"/></svg></span><div><b>الرابط الحالي</b><a id="video-preview-anchor" target="_blank" rel="noopener noreferrer">افتح الفيديو للتأكد منه</a></div></div></section>
                 <section class="panel editor-section"><div class="section-label"><span>03</span><div><h2>آراء من جرّبوا الاستشارة</h2><p class="muted">أضف الآراء الحقيقية بعد موافقة أصحابها على نشرها.</p></div></div><div id="testimonials-editor"></div><div id="no-testimonials" class="small-empty">لم تضف آراء بعد. تظهر في الصفحة عندما تضيفها وتحفظ التغييرات.</div><button type="button" class="button secondary full-width" id="add-testimonial"><svg><use href="#i-plus"/></svg>إضافة رأي</button></section>

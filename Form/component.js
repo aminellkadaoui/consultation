@@ -9,7 +9,7 @@ import {
   validInstagram
 } from '../public-utils.js';
 
-import { submitRequest, REQUEST_LIMITS } from '../data.js?v=admin-3';
+import { submitRequest, REQUEST_LIMITS } from '../data.js?v=content-1';
 import { translate } from '../translations.js?v=sentence-2';
 import { setupPhoneCountryPicker } from './phone-country.js?v=shared-form-1';
 

@@ -1,7 +1,7 @@
 window.CONSULTATION_CONFIG = {
   brand: 'أمين القضاوي',
-  headline: 'تعمل كإديتور، لكنك محتار على ماذا تركز الآن؟',
-  subheadline: 'نراجع المشكلة التي تواجهك، ونحدد ما يحتاج تركيزك الآن، وما تفعله أولًا.',
+  headline: 'تريد تطوير عملك كممنتج، لكنك لا تعرف ما الخطوة التالية؟',
+  subheadline: 'في 60 دقيقة نحدد فيها أولويتك وخطوتك التالية، مع خطة عمل واضحة بعد الجلسة.',
   price: 300, currency: 'درهم', durationMinutes: 60, actionDocHours: 24,
   videoUrl: '', videoPoster: '', testimonials: [], bookingUrl: '', contactWhatsapp: '',
   firebase: {
@@ -13,25 +13,3 @@ window.CONSULTATION_CONFIG = {
     vapidKey: 'BITwgU-dtq183i8b8q07Ei4VzdLkv2zgjanv-2GVKfu2T3-rfHfN3h9qpb4sfPs6kcgNWZ96xZHMGHk3AbynVp8'
   }
 };
-
-if (/(?:^|\/)admin\.html$/.test(location.pathname)) {
-  import('./admin-progress.js?v=progress-4').catch((error) => {
-    console.error('Progress admin extension failed:', error);
-  });
-
-  const notificationStyles = document.createElement('link');
-  notificationStyles.rel = 'stylesheet';
-  notificationStyles.href = './admin-notifications.css?v=push-2';
-  document.head.append(notificationStyles);
-  import('./admin-notifications.js?v=push-3').catch((error) => {
-    console.error('Admin notification settings failed:', error);
-  });
-
-  const adminUxStyles = document.createElement('link');
-  adminUxStyles.rel = 'stylesheet';
-  adminUxStyles.href = './admin-ux.css?v=archive-ux-4';
-  document.head.append(adminUxStyles);
-  import('./admin-ux.js?v=archive-ux-5').catch((error) => {
-    console.error('Admin UX extension failed:', error);
-  });
-}

@@ -1,0 +1,13 @@
+.content-section-editor{border:1px solid #e5e7f0;border-radius:18px;margin-top:14px;background:#fff;overflow:hidden}
+.content-section-editor summary{padding:18px 20px;cursor:pointer;font-weight:600;line-height:1.6}
+.content-section-editor[open] summary{border-bottom:1px solid #e5e7f0;background:#f8f9fd}
+.content-section-body{padding:20px}.content-section-body .field+.field{margin-top:16px}
+.section-visibility{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.visibility-option{display:flex!important;align-items:center;gap:10px;margin:0!important;padding:12px;border:1px solid #e5e7f0;border-radius:12px;cursor:pointer}
+.visibility-option input{width:20px!important;height:20px!important;min-height:20px!important;flex:none;accent-color:#0f6bff;margin:0}
+.content-edit-item{border:1px solid #e5e7f0;background:#fafbfe;border-radius:14px;padding:18px;margin-bottom:16px}
+.content-item-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}.content-item-actions .button{padding:8px 12px;min-height:40px}
+@media(max-width:620px){.section-visibility{grid-template-columns:1fr}.content-section-body{padding:14px}.content-edit-item{padding:14px}}
+
+.editor-panel{padding:24px}
+@media(max-width:680px){.editor-panel{padding:18px 14px}.main-nav{grid-template-columns:repeat(4,minmax(0,1fr))}}

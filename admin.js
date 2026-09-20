@@ -1,4 +1,6 @@
-import { login, logout, onAuth, getCurrentUser, listRequests, updateRequest, loadSettings, saveSettings } from './data.js?v=admin-3';
+import { resolvePageSettings } from './page-content.js?v=content-1';
+import { mountContentEditor } from './admin-content.js?v=content-1';
+import { login, logout, onAuth, getCurrentUser, listRequests, updateRequest, loadSettings, saveSettings } from './data.js?v=content-1';
 import { mediaSource, normalizeInstagram, normalizeWhatsapp } from './public-utils.js';
 import { statusLabels, requestFieldList, normalizeRequest, presentRequest, plainValue, csvCell, briefFor } from './request-presenter.js';
 
@@ -7,7 +9,8 @@ import { connectAdmin, publishAdmin } from './admin-store.js';
 
 const $ = (id) => document.getElementById(id);
 const formFields = requestFieldList;
-const settingsKeys = ['brand', 'headline', 'subheadline', 'videoUrl', 'videoPoster', 'testimonials', 'price', 'currency', 'durationMinutes', 'actionDocHours', 'bookingUrl', 'contactWhatsapp'];
+let pageEditor;
+const settingsKeys = ['pageContent', 'brand', 'headline', 'subheadline', 'videoUrl', 'videoPoster', 'testimonials', 'price', 'currency', 'durationMinutes', 'actionDocHours', 'bookingUrl', 'contactWhatsapp'];
 let requests = [];
 let settings = {};
 let currentUser = null;
@@ -303,6 +306,8 @@ function addTestimonial(item = {}, focus = false) {
   if (focus) { card.querySelector('input').focus(); setContentDirty(); }
 }
 function populateContent(value) {
+  value = resolvePageSettings(value);
+  pageEditor = mountContentEditor($('page-content-editor'),value.pageContent,setContentDirty);
   settings = {};
   for (const key of settingsKeys) if (value[key] !== undefined) settings[key] = value[key];
   $('content-brand').value = value.brand || 'أمين القداوي';
@@ -348,7 +353,7 @@ function collectContent() {
     for (const field of card.querySelectorAll('[data-field]')) item[field.dataset.field] = field.value.trim();
     return item;
   });
-  const next = { ...settings, brand: $('content-brand').value.trim(), headline: $('content-headline').value.trim(), subheadline: $('content-subheadline').value.trim(), videoUrl: $('content-video').value.trim(), videoPoster: $('content-poster').value.trim(), price: Number($('content-price').value), currency: settings.currency || 'درهم', durationMinutes: Number($('content-duration').value), actionDocHours: Number($('content-delivery').value), bookingUrl: $('content-booking').value.trim(), testimonials: reviews };
+  const next = { ...settings, pageContent: pageEditor.read(), brand: $('content-brand').value.trim(), headline: $('content-headline').value.trim(), subheadline: $('content-subheadline').value.trim(), videoUrl: $('content-video').value.trim(), videoPoster: $('content-poster').value.trim(), price: Number($('content-price').value), currency: settings.currency || 'درهم', durationMinutes: Number($('content-duration').value), actionDocHours: Number($('content-delivery').value), bookingUrl: $('content-booking').value.trim(), testimonials: reviews };
   if (!next.brand || !next.headline || !next.subheadline) throw new Error('أكمل الاسم والعنوان الرئيسي والنص الذي تحته.');
   for (const [key, label] of [['videoUrl', 'الفيديو'], ['videoPoster', 'صورة الغلاف'], ['bookingUrl', 'الحجز']]) if (!validHttps(next[key])) throw new Error(`استخدم رابط HTTPS صحيحًا في خانة ${label}.`);
   if (!supportedVideo(next.videoUrl)) throw new Error('رابط الفيديو يجب أن يكون من YouTube أو Vimeo أو ملف MP4 أو WebM أو OGG مباشر.');
@@ -366,6 +371,8 @@ function switchView(name) {
     const active = button.dataset.view === name; button.classList.toggle('active', active);
     if (active) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current');
   }
+  $('trash-nav').classList.remove('active');
+  $('trash-nav').removeAttribute('aria-current');
   $('view-label').textContent = labels[name];
   window.scrollTo({ top: 0, behavior: 'instant' });
 }

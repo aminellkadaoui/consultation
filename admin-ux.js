@@ -1,4 +1,4 @@
-import { updateRequest, moveRequestToTrash, restoreRequest, deleteRequest } from './data.js?v=admin-3';
+import { updateRequest, moveRequestToTrash, restoreRequest, deleteRequest } from './data.js?v=content-1';
 import { adminSnapshot, adminActions, subscribeAdmin } from './admin-store.js';
 
 const $ = (id) => document.getElementById(id);
@@ -160,6 +160,16 @@ function ensureTrashOptions() {
   }
 }
 
+function mountTrashNavigation() {
+  $('trash-nav')?.addEventListener('click', () => {
+    document.querySelector('[data-view="requests"]').click();
+    $('status-filter').value='trash';
+    $('status-filter').dispatchEvent(new Event('change',{bubbles:true}));
+  });
+  document.querySelector('[data-view="requests"]')?.addEventListener('click',()=>{
+    $('status-filter').value='all';$('status-filter').dispatchEvent(new Event('change',{bubbles:true}));
+  });
+}
 function mountQuickFilters() {
   ensureTrashOptions();
   const select = $('status-filter');
@@ -194,6 +204,15 @@ function mountQuickFilters() {
 
 function syncQuickFilters() {
   const value = $('status-filter')?.value || 'all';
+  const trash = value === 'trash';
+  if($('trash-count')) $('trash-count').textContent=requestCache.filter(item=>item.status==='trash').length;
+  if(!$('requests-view').hidden){
+    $('trash-nav')?.classList.toggle('active',trash);
+    $('trash-nav')?.setAttribute('aria-current',trash?'page':'false');
+    document.querySelector('[data-view="requests"]').classList.toggle('active',!trash);
+    $('requests-title').textContent=trash?'سلة المهملات':'طلبات الاستشارة';
+    $('view-label').textContent=trash?'سلة المهملات':'طلبات الاستشارة';
+  }
   document.querySelectorAll('.request-quick-filter').forEach((button) => {
     button.classList.toggle('is-active', button.dataset.status === value);
     button.setAttribute('aria-pressed', String(button.dataset.status === value));
@@ -581,6 +600,7 @@ function mount() {
   if (mounted) return;
   mounted = true;
   ensureTrashOptions();
+  mountTrashNavigation();
   mountQuickFilters();
   mountStatusShortcuts();
   mountDetailTools();
