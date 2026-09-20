@@ -1,4 +1,4 @@
-import { updateRequest, moveRequestToTrash, restoreRequest, deleteRequest } from './data.js?v=content-1';
+import { updateRequest, moveRequestToTrash, restoreRequest, deleteRequest } from './data.js?v=content-2';
 import { adminSnapshot, adminActions, subscribeAdmin } from './admin-store.js';
 
 const $ = (id) => document.getElementById(id);

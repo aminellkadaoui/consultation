@@ -1,4 +1,4 @@
-import { submitRequest } from '../data.js?v=content-1';
+import { submitRequest } from '../data.js?v=content-2';
 import { normalizeWhatsapp, normalizeInstagram } from '../public-utils.js';
 
 const $ = (id) => document.getElementById(id);

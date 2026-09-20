@@ -1,4 +1,4 @@
-import { onAuth } from './data.js?v=content-1';
+import { onAuth } from './data.js?v=content-2';
 
 const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
 const APP_NAME = 'consultation';

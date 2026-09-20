@@ -301,7 +301,20 @@ export async function saveSettings(changes) {
     return testimonial;
   });
   settings.pageContent = validatePageContent(source.pageContent);
-  await dbSDK.setDoc(dbSDK.doc(db, SETTINGS, 'public'), { ...settings, updatedAt: dbSDK.serverTimestamp() });
+  const ref = dbSDK.doc(db, SETTINGS, 'public');
+  try {
+    await dbSDK.setDoc(ref, { ...settings, updatedAt: dbSDK.serverTimestamp() });
+  } catch (error) {
+    // Keep the existing editor usable while the optional content rules roll out.
+    // Never omit an actual section edit or overwrite already-saved section data.
+    if (error?.code === 'permission-denied' && !existing?.pageContent
+        && JSON.stringify(settings.pageContent) === JSON.stringify(PAGE_DEFAULTS)) {
+      const { pageContent, ...legacySettings } = settings;
+      await dbSDK.setDoc(ref, { ...legacySettings, updatedAt: dbSDK.serverTimestamp() });
+    } else if (error?.code === 'permission-denied') {
+      throw invalid('لم تُحفظ تغييرات الأقسام. يلزم نشر قواعد محرر الصفحة الجديدة في Firebase أولًا.');
+    } else throw error;
+  }
   return settings;
 }
 

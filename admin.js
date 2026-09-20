@@ -1,6 +1,6 @@
 import { resolvePageSettings } from './page-content.js?v=content-1';
 import { mountContentEditor } from './admin-content.js?v=content-1';
-import { login, logout, onAuth, getCurrentUser, listRequests, updateRequest, loadSettings, saveSettings } from './data.js?v=content-1';
+import { login, logout, onAuth, getCurrentUser, listRequests, updateRequest, loadSettings, saveSettings } from './data.js?v=content-2';
 import { mediaSource, normalizeInstagram, normalizeWhatsapp } from './public-utils.js';
 import { statusLabels, requestFieldList, normalizeRequest, presentRequest, plainValue, csvCell, briefFor } from './request-presenter.js';
 
