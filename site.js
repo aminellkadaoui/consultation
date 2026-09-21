@@ -1,5 +1,5 @@
-import { resolvePageSettings } from './page-content.js?v=faq-order-1';
-import { renderPageContent } from './page-renderer.js?v=faq-order-1';
+import { resolvePageSettings } from './page-content.js?v=scope-copy-1';
+import { renderPageContent } from './page-renderer.js?v=scope-copy-1';
 import { makeHeroMedia } from './video-preview.js?v=flow-1';
 import { translate } from './translations.js?v=content-1';
 import { loadSettings } from './data.js?v=content-2';
