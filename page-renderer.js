@@ -1,4 +1,4 @@
-import { normalizePageContent } from './page-content.js?v=scope-copy-1';
+import { normalizePageContent } from './page-content.js?v=scope-copy-2';
 const $ = selector => document.querySelector(selector);
 const node = (tag, cls, text) => {const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 export function renderPageContent(config,t=s=>s) {
